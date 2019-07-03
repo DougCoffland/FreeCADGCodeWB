@@ -109,6 +109,10 @@ class Tool():
 		self.createToolUi = FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + "/resources/ui/tool.ui")
 		
 		self.straightToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/png/straightBitPic.png")				
+		self.taperedToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/png/taperedBitPic.png")				
+		self.conicalToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/png/conicalBitPic.png")				
+		self.ballToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/png/ballBitPic.png")				
+		self.taperedBallToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/png/taperedBallBitPic.png")				
 		
 	def GetResources(self):
 		return {'Pixmap'  : os.path.dirname(__file__) +  "/resources/svg/tool.svg", # the name of a svg file available in the resources
@@ -119,6 +123,10 @@ class Tool():
 		i = self.createToolUi.toolTypeCB.currentIndex()
 		self.createToolUi.stackedWidget.setCurrentIndex(i)
 		if i == 1: self.createToolUi.imageLabel.setPixmap(self.straightToolPic)
+		elif i == 2: self.createToolUi.imageLabel.setPixmap(self.taperedToolPic)
+		elif i == 3: self.createToolUi.imageLabel.setPixmap(self.conicalToolPic)
+		elif i == 4: self.createToolUi.imageLabel.setPixmap(self.ballToolPic)
+		elif i == 5: self.createToolUi.imageLabel.setPixmap(self.taperedBallToolPic)
 		else: self.createToolUi.imageLabel.setPixmap(None)
 
 	def Activated(self):

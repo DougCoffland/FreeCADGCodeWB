@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   sodipodi:docname="straightTool.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.35"
+     inkscape:cx="-245.71429"
+     inkscape:cy="320"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:snap-global="false"
+     inkscape:window-width="1675"
+     inkscape:window-height="962"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#ffa000;fill-opacity:1;stroke:none;stroke-width:2.64583325;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect815"
+       width="44.601189"
+       height="102.05357"
+       x="102.05357"
+       y="147.32143"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577" />
+    <rect
+       style="fill:#d4a000;fill-opacity:1;stroke:none;stroke-width:3.97118759;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect817"
+       width="30.424646"
+       height="92.412743"
+       x="109.51982"
+       y="55.757912"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577" />
+    <path
+       style="fill:#cd8700;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 146.65476,154.12501 -44.60119,89.20238 0.75595,6.04762 h 15.11905 l 28.72619,-59.72024 z"
+       id="path822"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccc"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:6.3499999px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="81.64286"
+       y="257.69046"
+       id="text826"><tspan
+         sodipodi:role="line"
+         id="tspan824"
+         x="81.64286"
+         y="263.30872"
+         style="font-size:6.3499999px;stroke-width:0.26458332" /></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.69999981px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="92.226196"
+       y="281.125"
+       id="text846"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"><tspan
+         sodipodi:role="line"
+         id="tspan844"
+         x="92.226196"
+         y="281.125"
+         style="stroke-width:0.26458332">Diameter</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.69999981px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="78.619049"
+       y="33.172619"
+       id="text850"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"><tspan
+         sodipodi:role="line"
+         id="tspan848"
+         x="78.619049"
+         y="33.172619"
+         style="stroke-width:0.26458332">Shaft Diameter</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.69999981px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="-185.56552"
+       y="37.691906"
+       id="text854"
+       transform="rotate(-90)"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"><tspan
+         sodipodi:role="line"
+         id="tspan852"
+         x="-185.56552"
+         y="37.691906"
+         style="stroke-width:0.26458332">Tool Length</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.69999981px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="-224.13225"
+       y="77.014565"
+       id="text858"
+       transform="rotate(-90)"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"><tspan
+         sodipodi:role="line"
+         id="tspan856"
+         x="-224.13225"
+         y="77.014565"
+         style="stroke-width:0.26458332">Cut Length</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 98.273809,149.58929 c -11.18799,-3.70039 -13.255581,6.39831 -10.583334,26.45833 2.762181,11.63395 -0.09668,11.81631 -6.803571,15.875 11.709341,6.64045 9.937336,12.7589 7.559522,17.3869 -0.688955,26.05161 -0.503709,37.73379 9.071429,36.28572"
+       id="path860"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 87.72844,61.839739 c -29.399926,-2.744898 -37.210689,34.71257 -32.505954,71.815481 2.762181,11.63395 -0.09668,11.81631 -6.803571,15.875 11.709342,6.64045 10.693288,25.61009 8.315474,30.23809 -2.535267,28.20564 -4.424264,65.86829 15.875002,67.27977"
+       id="path860-2"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.05232072;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 138.0087,54.206948 c 1.14455,-11.485995 -1.97907,-13.608658 -8.1838,-10.86524 -3.59849,2.835754 -3.65488,-0.09927 -4.91027,-6.984793 -2.05396,12.021235 -3.94644,10.202035 -5.37792,7.760889 -8.058,-0.707311 -11.6714,-0.517127 -11.2235,9.313049"
+       id="path860-5"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 101.86524,251.09593 c -1.74799,11.39773 3.02244,13.50407 12.49843,10.78174 5.49566,-2.81396 5.58181,0.0985 7.49906,6.93111 3.13682,-11.92884 6.02707,-10.12363 8.21325,-7.70123 12.3063,0.70186 17.82474,0.51315 17.1407,-9.24148"
+       id="path860-4"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577" />
+  </g>
+</svg>

@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   sodipodi:docname="taperedTool.svg">
+  <defs
+     id="defs2">
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow2Lend"
+       style="overflow:visible;"
+       inkscape:isstock="true">
+      <path
+         id="path993"
+         style="fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round;stroke:#000000;stroke-opacity:1;fill:#000000;fill-opacity:1"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+         transform="scale(1.1) rotate(180) translate(1,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Mend"
+       style="overflow:visible;"
+       inkscape:isstock="true">
+      <path
+         id="path981"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1;fill:#000000;fill-opacity:1"
+         transform="scale(0.4) rotate(180) translate(10,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Send"
+       style="overflow:visible;"
+       inkscape:isstock="true">
+      <path
+         id="path987"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1;fill:#000000;fill-opacity:1"
+         transform="scale(0.2) rotate(180) translate(6,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend-4"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path993-6"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend-2"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path993-2"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend-2-5"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path993-2-4"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend-8"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path993-9"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend-2-5-0"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path993-2-4-2"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend-8-1"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path993-9-0"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.35"
+     inkscape:cx="397.81171"
+     inkscape:cy="709.35115"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:snap-global="false"
+     inkscape:window-width="1675"
+     inkscape:window-height="962"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:6.3499999px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="81.64286"
+       y="257.69046"
+       id="text826"><tspan
+         sodipodi:role="line"
+         id="tspan824"
+         x="81.64286"
+         y="263.30872"
+         style="font-size:6.3499999px;stroke-width:0.26458332" /></text>
+    <path
+       style="fill:#ffa000;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 156.48214,148.07737 -64.255951,0.75596 15.875001,72.57142 35.52976,0.75596 z"
+       id="path939"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/taperedBitPic.png"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577" />
+    <rect
+       style="fill:#d4a000;fill-opacity:1;stroke:none;stroke-width:3.97118759;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect817"
+       width="30.424646"
+       height="92.412743"
+       x="109.51982"
+       y="55.757912"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/taperedBitPic.png" />
+    <path
+       style="fill:#cd8700;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 156.48214,149.5893 -49.1369,61.98809 -1e-5,10.58334 15.87501,-0.75596 26.45833,-29.48214 z"
+       id="path822"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccc"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/taperedBitPic.png" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.69999981px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="125.78649"
+       y="259.20236"
+       id="text846"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/taperedBitPic.png"><tspan
+         sodipodi:role="line"
+         x="125.78649"
+         y="259.20236"
+         style="text-align:center;text-anchor:middle;stroke-width:0.26458332"
+         id="tspan941">Bottom</tspan><tspan
+         sodipodi:role="line"
+         x="125.78649"
+         y="275.07736"
+         style="text-align:center;text-anchor:middle;stroke-width:0.26458332"
+         id="tspan945">Diameter</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.69999981px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="76.351189"
+       y="27.880953"
+       id="text850"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/taperedBitPic.png"><tspan
+         sodipodi:role="line"
+         id="tspan848"
+         x="76.351189"
+         y="27.880953"
+         style="stroke-width:0.26458332">Shaft Diameter</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.69999981px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="-185.56552"
+       y="37.691906"
+       id="text854"
+       transform="rotate(-90)"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/taperedBitPic.png"><tspan
+         sodipodi:role="line"
+         id="tspan852"
+         x="-185.56552"
+         y="37.691906"
+         style="stroke-width:0.26458332">Tool Length</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.69999981px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="-212.037"
+       y="67.94313"
+       id="text858"
+       transform="rotate(-90)"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/taperedBitPic.png"><tspan
+         sodipodi:role="line"
+         id="tspan856"
+         x="-212.037"
+         y="67.94313"
+         style="stroke-width:0.26458332">Cut Length</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.87035197;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 90.030616,150.09717 c -11.276767,-2.78103 -13.360764,4.80864 -10.667313,19.88473 2.784099,8.74348 -0.09745,8.88053 -6.857557,11.93084 11.802255,4.99062 10.016189,9.58894 7.619507,13.06711 -0.694422,19.57906 -0.507706,28.35879 9.143411,27.27049"
+       id="path860"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/taperedBitPic.png" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.94416481;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 80.953493,58.016499 C 51.511738,55.573044 43.689862,88.916958 48.401291,121.94526 c 2.766111,10.35631 -0.09682,10.51865 -6.813251,14.13162 11.726002,5.91119 10.708502,22.7976 8.327305,26.91736 -2.538874,25.10811 -4.430559,58.63468 15.897588,59.89115"
+       id="path860-2"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/taperedBitPic.png" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.69999981px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="-132.81938"
+       y="165.93509"
+       id="text846-0"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"
+       transform="rotate(-90)"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/taperedBitPic.png"><tspan
+         sodipodi:role="line"
+         x="-132.81938"
+         y="177.17162"
+         style="text-align:center;text-anchor:middle;stroke-width:0.26458332"
+         id="tspan941-5" /><tspan
+         sodipodi:role="line"
+         x="-132.81938"
+         y="193.04662"
+         style="text-align:center;text-anchor:middle;stroke-width:0.26458332"
+         id="tspan945-9">Top Diameter</tspan></text>
+    <g
+       id="g1411"
+       transform="translate(3.7797619,30.427083)"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/taperedBitPic.png"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577">
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path970"
+         d="m 68.791666,105.74405 18.142857,-1e-5"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend)" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path1407"
+         d="m 88.446426,94.404761 10e-7,23.434519"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       transform="matrix(-1,0,0,1,244.98958,29.671135)"
+       id="g1411-4"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/taperedBitPic.png"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577">
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path970-7"
+         d="m 68.791666,105.74405 18.142857,-1e-5"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend-2)" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path1407-7"
+         d="m 88.446426,94.404761 10e-7,23.434519"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       transform="matrix(-1,0,0,1,228.73661,-61.610116)"
+       id="g1411-4-8"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/taperedBitPic.png"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577">
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path970-7-1"
+         d="m 68.791666,105.74405 18.142857,-1e-5"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend-2-5)" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path1407-7-2"
+         d="m 88.446426,94.404761 10e-7,23.434519"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       id="g1411-3"
+       transform="translate(21.105656,-61.610115)"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/taperedBitPic.png"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577">
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path970-6"
+         d="m 68.791666,105.74405 18.142857,-1e-5"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend-8)" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path1407-8"
+         d="m 88.446426,94.404761 10e-7,23.434519"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       transform="matrix(-1,0,0,1,233.08333,128.13393)"
+       id="g1411-4-8-5"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/taperedBitPic.png"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577">
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path970-7-1-1"
+         d="m 68.791666,105.74405 18.142857,-1e-5"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend-2-5-0)" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path1407-7-2-1"
+         d="m 88.446426,94.404761 10e-7,23.434519"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       id="g1411-3-0"
+       transform="translate(19.404759,128.13393)"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/taperedBitPic.png"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577">
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path970-6-8"
+         d="m 68.791666,105.74405 18.142857,-1e-5"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend-8-1)" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path1407-8-5"
+         d="m 88.446426,94.404761 10e-7,23.434519"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+  </g>
+</svg>

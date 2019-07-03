@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   sodipodi:docname="ballTool.svg">
+  <defs
+     id="defs2">
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow2Lend"
+       style="overflow:visible;"
+       inkscape:isstock="true">
+      <path
+         id="path993"
+         style="fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round;stroke:#000000;stroke-opacity:1;fill:#000000;fill-opacity:1"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+         transform="scale(1.1) rotate(180) translate(1,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Mend"
+       style="overflow:visible;"
+       inkscape:isstock="true">
+      <path
+         id="path981"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1;fill:#000000;fill-opacity:1"
+         transform="scale(0.4) rotate(180) translate(10,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Send"
+       style="overflow:visible;"
+       inkscape:isstock="true">
+      <path
+         id="path987"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1;fill:#000000;fill-opacity:1"
+         transform="scale(0.2) rotate(180) translate(6,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend-4"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path993-6"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend-2"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path993-2"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend-2-5"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path993-2-4"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend-8"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path993-9"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend-2-5-0"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path993-2-4-2"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend-8-1"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path993-9-0"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.7"
+     inkscape:cx="434.94863"
+     inkscape:cy="707.06771"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:snap-global="false"
+     inkscape:window-width="1675"
+     inkscape:window-height="962"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:6.3499999px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="81.64286"
+       y="257.69046"
+       id="text826"><tspan
+         sodipodi:role="line"
+         id="tspan824"
+         x="81.64286"
+         y="263.30872"
+         style="font-size:6.3499999px;stroke-width:0.26458332" /></text>
+    <rect
+       style="fill:#d4a000;fill-opacity:1;stroke:none;stroke-width:3.97118759;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect817"
+       width="30.424646"
+       height="92.412743"
+       x="109.14185"
+       y="56.135887"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/ballBitPic.png" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.69999981px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="76.351189"
+       y="27.880953"
+       id="text850"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/ballBitPic.png"><tspan
+         sodipodi:role="line"
+         id="tspan848"
+         x="76.351189"
+         y="27.880953"
+         style="stroke-width:0.26458332">Shaft Diameter</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.69999981px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="-156.83934"
+       y="24.46274"
+       id="text854"
+       transform="rotate(-90)"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/ballBitPic.png"><tspan
+         sodipodi:role="line"
+         id="tspan852"
+         x="-156.83934"
+         y="24.46274"
+         style="stroke-width:0.26458332">Tool Length</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.69999981px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="-197.6739"
+       y="67.18718"
+       id="text858"
+       transform="rotate(-90)"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/ballBitPic.png"><tspan
+         sodipodi:role="line"
+         id="tspan856"
+         x="-197.6739"
+         y="67.18718"
+         style="stroke-width:0.26458332">Cut Length</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.56075209;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 90.22003,149.62326 c -11.507591,-1.13125 -13.634245,1.95603 -10.885662,8.08858 2.841087,3.55661 -0.09945,3.61236 -6.997924,4.85314 12.043835,2.03005 10.22121,3.90052 7.77547,5.31535 -0.708636,7.96423 -0.518098,11.53559 9.330568,11.0929"
+       id="path860"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/ballBitPic.png" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.81340277;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 69.307073,56.40995 c -29.545141,-1.807164 -37.394484,22.853789 -32.66651,47.28132 2.775824,7.65946 -0.09716,7.77953 -6.837176,10.45166 11.767178,4.37188 10.746105,16.86096 8.356546,19.90791 -2.547789,18.56981 -4.446117,43.36585 15.953413,44.29513"
+       id="path860-2"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/ballBitPic.png" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.69999981px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="-132.81938"
+       y="165.93509"
+       id="text846-0"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"
+       transform="rotate(-90)"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/ballBitPic.png"><tspan
+         sodipodi:role="line"
+         x="-132.81938"
+         y="177.17162"
+         style="text-align:center;text-anchor:middle;stroke-width:0.26458332"
+         id="tspan941-5" /><tspan
+         sodipodi:role="line"
+         x="-132.81938"
+         y="193.04662"
+         style="text-align:center;text-anchor:middle;stroke-width:0.26458332"
+         id="tspan945-9">Ball Diameter</tspan></text>
+    <g
+       id="g1411"
+       transform="translate(3.7797619,30.427083)"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/ballBitPic.png"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577">
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path970"
+         d="m 68.791666,105.74405 18.142857,-1e-5"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend)" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path1407"
+         d="m 88.446426,94.404761 10e-7,23.434519"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       transform="matrix(-1,0,0,1,244.98958,29.671135)"
+       id="g1411-4"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/ballBitPic.png"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577">
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path970-7"
+         d="m 68.791666,105.74405 18.142857,-1e-5"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend-2)" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path1407-7"
+         d="m 88.446426,94.404761 10e-7,23.434519"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       transform="matrix(-1,0,0,1,228.73661,-61.610116)"
+       id="g1411-4-8"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/ballBitPic.png"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577">
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path970-7-1"
+         d="m 68.791666,105.74405 18.142857,-1e-5"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend-2-5)" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path1407-7-2"
+         d="m 88.446426,94.404761 10e-7,23.434519"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       id="g1411-3"
+       transform="translate(21.105656,-61.610115)"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/ballBitPic.png"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577">
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path970-6"
+         d="m 68.791666,105.74405 18.142857,-1e-5"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend-8)" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path1407-8"
+         d="m 88.446426,94.404761 10e-7,23.434519"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <path
+       style="fill:#ffa000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4716"
+       sodipodi:type="arc"
+       sodipodi:cx="124.35416"
+       sodipodi:cy="149.2113"
+       sodipodi:rx="32.505951"
+       sodipodi:ry="32.505951"
+       sodipodi:start="6.246454"
+       sodipodi:end="3.1612381"
+       sodipodi:open="true"
+       d="m 156.83818,148.01759 a 32.505951,32.505951 0 0 1 -15.72869,29.04862 32.505951,32.505951 0 0 1 -33.03232,0.2822 32.505951,32.505951 0 0 1 -16.222692,-28.77566"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/ballBitPic.png"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577" />
+    <path
+       style="fill:#cd8700;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 157.23808,148.45537 -41.57737,31.75 c 24.41289,2.01818 19.67485,0.0918 28.34821,-5.66964 9.80953,-7.83367 14.30641,-13.34886 13.22916,-26.08036 z"
+       id="path822"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc"
+       inkscape:export-xdpi="34.193577"
+       inkscape:export-ydpi="34.193577"
+       inkscape:export-filename="/home/doug/FreeCADGCodeWB/buildbotics/resources/png/ballBitPic.png" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot4720"
+       style="font-style:normal;font-weight:normal;font-size:48px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       transform="scale(0.26458333)"><flowRegion
+         id="flowRegion4722"><rect
+           id="rect4724"
+           width="5.7142859"
+           height="774.28571"
+           x="-45.714287"
+           y="29.662542" /></flowRegion><flowPara
+         id="flowPara4726"></flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot4728"
+       style="font-style:normal;font-weight:normal;font-size:48px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       transform="scale(0.26458333)"><flowRegion
+         id="flowRegion4730"><rect
+           id="rect4732"
+           width="992.85712"
+           height="708.57141"
+           x="-31.428572"
+           y="68.233971" /></flowRegion><flowPara
+         id="flowPara4734"></flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot4736"
+       style="fill:black;fill-opacity:1;stroke:none;font-family:sans-serif;font-style:normal;font-weight:normal;font-size:48px;line-height:1.25;letter-spacing:0px;word-spacing:0px"><flowRegion
+         id="flowRegion4738"><rect
+           id="rect4740"
+           width="1090"
+           height="900"
+           x="-178.57143"
+           y="-78.90889" /></flowRegion><flowPara
+         id="flowPara4742"></flowPara></flowRoot>  </g>
+</svg>
