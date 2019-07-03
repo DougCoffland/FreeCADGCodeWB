@@ -172,7 +172,7 @@ static char * cnc_xpm[] = {
 class GCodeProject():
 	def __init__(self):
 		self.jobList = []
-		self.defineJobUi =  FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + '/resources/createjob.ui')
+		self.defineJobUi =  FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + '/resources/ui/createjob.ui')
 		self.defineJobUi.buttonBox.accepted.connect(self.accept)
 		self.defineJobUi.buttonBox.rejected.connect(self.reject)
 		self.defineJobUi.nameLE.textChanged.connect(self.validate)
@@ -181,7 +181,7 @@ class GCodeProject():
 		doubleValid = VALID.MyDoubleValidator()	
 
 	def GetResources(self):
-		return {'Pixmap'  : os.path.dirname(__file__) + '/resources/cnc.svg', # the name of a svg file available in the resources
+		return {'Pixmap'  : os.path.dirname(__file__) + '/resources/svg/cnc.svg', # the name of a svg file available in the resources
                 'MenuText': "New GCode Project",
                 'ToolTip' : "Sets up a new project for creating G-Code paths from FreeCAD Shapes"}
 

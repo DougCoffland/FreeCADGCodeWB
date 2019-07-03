@@ -195,12 +195,12 @@ static char * tooltable_xpm[] = {
 
 class ToolTable():
 	def __init__(self):
-		self.createTTUi =  FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + "/resources/tooltable.ui")
+		self.createTTUi =  FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + "/resources/ui/tooltable.ui")
 		self.createTTUi.buttonBox.accepted.connect(self.accept)
 		self.createTTUi.buttonBox.rejected.connect(self.reject)
 
 	def GetResources(self):
-		return {'Pixmap'  : os.path.dirname(__file__) +  "/resources/tooltable.svg", # the name of a svg file available in the resources
+		return {'Pixmap'  : os.path.dirname(__file__) +  "/resources/svg/tooltable.svg", # the name of a svg file available in the resources
                 'MenuText': "New Tool Table",
                 'ToolTip' : "Sets up a new tool table that an be used for creating G-Code paths from FreeCAD Shapes"}
 

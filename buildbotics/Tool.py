@@ -106,12 +106,12 @@ static char * tool_xpm[] = {
 		
 class Tool():
 	def __init__(self):
-		self.createToolUi = FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + "/resources/tool.ui")
+		self.createToolUi = FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + "/resources/ui/tool.ui")
 		
-		self.straightToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/straightBitPic.png")				
+		self.straightToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/png/straightBitPic.png")				
 		
 	def GetResources(self):
-		return {'Pixmap'  : os.path.dirname(__file__) +  "/resources/tool.svg", # the name of a svg file available in the resources
+		return {'Pixmap'  : os.path.dirname(__file__) +  "/resources/svg/tool.svg", # the name of a svg file available in the resources
                 'MenuText': "New Tool",
                 'ToolTip' : "Sets up a new tool that can be added to a tool table"}
                 
