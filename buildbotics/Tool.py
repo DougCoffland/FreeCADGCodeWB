@@ -107,7 +107,6 @@ static char * tool_xpm[] = {
 class Tool():
 	def __init__(self):
 		self.createToolUi = FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + "/resources/tool.ui")
-		self.toolHelpUi = FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + "/resources/toolHelp.ui")
 		
 		self.straightToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/straightBitPic.png")				
 		
