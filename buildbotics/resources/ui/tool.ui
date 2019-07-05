@@ -56,7 +56,7 @@
          <item>
           <layout class="QFormLayout" name="formLayout">
            <item row="0" column="1">
-            <widget class="QLineEdit" name="lineEdit"/>
+            <widget class="QLineEdit" name="nameEdit"/>
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label_2">
@@ -66,16 +66,16 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="lineEdit_2"/>
+            <widget class="QLineEdit" name="numberEdit"/>
            </item>
-           <item row="2" column="0">
+           <item row="4" column="0">
             <widget class="QLabel" name="label_3">
              <property name="text">
               <string>Tool Type</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
+           <item row="4" column="1">
             <widget class="QComboBox" name="toolTypeCB">
              <item>
               <property name="text">
@@ -116,17 +116,27 @@
              </property>
             </widget>
            </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_31">
+             <property name="text">
+              <string>Make</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="makeEdit"/>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_32">
+             <property name="text">
+              <string>Model</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="modelEdit"/>
+           </item>
           </layout>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_31">
-           <property name="text">
-            <string>Notes</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QTextEdit" name="textEdit"/>
          </item>
          <item>
           <widget class="QLabel" name="label_10">
@@ -143,55 +153,65 @@
          </item>
          <item>
           <layout class="QFormLayout" name="formLayout_2">
-           <item row="2" column="0">
+           <item row="3" column="0">
             <widget class="QLabel" name="label_5">
              <property name="text">
               <string>Plunge Feed Rate</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="lineEdit_4"/>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="plungeRateEdit"/>
            </item>
-           <item row="3" column="0">
+           <item row="4" column="0">
             <widget class="QLabel" name="label_6">
              <property name="text">
               <string>Spindle Speed (rpm)</string>
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="lineEdit_5"/>
+           <item row="4" column="1">
+            <widget class="QLineEdit" name="spindleSpeedEdit"/>
            </item>
-           <item row="4" column="0">
+           <item row="5" column="0">
             <widget class="QLabel" name="label_7">
              <property name="text">
               <string>% Step Over</string>
              </property>
             </widget>
            </item>
-           <item row="4" column="1">
-            <widget class="QLineEdit" name="lineEdit_6"/>
+           <item row="5" column="1">
+            <widget class="QLineEdit" name="stepOverEdit"/>
            </item>
-           <item row="5" column="0">
+           <item row="6" column="0">
             <widget class="QLabel" name="label_8">
              <property name="text">
               <string>Depth of Cut</string>
              </property>
             </widget>
            </item>
-           <item row="5" column="1">
-            <widget class="QLineEdit" name="lineEdit_7"/>
+           <item row="6" column="1">
+            <widget class="QLineEdit" name="depthOfCutEdit"/>
            </item>
-           <item row="1" column="0">
+           <item row="2" column="0">
             <widget class="QLabel" name="label_4">
              <property name="text">
               <string>Feed Rate</string>
              </property>
             </widget>
            </item>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="feedRateEdit"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_33">
+             <property name="text">
+              <string>Workpiece Material</string>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="lineEdit_3"/>
+            <widget class="QLineEdit" name="materialEdit"/>
            </item>
           </layout>
          </item>
@@ -216,7 +236,7 @@
             </sizepolicy>
            </property>
            <property name="currentIndex">
-            <number>1</number>
+            <number>5</number>
            </property>
            <widget class="QWidget" name="blankPage"/>
            <widget class="QWidget" name="straightPage">
@@ -231,7 +251,7 @@
                 </widget>
                </item>
                <item row="0" column="1">
-                <widget class="QLineEdit" name="lineEdit_8"/>
+                <widget class="QLineEdit" name="straightDiameterEdit"/>
                </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="label_12">
@@ -241,7 +261,7 @@
                 </widget>
                </item>
                <item row="1" column="1">
-                <widget class="QLineEdit" name="lineEdit_9"/>
+                <widget class="QLineEdit" name="straightCutLengthEdit"/>
                </item>
                <item row="2" column="0">
                 <widget class="QLabel" name="label_13">
@@ -251,7 +271,7 @@
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QLineEdit" name="lineEdit_10"/>
+                <widget class="QLineEdit" name="straightToolLengthEdit"/>
                </item>
                <item row="3" column="0">
                 <widget class="QLabel" name="label_30">
@@ -261,7 +281,7 @@
                 </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QLineEdit" name="lineEdit_28"/>
+                <widget class="QLineEdit" name="straightShaftDiameterEdit"/>
                </item>
               </layout>
              </item>
@@ -279,7 +299,7 @@
                 </widget>
                </item>
                <item row="0" column="1">
-                <widget class="QLineEdit" name="lineEdit_11"/>
+                <widget class="QLineEdit" name="taperedTopDiameterEdit"/>
                </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="label_15">
@@ -289,7 +309,7 @@
                 </widget>
                </item>
                <item row="1" column="1">
-                <widget class="QLineEdit" name="lineEdit_12"/>
+                <widget class="QLineEdit" name="taperedBottomDiameterEdit"/>
                </item>
                <item row="2" column="0">
                 <widget class="QLabel" name="label_16">
@@ -299,7 +319,7 @@
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QLineEdit" name="lineEdit_13"/>
+                <widget class="QLineEdit" name="taperedCutLengthEdit"/>
                </item>
                <item row="3" column="0">
                 <widget class="QLabel" name="label_17">
@@ -309,7 +329,7 @@
                 </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QLineEdit" name="lineEdit_14"/>
+                <widget class="QLineEdit" name="taperedToolLengthEdit"/>
                </item>
                <item row="4" column="0">
                 <widget class="QLabel" name="label_29">
@@ -319,7 +339,7 @@
                 </widget>
                </item>
                <item row="4" column="1">
-                <widget class="QLineEdit" name="lineEdit_27"/>
+                <widget class="QLineEdit" name="taperedShaftDiameterEdit"/>
                </item>
               </layout>
              </item>
@@ -337,7 +357,7 @@
                 </widget>
                </item>
                <item row="0" column="1">
-                <widget class="QLineEdit" name="lineEdit_15"/>
+                <widget class="QLineEdit" name="conicalTopDiameterEdit"/>
                </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="label_19">
@@ -347,7 +367,7 @@
                 </widget>
                </item>
                <item row="1" column="1">
-                <widget class="QLineEdit" name="lineEdit_16"/>
+                <widget class="QLineEdit" name="conicalCutAngleEdit"/>
                </item>
                <item row="2" column="0">
                 <widget class="QLabel" name="label_20">
@@ -357,7 +377,7 @@
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QLineEdit" name="lineEdit_17"/>
+                <widget class="QLineEdit" name="conicalToolLengthEdit"/>
                </item>
                <item row="3" column="0">
                 <widget class="QLabel" name="label_28">
@@ -367,7 +387,7 @@
                 </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QLineEdit" name="lineEdit_26"/>
+                <widget class="QLineEdit" name="conicalShaftDiameterEdit"/>
                </item>
               </layout>
              </item>
@@ -378,7 +398,7 @@
              <item>
               <layout class="QFormLayout" name="ballToolForm">
                <item row="0" column="1">
-                <widget class="QLineEdit" name="lineEdit_18"/>
+                <widget class="QLineEdit" name="ballDiameterEdit"/>
                </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="label_22">
@@ -388,7 +408,7 @@
                 </widget>
                </item>
                <item row="1" column="1">
-                <widget class="QLineEdit" name="lineEdit_19"/>
+                <widget class="QLineEdit" name="ballToolLengthEdit"/>
                </item>
                <item row="0" column="0">
                 <widget class="QLabel" name="label_21">
@@ -405,7 +425,7 @@
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QLineEdit" name="lineEdit_25"/>
+                <widget class="QLineEdit" name="ballShaftDiameterEdit"/>
                </item>
               </layout>
              </item>
@@ -423,7 +443,7 @@
                 </widget>
                </item>
                <item row="0" column="1">
-                <widget class="QLineEdit" name="lineEdit_20"/>
+                <widget class="QLineEdit" name="taperedBallTopDiameterEdit"/>
                </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="label_23">
@@ -433,7 +453,7 @@
                 </widget>
                </item>
                <item row="1" column="1">
-                <widget class="QLineEdit" name="lineEdit_21"/>
+                <widget class="QLineEdit" name="taperedBallDiameterEdit"/>
                </item>
                <item row="2" column="0">
                 <widget class="QLabel" name="label_24">
@@ -443,7 +463,7 @@
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QLineEdit" name="lineEdit_22"/>
+                <widget class="QLineEdit" name="taperedBallCutLengthEdit"/>
                </item>
                <item row="3" column="0">
                 <widget class="QLabel" name="label_25">
@@ -453,7 +473,7 @@
                 </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QLineEdit" name="lineEdit_23"/>
+                <widget class="QLineEdit" name="taperedBallToolLengthEdit"/>
                </item>
                <item row="4" column="0">
                 <widget class="QLabel" name="label_26">
@@ -463,7 +483,7 @@
                 </widget>
                </item>
                <item row="4" column="1">
-                <widget class="QLineEdit" name="lineEdit_24"/>
+                <widget class="QLineEdit" name="taperedBallShaftDiameterEdit"/>
                </item>
               </layout>
              </item>
