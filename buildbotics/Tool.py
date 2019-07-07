@@ -500,120 +500,75 @@ static char * taperedBallBitPic_xpm[] = {
 """
 			
 class Tool():
-	def __init__(self):
-		self.createToolUi = FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + "/resources/ui/tool.ui")
-		
-		self.straightToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/png/straightBitPic.png")				
-		self.taperedToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/png/taperedBitPic.png")				
-		self.conicalToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/png/conicalBitPic.png")				
-		self.ballToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/png/ballBitPic.png")				
-		self.taperedBallToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/png/taperedBallBitPic.png")	
-					
-		self.createToolUi.buttonBox.accepted.connect(self.accept)
-		self.createToolUi.buttonBox.rejected.connect(self.reject)
-		
-	def GetResources(self):
-		return {'Pixmap'  : os.path.dirname(__file__) +  "/resources/svg/tool.svg", # the name of a svg file available in the resources
-                'MenuText': "New Tool",
-                'ToolTip' : "Sets up a new tool that can be added to a tool table"}
-                
-	def changeToolTypeWidget(self):
-		i = self.createToolUi.toolTypeCB.currentIndex()
-		self.createToolUi.stackedWidget.setCurrentIndex(i)
-		if i == 1: self.createToolUi.imageLabel.setPixmap(self.straightToolPic)
-		elif i == 2: self.createToolUi.imageLabel.setPixmap(self.taperedToolPic)
-		elif i == 3: self.createToolUi.imageLabel.setPixmap(self.conicalToolPic)
-		elif i == 4: self.createToolUi.imageLabel.setPixmap(self.ballToolPic)
-		elif i == 5: self.createToolUi.imageLabel.setPixmap(self.taperedBallToolPic)
-		else: self.createToolUi.imageLabel.setPixmap(None)
-
-	def Activated(self):
-		self.createToolUi.toolTypeCB.currentIndexChanged.connect(self.changeToolTypeWidget) 
-		self.createToolUi.stackedWidget.setCurrentIndex(0)       
-		self.createToolUi.show()       
-		return
-        
-	def accept(self):
-		ui = self.createToolUi
-		ui.hide()
+	def __init__(self,ui,tt):
 		obj = FreeCAD.ActiveDocument.addObject('Part::FeaturePython', "Tool")
 		obj.Label = ui.nameEdit.text()
+		if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units").GetInt("UserSchema") in [0, 1, 4, 6]: units = 1
+		else: units = 25.4		
 		S = "App::PropertyString"
 		I = "App::PropertyInteger"
 		F = "App::PropertyFloat"
+		L = "App::PropertyLength"
+		A = "App::PropertyAngle"
 		obj.addProperty(I,"ToolNumber").ToolNumber = eval(ui.numberEdit.text())
 		obj.addProperty(S,"Make").Make = ui.makeEdit.text()
 		obj.addProperty(S,"Model").Model = ui.modelEdit.text()
 		obj.addProperty(S,"ToolType").ToolType = ui.toolTypeCB.currentText()
 		obj.addProperty(S,"StockMaterial").StockMaterial = ui.materialEdit.text()
-		if ui.feedRateEdit.text() != "": obj.addProperty(F,"FeedRate").FeedRate = eval(ui.feedRateEdit.text())
-		if ui.plungeRateEdit.text() != "": obj.addProperty(F,"PlungeRate").PlungeRate = eval(ui.plungeRateEdit.text())
+		if ui.feedRateEdit.text() != "": obj.addProperty(F,"FeedRate").FeedRate = eval(ui.feedRateEdit.text()) * units
+		if ui.plungeRateEdit.text() != "": obj.addProperty(F,"PlungeRate").PlungeRate = eval(ui.plungeRateEdit.text()) * units
 		if ui.spindleSpeedEdit.text() != "": obj.addProperty(F,"SpindleSpeed").SpindleSpeed = eval(ui.spindleSpeedEdit.text())
-		if ui.stepOverEdit.text() != "": obj.addProperty(F,"StepOver").StepOver = eval(ui.stepOverEdit.text())
-		if ui.depthOfCutEdit.text() != "": obj.addProperty(F,"DepthOfCut").DepthOfCut = eval(ui.depthOfCutEdit.text())
+		if ui.stepOverEdit.text() != "": obj.addProperty(L,"StepOver").StepOver = eval(ui.stepOverEdit.text()) * units
+		if ui.depthOfCutEdit.text() != "": obj.addProperty(L,"DepthOfCut").DepthOfCut = eval(ui.depthOfCutEdit.text()) * units
 
-		i = self.createToolUi.toolTypeCB.currentIndex()
-		obj.addProperty("App::PropertyString","ObjectType")
+		i = ui.toolTypeCB.currentIndex()
+		obj.addProperty("App::PropertyString","ObjectType").ObjectType = ui.toolTypeCB.currentText()
 		if i == 1:
-			obj.addProperty(F,"Diameter").Diameter = eval(ui.straightDiameterEdit.text())
-			obj.addProperty(F,"CutLength").CutLength = eval(ui.straightCutLengthEdit.text())
-			obj.addProperty(F,"ToolLength").ToolLength = eval(ui.straightToolLengthEdit.text())
-			obj.addProperty(F,"ShaftDiameter").ShaftDiameter = eval(ui.straightShaftDiameterEdit.text())
+			obj.addProperty(L,"Diameter").Diameter = eval(ui.straightDiameterEdit.text()) * units
+			obj.addProperty(L,"CutLength").CutLength = eval(ui.straightCutLengthEdit.text()) * units
+			obj.addProperty(L,"ToolLength").ToolLength = eval(ui.straightToolLengthEdit.text()) * units
+			obj.addProperty(L,"ShaftDiameter").ShaftDiameter = eval(ui.straightShaftDiameterEdit.text()) * units
 			ViewStraightTool(obj.ViewObject)
 			obj.ObjectType = "StraightTool"
 		elif i == 2:
-			obj.addProperty(F,"TopDiameter").TopDiameter = eval(ui.taperedTopDiameterEdit.text())
-			obj.addProperty(F,"BottomDiameter").BottomDiameter = eval(ui.taperedBottomDiameterEdit.text())
-			obj.addProperty(F,"CutLength").CutLength = eval(ui.taperedCutLengthEdit.text())
-			obj.addProperty(F,"ToolLength").ToolLength = eval(ui.taperedToolLengthEdit.text())
-			obj.addProperty(F,"ShaftDiameter").ShaftDiameter = eval(ui.taperedShaftDiameterEdit.text())
+			obj.addProperty(L,"TopDiameter").TopDiameter = eval(ui.taperedTopDiameterEdit.text()) * units
+			obj.addProperty(L,"BottomDiameter").BottomDiameter = eval(ui.taperedBottomDiameterEdit.text()) * units
+			obj.addProperty(L,"CutLength").CutLength = eval(ui.taperedCutLengthEdit.text()) * units
+			obj.addProperty(L,"ToolLength").ToolLength = eval(ui.taperedToolLengthEdit.text()) * units
+			obj.addProperty(L,"ShaftDiameter").ShaftDiameter = eval(ui.taperedShaftDiameterEdit.text()) * units
 			ViewTaperedTool(obj.ViewObject)
 			obj.ObjectType = "TaperedTool"
 		elif i == 3:
-			obj.addProperty(F,"TopDiameter").TopDiameter = eval(ui.conicalTopDiameterEdit.text())
-			obj.addProperty(F,"CutAngle").CutAngle = eval(ui.conicalCutAngleEdit.text())
-			obj.addProperty(F,"ToolLength").ToolLength = eval(ui.conicalToolLengthEdit.text())
-			obj.addProperty(F,"ShaftDiameter").ShaftDiameter = eval(ui.conicalShaftDiameterEdit.text())
+			obj.addProperty(L,"TopDiameter").TopDiameter = eval(ui.conicalTopDiameterEdit.text()) * units
+			obj.addProperty(A,"CutAngle").CutAngle = eval(ui.conicalCutAngleEdit.text())
+			obj.addProperty(L,"ToolLength").ToolLength = eval(ui.conicalToolLengthEdit.text()) * units
+			obj.addProperty(L,"ShaftDiameter").ShaftDiameter = eval(ui.conicalShaftDiameterEdit.text()) * units
 			ViewConicalTool(obj.ViewObject)
 			obj.ObjectType = "ConicalTool"
 		elif i == 4:
-			obj.addProperty(F,"BallDiameter").BallDiameter = eval(ui.ballDiameterEdit.text())
-			obj.addProperty(F,"ToolLength").ToolLength = eval(ui.ballToolLengthEdit.text())
-			obj.addProperty(F,"ShaftDiameter").ShaftDiameter = eval(ui.ballShaftDiameterEdit.text())
+			obj.addProperty(L,"BallDiameter").BallDiameter = eval(ui.ballDiameterEdit.text()) * units
+			obj.addProperty(L,"ToolLength").ToolLength = eval(ui.ballToolLengthEdit.text()) * units
+			obj.addProperty(L,"ShaftDiameter").ShaftDiameter = eval(ui.ballShaftDiameterEdit.text()) * units
 			ViewBallTool(obj.ViewObject)
 			obj.ObjectType = "BallTool"
 		elif i == 5:
-			obj.addProperty(F,"TopDiameter").TopDiameter = eval(ui.taperedBallTopDiameterEdit.text())
-			obj.addProperty(F,"BallDiameter").BallDiameter = eval(ui.taperedBallDiameterEdit.text())
-			obj.addProperty(F,"CutLength").CutLength = eval(ui.taperedBallCutLengthEdit.text())
-			obj.addProperty(F,"ToolLength").ToolLength = eval(ui.taperedBallToolLengthEdit.text())
-			obj.addProperty(F,"ShaftDiameter").ShaftDiameter = eval(ui.taperedBallShaftDiameterEdit.text())
+			obj.addProperty(L,"TopDiameter").TopDiameter = eval(ui.taperedBallTopDiameterEdit.text()) * units
+			obj.addProperty(L,"BallDiameter").BallDiameter = eval(ui.taperedBallDiameterEdit.text()) * units
+			obj.addProperty(L,"CutLength").CutLength = eval(ui.taperedBallCutLengthEdit.text()) * units
+			obj.addProperty(L,"ToolLength").ToolLength = eval(ui.taperedBallToolLengthEdit.text()) * units
+			obj.addProperty(L,"ShaftDiameter").ShaftDiameter = eval(ui.taperedBallShaftDiameterEdit.text()) * units
 			ViewTaperedBallTool(obj.ViewObject)
 			obj.ObjectType = "TaperedBallTool"
 		else:
 			ViewTool(obj.ViewObject)
 			obj.ObjectType = "Tool"
+		obj.Proxy = self
 		obj.setEditorMode("ObjectType",("ReadOnly",))
-		self.ToolTable.addObject(obj)
+		self.obj = obj
+		tt.addObject(obj)
 		FreeCAD.ActiveDocument.recompute()
-		return True
 		
-	def reject(self):
-		self.createToolUi.hide()
-		return False
+	def execute(self,obj):
+		pass
 
-	def IsActive(self):
-		"""Here you can define if the command must be active or not (greyed) if certain conditions
-		are met or not. This function is optional."""
-		mw = FreeCADGui.getMainWindow()
-		tree = mw.findChildren(QtGui.QTreeWidget)[0]
-		numberOfInstances = 0
-		for item in tree.selectedItems():
-			obj = FreeCAD.ActiveDocument.getObjectsByLabel(item.text(0))[0]
-			if obj.ObjectType == "ToolTable": 
-				numberOfInstances += 1
-				self.ToolTable = obj
-		if numberOfInstances != 1: return False
-		return True
 
-FreeCADGui.addCommand('New_Tool',Tool())
