@@ -515,8 +515,8 @@ class Tool():
 		obj.addProperty(S,"Model").Model = ui.modelEdit.text()
 		obj.addProperty(S,"ToolType").ToolType = ui.toolTypeCB.currentText()
 		obj.addProperty(S,"StockMaterial").StockMaterial = ui.materialEdit.text()
-		if ui.feedRateEdit.text() != "": obj.addProperty(F,"FeedRate").FeedRate = eval(ui.feedRateEdit.text()) * units
-		if ui.plungeRateEdit.text() != "": obj.addProperty(F,"PlungeRate").PlungeRate = eval(ui.plungeRateEdit.text()) * units
+		if ui.feedRateEdit.text() != "": obj.addProperty(L,"FeedRate").FeedRate = eval(ui.feedRateEdit.text()) * units
+		if ui.plungeRateEdit.text() != "": obj.addProperty(L,"PlungeRate").PlungeRate = eval(ui.plungeRateEdit.text()) * units
 		if ui.spindleSpeedEdit.text() != "": obj.addProperty(F,"SpindleSpeed").SpindleSpeed = eval(ui.spindleSpeedEdit.text())
 		if ui.stepOverEdit.text() != "": obj.addProperty(L,"StepOver").StepOver = eval(ui.stepOverEdit.text()) * units
 		if ui.depthOfCutEdit.text() != "": obj.addProperty(L,"DepthOfCut").DepthOfCut = eval(ui.depthOfCutEdit.text()) * units
