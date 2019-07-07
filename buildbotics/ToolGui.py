@@ -70,9 +70,46 @@ class ToolGui():
 		ui.taperedBallCutLengthEdit.setValidator(dv)
 		ui.taperedBallToolLengthEdit.setValidator(dv)
 		ui.taperedBallShaftDiameterEdit.setValidator(dv)
-							
+				
 		ui.buttonBox.accepted.connect(self.accept)
 		ui.buttonBox.rejected.connect(self.reject)
+		ui.toolTypeCB.currentIndexChanged.connect(self.changeToolTypeWidget) 
+		
+	def reset(self):
+		ui = self.createToolUi
+		ui.stackedWidget.setCurrentIndex(0)       
+		ui.nameEdit.clear()
+		ui.numberEdit.clear()
+		ui.makeEdit.clear()
+		ui.modelEdit.clear()
+		ui.toolTypeCB.setCurrentIndex(0)
+		ui.materialEdit.clear()
+		ui.feedRateEdit.clear()
+		ui.plungeRateEdit.clear()
+		ui.spindleSpeedEdit.clear()
+		ui.stepOverEdit.clear()
+		ui.depthOfCutEdit.clear()
+		ui.straightDiameterEdit.clear()
+		ui.straightCutLengthEdit.clear()
+		ui.straightToolLengthEdit.clear()
+		ui.straightShaftDiameterEdit.clear()
+		ui.taperedTopDiameterEdit.clear()
+		ui.taperedBottomDiameterEdit.clear()
+		ui.taperedCutLengthEdit.clear()
+		ui.taperedToolLengthEdit.clear()
+		ui.taperedShaftDiameterEdit.clear()
+		ui.conicalTopDiameterEdit.clear()
+		ui.conicalCutAngleEdit.clear()
+		ui.conicalToolLengthEdit.clear()
+		ui.conicalShaftDiameterEdit.clear()
+		ui.ballDiameterEdit.clear()
+		ui.ballToolLengthEdit.clear()
+		ui.ballShaftDiameterEdit.clear()
+		ui.taperedBallTopDiameterEdit.clear()
+		ui.taperedBallDiameterEdit.clear()
+		ui.taperedBallCutLengthEdit.clear()
+		ui.taperedBallToolLengthEdit.clear()
+		ui.taperedBallShaftDiameterEdit.clear()
 		
 	def GetResources(self):
 		return {'Pixmap'  : os.path.dirname(__file__) +  "/resources/svg/tool.svg", # the name of a svg file available in the resources
@@ -128,8 +165,7 @@ class ToolGui():
 
 	def Activated(self):
 		self.setUnits()
-		self.createToolUi.toolTypeCB.currentIndexChanged.connect(self.changeToolTypeWidget) 
-		self.createToolUi.stackedWidget.setCurrentIndex(0)       
+		self.reset()
 		self.createToolUi.show()       
 		return
         
