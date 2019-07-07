@@ -28,6 +28,7 @@ from PySide import QtGui, QtCore
 import os
 
 from Tool import Tool
+import validator
 
 class ToolGui():
 	def __init__(self):			
@@ -37,10 +38,41 @@ class ToolGui():
 		self.taperedToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/png/taperedBitPic.png")				
 		self.conicalToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/png/conicalBitPic.png")				
 		self.ballToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/png/ballBitPic.png")				
-		self.taperedBallToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/png/taperedBallBitPic.png")	
-					
-		self.createToolUi.buttonBox.accepted.connect(self.accept)
-		self.createToolUi.buttonBox.rejected.connect(self.reject)
+		self.taperedBallToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/png/taperedBallBitPic.png")
+		
+		ui = self.createToolUi
+		iv = validator.MyIntValidator()
+		dv = validator.MyDoubleValidator()
+		ui.numberEdit.setValidator(iv)
+		ui.feedRateEdit.setValidator(dv)
+		ui.plungeRateEdit.setValidator(dv)
+		ui.spindleSpeedEdit.setValidator(dv)
+		ui.stepOverEdit.setValidator(dv)
+		ui.depthOfCutEdit.setValidator(dv)
+		ui.straightDiameterEdit.setValidator(dv)
+		ui.straightCutLengthEdit.setValidator(dv)
+		ui.straightToolLengthEdit.setValidator(dv)
+		ui.straightShaftDiameterEdit.setValidator(dv)
+		ui.taperedTopDiameterEdit.setValidator(dv)
+		ui.taperedBottomDiameterEdit.setValidator(dv)
+		ui.taperedCutLengthEdit.setValidator(dv)
+		ui.taperedToolLengthEdit.setValidator(dv)
+		ui.taperedShaftDiameterEdit.setValidator(dv)
+		ui.conicalTopDiameterEdit.setValidator(dv)
+		ui.conicalCutAngleEdit.setValidator(dv)
+		ui.conicalToolLengthEdit.setValidator(dv)
+		ui.conicalShaftDiameterEdit.setValidator(dv)
+		ui.ballDiameterEdit.setValidator(dv)
+		ui.ballToolLengthEdit.setValidator(dv)
+		ui.ballShaftDiameterEdit.setValidator(dv)
+		ui.taperedBallTopDiameterEdit.setValidator(dv)
+		ui.taperedBallDiameterEdit.setValidator(dv)
+		ui.taperedBallCutLengthEdit.setValidator(dv)
+		ui.taperedBallToolLengthEdit.setValidator(dv)
+		ui.taperedBallShaftDiameterEdit.setValidator(dv)
+							
+		ui.buttonBox.accepted.connect(self.accept)
+		ui.buttonBox.rejected.connect(self.reject)
 		
 	def GetResources(self):
 		return {'Pixmap'  : os.path.dirname(__file__) +  "/resources/svg/tool.svg", # the name of a svg file available in the resources

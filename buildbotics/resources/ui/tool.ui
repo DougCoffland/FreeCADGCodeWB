@@ -236,7 +236,7 @@
             </sizepolicy>
            </property>
            <property name="currentIndex">
-            <number>5</number>
+            <number>6</number>
            </property>
            <widget class="QWidget" name="blankPage"/>
            <widget class="QWidget" name="straightPage">
