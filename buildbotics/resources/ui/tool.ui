@@ -236,7 +236,7 @@
             </sizepolicy>
            </property>
            <property name="currentIndex">
-            <number>4</number>
+            <number>5</number>
            </property>
            <widget class="QWidget" name="blankPage"/>
            <widget class="QWidget" name="straightPage">
@@ -536,6 +536,40 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>nameEdit</tabstop>
+  <tabstop>numberEdit</tabstop>
+  <tabstop>makeEdit</tabstop>
+  <tabstop>modelEdit</tabstop>
+  <tabstop>toolTypeCB</tabstop>
+  <tabstop>materialEdit</tabstop>
+  <tabstop>feedRateEdit</tabstop>
+  <tabstop>plungeRateEdit</tabstop>
+  <tabstop>spindleSpeedEdit</tabstop>
+  <tabstop>stepOverEdit</tabstop>
+  <tabstop>depthOfCutEdit</tabstop>
+  <tabstop>straightDiameterEdit</tabstop>
+  <tabstop>straightCutLengthEdit</tabstop>
+  <tabstop>straightToolLengthEdit</tabstop>
+  <tabstop>straightShaftDiameterEdit</tabstop>
+  <tabstop>taperedTopDiameterEdit</tabstop>
+  <tabstop>taperedBottomDiameterEdit</tabstop>
+  <tabstop>taperedCutLengthEdit</tabstop>
+  <tabstop>taperedToolLengthEdit</tabstop>
+  <tabstop>taperedShaftDiameterEdit</tabstop>
+  <tabstop>conicalTopDiameterEdit</tabstop>
+  <tabstop>conicalCutAngleEdit</tabstop>
+  <tabstop>conicalToolLengthEdit</tabstop>
+  <tabstop>conicalShaftDiameterEdit</tabstop>
+  <tabstop>ballDiameterEdit</tabstop>
+  <tabstop>ballToolLengthEdit</tabstop>
+  <tabstop>ballShaftDiameterEdit</tabstop>
+  <tabstop>taperedBallTopDiameterEdit</tabstop>
+  <tabstop>taperedBallDiameterEdit</tabstop>
+  <tabstop>taperedBallCutLengthEdit</tabstop>
+  <tabstop>taperedBallToolLengthEdit</tabstop>
+  <tabstop>taperedBallShaftDiameterEdit</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
