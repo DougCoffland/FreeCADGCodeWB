@@ -519,12 +519,17 @@ class Tool():
 	def __init__(self,ui,selectedObject):
 		obj = FreeCAD.ActiveDocument.addObject('App::FeaturePython', "Tool")
 		obj.Proxy = self
+		self.obj = obj
 		selectedObject.addObject(obj)
 		FreeCAD.ActiveDocument.recompute()
 		
+	def getObject(self):
+		return self.obj
+		
 	def setProperties(self,p, obj):
-		for prop in obj.PropertiesList:
-			obj.removeProperty(prop)
+		if hasattr(obj,'PropertiesList'):
+			for prop in obj.PropertiesList:
+				obj.removeProperty(prop)
 		for prop in p:
 			newprop = obj.addProperty(prop[0],prop[1])
 			setattr(newprop,prop[1],prop[2])
@@ -537,7 +542,7 @@ class Tool():
 		elif obj.ToolType== "TaperedBall": ViewTaperedBallTool(obj.ViewObject)
 
 		obj.setEditorMode("ObjectType",("ReadOnly",))
-		obj.purgeTouched()		
+		FreeCAD.ActiveDocument.recompute()		
 	
 	def IsActive(self):
 		return True

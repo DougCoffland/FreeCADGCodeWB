@@ -63,37 +63,41 @@ class ToolGui():
 		iv = VAL.MyIntValidator()
 
 		ui.numberEdit.setValidator(iv)
-		ui.feedRateEdit.textChanged.connect(lambda: VAL.validate(ui.feedRateEdit,ui.feedRateL,VELOCITY))
-		ui.plungeRateEdit.textChanged.connect(lambda: VAL.validate(ui.plungeRateEdit,ui.plungeRateL,VELOCITY))
-		ui.spindleSpeedEdit.textChanged.connect(lambda: VAL.validate(ui.spindleSpeedEdit,ui.spindleSpeedLabel,ANGULAR_VELOCITY))
-		ui.stepOverEdit.textChanged.connect(lambda: VAL.validate(ui.stepOverEdit,ui.stepOverL,LENGTH))
-		ui.depthOfCutEdit.textChanged.connect(lambda: VAL.validate(ui.depthOfCutEdit,ui.docL,LENGTH))
+		ui.toolTypeCB.currentIndexChanged.connect(self.validateAllFields)
+		ui.numberEdit.textChanged.connect(self.validateAllFields)
+		ui.nameEdit.textChanged.connect(self.validateAllFields)
+		ui.feedRateEdit.textChanged.connect(self.validateAllFields)
+		ui.plungeRateEdit.textChanged.connect(self.validateAllFields)
+		ui.spindleSpeedEdit.textChanged.connect(self.validateAllFields)
+		ui.stepOverEdit.textChanged.connect(self.validateAllFields)
+		ui.depthOfCutEdit.textChanged.connect(self.validateAllFields)
 		
-		ui.straightDiameterEdit.textChanged.connect(lambda: VAL.validate(ui.straightDiameterEdit,ui.straightDiameterL,LENGTH))
-		ui.straightCutLengthEdit.textChanged.connect(lambda: VAL.validate(ui.straightCutLengthEdit,ui.straightCutLenL,LENGTH))
-		ui.straightToolLengthEdit.textChanged.connect(lambda: VAL.validate(ui.straightToolLengthEdit,ui.straightToolLenL,LENGTH))
-		ui.straightShaftDiameterEdit.textChanged.connect(lambda: VAL.validate(ui.straightShaftDiameterEdit,ui.staightShaftDiameterL,LENGTH))
+		ui.straightDiameterEdit.textChanged.connect(self.validateAllFields)
+		ui.straightCutLengthEdit.textChanged.connect(self.validateAllFields)
+		ui.straightToolLengthEdit.textChanged.connect(self.validateAllFields)
+		ui.straightShaftDiameterEdit.textChanged.connect(self.validateAllFields)
 
-		ui.taperedTopDiameterEdit.textChanged.connect(lambda: VAL.validate(ui.taperedTopDiameterEdit,ui.taperedTopDiameterL,LENGTH))
-		ui.taperedBottomDiameterEdit.textChanged.connect(lambda: VAL.validate(ui.taperedBottomDiameterEdit,ui.taperedBottomDiameterL,LENGTH))
-		ui.taperedCutLengthEdit.textChanged.connect(lambda: VAL.validate(ui.taperedCutLengthEdit,ui.taperedCutLengthL,LENGTH))
-		ui.taperedToolLengthEdit.textChanged.connect(lambda: VAL.validate(ui.taperedToolLengthEdit,ui.taperedToolLengthL,LENGTH))
-		ui.taperedShaftDiameterEdit.textChanged.connect(lambda: VAL.validate(ui.taperedShaftDiameterEdit,ui.taperedShaftDiameterL,LENGTH))
+		ui.taperedTopDiameterEdit.textChanged.connect(self.validateAllFields)
+		ui.taperedBottomDiameterEdit.textChanged.connect(self.validateAllFields)
+		ui.taperedCutLengthEdit.textChanged.connect(self.validateAllFields)
+		ui.taperedToolLengthEdit.textChanged.connect(self.validateAllFields)
+		ui.taperedShaftDiameterEdit.textChanged.connect(self.validateAllFields)
 
-		ui.conicalTopDiameterEdit.textChanged.connect(lambda: VAL.validate(ui.conicalTopDiameterEdit,ui.conicalTopDiameterL,LENGTH))
-		ui.conicalCutAngleEdit.textChanged.connect(lambda: VAL.validate(ui.conicalCutAngleEdit,ui.conicalCutAngleL,ANGLE))
-		ui.conicalToolLengthEdit.textChanged.connect(lambda: VAL.validate(ui.conicalToolLengthEdit,ui.conicalToolLengthL,LENGTH))
-		ui.conicalShaftDiameterEdit.textChanged.connect(lambda: VAL.validate(ui.conicalShaftDiameterEdit,ui.conicalShaftDiameterL,LENGTH))
+		ui.conicalTopDiameterEdit.textChanged.connect(self.validateAllFields)
+		ui.conicalCutAngleEdit.textChanged.connect(self.validateAllFields)
+		ui.conicalToolLengthEdit.textChanged.connect(self.validateAllFields)
+		ui.conicalShaftDiameterEdit.textChanged.connect(self.validateAllFields)
 
-		ui.ballDiameterEdit.textChanged.connect(lambda: VAL.validate(ui.ballDiameterEdit,ui.ballDiameterL,LENGTH))
-		ui.ballToolLengthEdit.textChanged.connect(lambda: VAL.validate(ui.ballToolLengthEdit,ui.ballToolLengthL,LENGTH))
-		ui.ballShaftDiameterEdit.textChanged.connect(lambda: VAL.validate(ui.ballShaftDiameterEdit,ui.ballShaftDiameterL,LENGTH))
+		ui.ballDiameterEdit.textChanged.connect(self.validateAllFields)
+		ui.ballToolLengthEdit.textChanged.connect(self.validateAllFields)
+		ui.ballShaftDiameterEdit.textChanged.connect(self.validateAllFields)
 
-		ui.taperedBallTopDiameterEdit.textChanged.connect(lambda: VAL.validate(ui.taperedBallTopDiameterEdit,ui.taperedBallTopDiameterL,LENGTH))
-		ui.taperedBallDiameterEdit.textChanged.connect(lambda: VAL.validate(ui.taperedBallDiameterEdit,ui.taperedBallBallDiameterL,LENGTH))
-		ui.taperedBallCutLengthEdit.textChanged.connect(lambda: VAL.validate(ui.taperedBallCutLengthEdit,ui.taperedBallCutLengthL,LENGTH))
-		ui.taperedBallToolLengthEdit.textChanged.connect(lambda: VAL.validate(ui.taperedBallToolLengthEdit,ui.TaperedBallToolLengthL,LENGTH))
-		ui.taperedBallShaftDiameterEdit.textChanged.connect(lambda: VAL.validate(ui.taperedBallShaftDiameterEdit,ui.taperedBallShaftDiameterL,LENGTH))
+		ui.taperedBallTopDiameterEdit.textChanged.connect(self.validateAllFields)
+		ui.taperedBallDiameterEdit.textChanged.connect(self.validateAllFields)
+		ui.taperedBallCutLengthEdit.textChanged.connect(self.validateAllFields)
+		ui.taperedBallToolLengthEdit.textChanged.connect(self.validateAllFields)
+		ui.taperedBallShaftDiameterEdit.textChanged.connect(self.validateAllFields)
+
 				
 		ui.buttonBox.accepted.connect(self.accept)
 		ui.buttonBox.rejected.connect(self.reject)
@@ -139,7 +143,67 @@ class ToolGui():
 		return {'Pixmap'  : os.path.dirname(__file__) +  "/resources/svg/tool.svg", # the name of a svg file available in the resources
                 'MenuText': "New Tool",
                 'ToolTip' : "Sets up a new tool that can be added to a tool table"}
-                
+
+	def validateAllFields(self):
+		ui = self.createToolUi
+		valid = True
+		toolType = ui.toolTypeCB.currentText()
+		if toolType == 'None Selected...':
+			VAL.setLabel(ui.toolTypeLabel,'INVALID')
+			valid = False
+		else:
+			VAL.setLabel(ui.toolTypeLabel,'VALID')
+		if ui.numberEdit.text() == "":
+			VAL.setLabel(ui.numberLabel, 'INVALID')
+			valid = False
+		else:
+			VAL.setLabel(ui.numberLabel, 'VALID') 
+			for tool in self.parent.Group:
+				if tool == self.selectedObject: continue
+				if str(tool.Number) == ui.numberEdit.text():
+					VAL.setLabel(ui.numberLabel,'INVALID')
+					valid = False
+					break
+		VAL.setLabel(ui.nameLabel, 'VALID')
+		if ui.nameEdit.text() == "":
+			valid = False
+			VAL.setLabel(ui.nameLabel,'INVALID')
+		valid = VAL.validate(ui.feedRateEdit,ui.feedRateL,False,valid,VELOCITY)
+		valid = VAL.validate(ui.plungeRateEdit,ui.plungeRateL,False,valid,VELOCITY)
+		valid = VAL.validate(ui.spindleSpeedEdit,ui.spindleSpeedLabel,False,valid,ANGULAR_VELOCITY)
+		valid = VAL.validate(ui.stepOverEdit,ui.stepOverL,False,valid,LENGTH)
+		valid = VAL.validate(ui.depthOfCutEdit,ui.docL,False,valid,LENGTH)
+		if toolType == "Straight":
+			valid = VAL.validate(ui.straightDiameterEdit,ui.straightDiameterL,True,valid,LENGTH)
+			valid = VAL.validate(ui.straightCutLengthEdit,ui.straightCutLenL,True,valid,LENGTH)
+			valid = VAL.validate(ui.straightToolLengthEdit,ui.straightToolLenL,True,valid,LENGTH)
+			valid = VAL.validate(ui.straightShaftDiameterEdit,ui.staightShaftDiameterL,True,valid,LENGTH)
+		elif toolType == "Tapered":
+			valid = VAL.validate(ui.taperedTopDiameterEdit,ui.taperedTopDiameterL,True,valid,LENGTH)
+			valid = VAL.validate(ui.taperedBottomDiameterEdit,ui.taperedBottomDiameterL,True,valid,LENGTH)
+			valid = VAL.validate(ui.taperedCutLengthEdit,ui.taperedCutLengthL,True,valid,LENGTH)
+			valid = VAL.validate(ui.taperedToolLengthEdit,ui.taperedToolLengthL,True,valid,LENGTH)
+			valid = VAL.validate(ui.taperedShaftDiameterEdit,ui.taperedShaftDiameterL,True,valid,LENGTH)
+		elif toolType == "Conical":
+			valid = VAL.validate(ui.conicalTopDiameterEdit,ui.conicalTopDiameterL,True,valid,LENGTH)
+			valid = VAL.validate(ui.conicalCutAngleEdit,ui.conicalCutAngleL,True,valid,ANGLE)
+			valid = VAL.validate(ui.conicalToolLengthEdit,ui.conicalToolLengthL,True,valid,LENGTH)
+			valid = VAL.validate(ui.conicalShaftDiameterEdit,ui.conicalShaftDiameterL,True,valid,LENGTH)
+		elif toolType == "Ball":
+			valid = VAL.validate(ui.ballDiameterEdit,ui.ballDiameterL,True,valid,LENGTH)
+			valid = VAL.validate(ui.ballToolLengthEdit,ui.ballToolLengthL,True,valid,LENGTH)
+			valid = VAL.validate(ui.ballShaftDiameterEdit,ui.ballShaftDiameterL,True,valid,LENGTH)
+		elif toolType == "TaperedBall":
+			valid = VAL.validate(ui.taperedBallTopDiameterEdit,ui.taperedBallTopDiameterL,True,valid,LENGTH)
+			valid = VAL.validate(ui.taperedBallDiameterEdit,ui.taperedBallBallDiameterL,True,valid,LENGTH)
+			valid = VAL.validate(ui.taperedBallCutLengthEdit,ui.taperedBallCutLengthL,True,valid,LENGTH)
+			valid = VAL.validate(ui.taperedBallToolLengthEdit,ui.TaperedBallToolLengthL,True,valid,LENGTH)
+			valid = VAL.validate(ui.taperedBallShaftDiameterEdit,ui.taperedBallShaftDiameterL,True,valid,LENGTH)
+				
+		ui.buttonBox.buttons()[0].setEnabled(valid)
+		return valid
+		
+
 	def changeToolTypeWidget(self):
 		i = self.createToolUi.toolTypeCB.currentIndex()
 		self.createToolUi.stackedWidget.setCurrentIndex(i)
@@ -167,15 +231,15 @@ class ToolGui():
 		ui.stackedWidget.setCurrentIndex(self.toolTypes.index(obj.ObjectType) + 1)      
 		ui.nameEdit.setText(obj.Label)
 		ui.numberEdit.setText(str(obj.Number))
-		ui.makeEdit.setText(obj.Make)
-		ui.modelEdit.setText(obj.Model)
+		if hasattr(obj, 'Make'): ui.makeEdit.setText(obj.Make)
+		if hasattr(obj, 'Model'): ui.modelEdit.setText(obj.Model)
 		ui.toolTypeCB.setCurrentIndex(self.toolTypes.index(obj.ObjectType) + 1)
-		ui.materialEdit.setText(obj.StockMaterial)
-		ui.feedRateEdit.setText(obj.FeedRate.UserString)
-		ui.plungeRateEdit.setText(obj.PlungeRate.UserString)
-		ui.spindleSpeedEdit.setText(obj.SpindleSpeed)
-		ui.stepOverEdit.setText(obj.StepOver.UserString)
-		ui.depthOfCutEdit.setText(obj.DepthOfCut.UserString)
+		if hasattr(obj, 'StockMaterial'): ui.materialEdit.setText(obj.StockMaterial)
+		if hasattr(obj, 'FeedRate'): ui.feedRateEdit.setText(obj.FeedRate.UserString)
+		if hasattr(obj, 'PlungeRate'): ui.plungeRateEdit.setText(obj.PlungeRate.UserString)
+		if hasattr(obj, 'SpindleSpeed'): ui.spindleSpeedEdit.setText(obj.SpindleSpeed)
+		if hasattr(obj, 'StepOver'): ui.stepOverEdit.setText(obj.StepOver.UserString)
+		if hasattr(obj, 'DepthOfCut'): ui.depthOfCutEdit.setText(obj.DepthOfCut.UserString)
 		
 		toolType = ui.toolTypeCB.currentText()
 		if toolType == "Straight":		
@@ -218,16 +282,16 @@ class ToolGui():
 		tooltype = ui.toolTypeCB.currentText().replace(" ","")
 		p = [[S,	"ObjectType",		tooltype + "Tool"],
 			 [S,	"Name",				ui.nameEdit.text()],
-		     [I,	"Number",			eval(ui.numberEdit.text())],
-		     [S,	"Make",				ui.makeEdit.text()],
-		     [S,	"Model",			ui.modelEdit.text()],
-		     [S,	"ToolType",			tooltype],
-		     [S,	"StockMaterial",	ui.materialEdit.text()],
-		     [V,	"FeedRate",			VAL.toSystemValue(ui.feedRateEdit, 'velocity')],
-		     [V,	"PlungeRate",		VAL.toSystemValue(ui.plungeRateEdit, 'velocity')],
-		     [S,	"SpindleSpeed",		VAL.toSystemValue(ui.spindleSpeedEdit, 'angularVelocity')],
-		     [L,	"StepOver",			VAL.toSystemValue(ui.stepOverEdit, 'length')],
-		     [L,	"DepthOfCut",		VAL.toSystemValue(ui.depthOfCutEdit, 'length')]]
+		     [I,	"Number",			eval(ui.numberEdit.text())],		     
+		     [S,	"ToolType",			tooltype]]
+		if ui.makeEdit.text() != "": p.append([S,	"Make",				ui.makeEdit.text()])
+		if ui.modelEdit.text() != "": p.append([S,	"Model",			ui.modelEdit.text()])
+		if ui.materialEdit.text() != "": p.append([S,	"StockMaterial",	ui.materialEdit.text()])
+		if ui.feedRateEdit.text() != "": p.append([V,	"FeedRate",			VAL.toSystemValue(ui.feedRateEdit, 'velocity')])
+		if ui.plungeRateEdit.text() != "": p.append([V,	"PlungeRate",		VAL.toSystemValue(ui.plungeRateEdit, 'velocity')])
+		if ui.spindleSpeedEdit.text() != "": p.append([S,	"SpindleSpeed",		VAL.toSystemValue(ui.spindleSpeedEdit, 'angularVelocity')])
+		if ui.stepOverEdit.text() != "": p.append([L,	"StepOver",			VAL.toSystemValue(ui.stepOverEdit, 'length')])
+		if ui.depthOfCutEdit.text() != "": p.append([L,	"DepthOfCut",		VAL.toSystemValue(ui.depthOfCutEdit, 'length')])
 		if tooltype == "Straight":
 			p.append([L,			"Diameter",			VAL.toSystemValue(ui.straightDiameterEdit, 'length')])
 			p.append([L,			"CutLength",		VAL.toSystemValue(ui.straightCutLengthEdit, 'length')])
@@ -261,8 +325,12 @@ class ToolGui():
 		self.setUnits()
 		if self.selectedObject.ObjectType == "ToolTable":
 			self.reset()
+			self.parent = self.selectedObject
+			self.validateAllFields()
 		elif self.selectedObject.ObjectType in self.toolTypes:
+			self.parent = self.selectedObject.getParentGroup()
 			self.getToolProperties(self.selectedObject)
+			self.validateAllFields()
 		else:
 			return False
 		self.createToolUi.show()       
@@ -273,12 +341,11 @@ class ToolGui():
 		ui.hide()
 		if self.selectedObject.ObjectType == "ToolTable":
 			self.tool = Tool(self.createToolUi, self.selectedObject)
-			self.setToolProperties(self.selectedObject)
+			self.setToolProperties(self.tool.getObject())
 			return True
 		elif self.selectedObject.ObjectType in self.toolTypes:
 			self.tool = self.selectedObject.Proxy
-			self.setToolProperties(self.selectedObject)
-			
+			self.setToolProperties(self.selectedObject)			
 			return True
 		return False
 		

@@ -1,8 +1,11 @@
 from PySide import QtGui, QtCore
 import FreeCAD, FreeCADGui
 
-def setLabel(label,color):
-	label.setStyleSheet("QLabel {background-color: " + color + "}")
+def setLabel(label,valid):
+	if valid == 'INVALID':
+		label.setStyleSheet("QLabel {background-color: red;}")
+	else:
+		label.setStyleSheet("")
 	
 def isfloat(s):
 	try:
@@ -11,30 +14,33 @@ def isfloat(s):
 	except:
 		return False
 		
-def validate(edit, label, args):
+def validate(edit, label, required, valid, args):
 	s = edit.text().lower().strip()
-	if len(s) == 0:
-		setLabel(label,'red')
-		return "INVALID"
+	if len(s) == 0 and required == True:
+		setLabel(label,'INVALID')
+		return False
+	elif len(s) == 0 and required == False:
+		setLabel(label, 'VALID')
+		return valid
 	i = len(s)
 	while i > 0:
 		if isfloat(s[0:i]) is True: break
 		else: i = i - 1
 	val = s[0:i]
 	if val == "":
-		setLabel(label,'red')
-		return "INVALID"
+		setLabel(label,'INVALID')
+		return False
 	s = s.strip()[i:]
 	if len(s) == 0:
-		setLabel(label,'white')
-		return 'VALID'
+		setLabel(label,'VALID')
+		return valid
 	try:
 		args.index(s)
-		setLabel(label,'white')
-		return 'VALID'
+		setLabel(label,'VALID')
+		return valid
 	except:
-		setLabel(label,'red')
-		return 'INVALID'
+		setLabel(label,'INVALID')
+		return False
 
 def toSystemValue(edit,form):
 	if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units").GetInt("UserSchema") in [0, 1, 4, 6]:

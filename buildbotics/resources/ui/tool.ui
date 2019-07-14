@@ -76,7 +76,7 @@ background-color: 'white';
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-          <widget class="QLabel" name="label_3">
+          <widget class="QLabel" name="toolTypeLabel">
            <property name="text">
             <string>Tool Type</string>
            </property>
@@ -163,7 +163,7 @@ background-color: 'white';
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="nameLabel">
            <property name="text">
             <string>Tool Name</string>
            </property>
