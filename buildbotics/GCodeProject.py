@@ -175,10 +175,12 @@ class GCodeProject():
 		self.defineJobUi =  FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + '/resources/ui/createjob.ui')
 		self.defineJobUi.buttonBox.accepted.connect(self.accept)
 		self.defineJobUi.buttonBox.rejected.connect(self.reject)
-		self.defineJobUi.nameLE.textChanged.connect(self.validate)
+		#self.defineJobUi.nameLE.textChanged.connect(self.validate)
 		
+		"""
 		intValid = VALID.MyIntValidator()
 		doubleValid = VALID.MyDoubleValidator()	
+		"""
 
 	def GetResources(self):
 		return {'Pixmap'  : os.path.dirname(__file__) + '/resources/svg/cnc.svg', # the name of a svg file available in the resources
@@ -198,9 +200,8 @@ class GCodeProject():
 		if numberOfInstances != 1: return False
 		return True	
 		
+	"""
 	def validate(self):
-		""" Check fields, turn label red if they are not complete or are invalid. Only enable OK if everything is
-		complete and valid"""
 		valid = True
 		if VALID.setLineEditLabelBG(self.defineJobUi.nameLE, self.defineJobUi.nameLabel) is not True: valid = False
 		name = self.defineJobUi.nameLE.text().strip()
@@ -209,6 +210,7 @@ class GCodeProject():
 			valid = False
 			
 		return valid
+	"""
 		
 	def Activated(self):
 		if self.aGCodeJobIsSelected():

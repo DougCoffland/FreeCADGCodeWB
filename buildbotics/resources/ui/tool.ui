@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>726</width>
-    <height>562</height>
+    <width>861</width>
+    <height>750</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,6 +18,12 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="maximumSize">
    <size>
@@ -34,190 +40,168 @@
   <property name="windowTitle">
    <string>Define Tool</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
+  <property name="styleSheet">
+   <string notr="true">font: 75 italic 16pt &quot;Gentium&quot;;
+selection-background-color: rgb(255, 255, 255);
+background-color: rgb(249, 235, 192);
+QlineEdit {background-color: 'white'};
+</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_6">
    <item>
-    <widget class="QFrame" name="frame_4">
+    <widget class="QFrame" name="frame_8">
+     <property name="styleSheet">
+      <string notr="true">QLineEdit {
+padding: 1px;
+border-style: solid;
+border: 2px solid gray;
+border-radius: 8px;
+background-color: 'white';
+}</string>
+     </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
      <property name="frameShadow">
       <enum>QFrame::Plain</enum>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
       <item>
-       <widget class="QFrame" name="frame_2">
+       <widget class="QFrame" name="frame_5">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="frameShadow">
          <enum>QFrame::Plain</enum>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-          <layout class="QFormLayout" name="formLayout">
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="nameEdit"/>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Tool Number</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="numberEdit"/>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_3">
-             <property name="text">
-              <string>Tool Type</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QComboBox" name="toolTypeCB">
-             <item>
-              <property name="text">
-               <string>None Selected...</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Straight</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Tapered</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Conical</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Ball</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Tapered Ball</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label">
-             <property name="text">
-              <string>Tool Name</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_31">
-             <property name="text">
-              <string>Make</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="makeEdit"/>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_32">
-             <property name="text">
-              <string>Model</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="modelEdit"/>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_10">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
+          <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>Speeds and Feeds (recommended)</string>
+            <string>Tool Type</string>
            </property>
           </widget>
          </item>
          <item>
-          <layout class="QFormLayout" name="formLayout_2">
-           <item row="3" column="0">
-            <widget class="QLabel" name="plungeRateL">
-             <property name="text">
-              <string>Plunge Feed Rate</string>
-             </property>
-            </widget>
+          <widget class="QComboBox" name="toolTypeCB">
+           <item>
+            <property name="text">
+             <string>None Selected...</string>
+            </property>
            </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="plungeRateEdit"/>
+           <item>
+            <property name="text">
+             <string>Straight</string>
+            </property>
            </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_6">
-             <property name="text">
-              <string>Spindle Speed (rpm)</string>
-             </property>
-            </widget>
+           <item>
+            <property name="text">
+             <string>Tapered</string>
+            </property>
            </item>
-           <item row="4" column="1">
-            <widget class="QLineEdit" name="spindleSpeedEdit"/>
+           <item>
+            <property name="text">
+             <string>Conical</string>
+            </property>
            </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="stepOverL">
-             <property name="text">
-              <string>Step Over</string>
-             </property>
-            </widget>
+           <item>
+            <property name="text">
+             <string>Ball</string>
+            </property>
            </item>
-           <item row="5" column="1">
-            <widget class="QLineEdit" name="stepOverEdit"/>
+           <item>
+            <property name="text">
+             <string>Tapered Ball</string>
+            </property>
            </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="docL">
-             <property name="text">
-              <string>Depth of Cut</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="1">
-            <widget class="QLineEdit" name="depthOfCutEdit"/>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="feedRateL">
-             <property name="text">
-              <string>Feed Rate</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="feedRateEdit"/>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_33">
-             <property name="text">
-              <string>Workpiece Material</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="materialEdit"/>
-           </item>
-          </layout>
+          </widget>
          </item>
         </layout>
        </widget>
       </item>
+      <item>
+       <widget class="QFrame" name="frame_6">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QLabel" name="numberLabel">
+           <property name="text">
+            <string>Tool Number</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="numberEdit"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame_7">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Tool Name</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="nameEdit"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QLineEdit {
+padding: 1px;
+border-style: solid;
+border: 2px solid gray;
+border-radius: 8px;
+background-color: 'white';
+}</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_8">
       <item>
        <widget class="QFrame" name="frame_3">
         <property name="frameShape">
@@ -236,17 +220,26 @@
             </sizepolicy>
            </property>
            <property name="currentIndex">
-            <number>6</number>
+            <number>5</number>
            </property>
            <widget class="QWidget" name="blankPage"/>
            <widget class="QWidget" name="straightPage">
             <layout class="QHBoxLayout" name="horizontalLayout_6">
              <item>
               <layout class="QFormLayout" name="straightToolForm">
+               <property name="labelAlignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="formAlignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+               </property>
                <item row="0" column="0">
                 <widget class="QLabel" name="straightDiameterL">
                  <property name="text">
                   <string>Diameter</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                  </property>
                 </widget>
                </item>
@@ -258,6 +251,9 @@
                  <property name="text">
                   <string>Cut Length</string>
                  </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
                 </widget>
                </item>
                <item row="1" column="1">
@@ -268,6 +264,9 @@
                  <property name="text">
                   <string>Tool Length</string>
                  </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
                 </widget>
                </item>
                <item row="2" column="1">
@@ -277,6 +276,9 @@
                 <widget class="QLabel" name="staightShaftDiameterL">
                  <property name="text">
                   <string>Shaft Diameter</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                  </property>
                 </widget>
                </item>
@@ -291,6 +293,12 @@
             <layout class="QHBoxLayout" name="horizontalLayout_4">
              <item>
               <layout class="QFormLayout" name="taperedToolForm">
+               <property name="labelAlignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="formAlignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+               </property>
                <item row="0" column="0">
                 <widget class="QLabel" name="taperedTopDiameterL">
                  <property name="text">
@@ -349,6 +357,12 @@
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
               <layout class="QFormLayout" name="conicalToolForm">
+               <property name="labelAlignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="formAlignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+               </property>
                <item row="0" column="0">
                 <widget class="QLabel" name="conicalTopDiameterL">
                  <property name="text">
@@ -397,6 +411,12 @@
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <item>
               <layout class="QFormLayout" name="ballToolForm">
+               <property name="labelAlignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="formAlignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+               </property>
                <item row="0" column="1">
                 <widget class="QLineEdit" name="ballDiameterEdit"/>
                </item>
@@ -435,6 +455,12 @@
             <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
               <layout class="QFormLayout" name="formLayout_3">
+               <property name="labelAlignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="formAlignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+               </property>
                <item row="0" column="0">
                 <widget class="QLabel" name="taperedBallTopDiameterL">
                  <property name="text">
@@ -492,62 +518,237 @@
            <widget class="QWidget" name="page_2"/>
           </widget>
          </item>
-         <item>
-          <widget class="QLabel" name="imageLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QFrame" name="frame">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="frameShape">
-            <enum>QFrame::NoFrame</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Plain</enum>
-           </property>
-          </widget>
-         </item>
         </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="imageLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
+    <widget class="QLabel" name="label_10">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
+     <property name="text">
+      <string>Optional Information</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame_4">
+     <property name="styleSheet">
+      <string notr="true">QLineEdit {
+padding: 1px;
+border-style: solid;
+border: 2px solid gray;
+border-radius: 8px;
+background-color: 'white';
+}</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <item>
+       <widget class="QFrame" name="frame_2">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2"/>
+       </widget>
+      </item>
+      <item>
+       <layout class="QFormLayout" name="formLayout_4">
+        <property name="labelAlignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_31">
+          <property name="text">
+           <string>Make</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="makeEdit"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_32">
+          <property name="text">
+           <string>Model</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="modelEdit"/>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="stepOverL">
+          <property name="text">
+           <string>Step Over</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="stepOverEdit"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="docL">
+          <property name="text">
+           <string>Depth of Cut</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="depthOfCutEdit"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QFormLayout" name="formLayout_2">
+        <property name="labelAlignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <item row="4" column="0">
+         <widget class="QLabel" name="plungeRateL">
+          <property name="text">
+           <string>Plunge Rate</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="plungeRateEdit"/>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="spindleSpeedLabel">
+          <property name="text">
+           <string>Spindle Speed </string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QLineEdit" name="spindleSpeedEdit"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="feedRateL">
+          <property name="text">
+           <string>Feed Rate</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="feedRateEdit"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_33">
+          <property name="text">
+           <string>Stock Material</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="materialEdit"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame_9">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_9">
+      <item>
+       <widget class="QLabel" name="unitsLabel">
+        <property name="styleSheet">
+         <string notr="true">color: rgb(114, 159, 207);</string>
+        </property>
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDialogButtonBox" name="buttonBox">
+        <property name="styleSheet">
+         <string notr="true">background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(255, 235, 235, 206), stop:0.35 rgba(255, 188, 188, 80), stop:0.4 rgba(255, 162, 162, 80), stop:0.425 rgba(255, 132, 132, 156), stop:0.44 rgba(252, 128, 128, 80), stop:1 rgba(255, 255, 255, 0));</string>
+        </property>
+        <property name="standardButtons">
+         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>nameEdit</tabstop>
-  <tabstop>numberEdit</tabstop>
-  <tabstop>makeEdit</tabstop>
-  <tabstop>modelEdit</tabstop>
   <tabstop>toolTypeCB</tabstop>
-  <tabstop>materialEdit</tabstop>
-  <tabstop>feedRateEdit</tabstop>
-  <tabstop>plungeRateEdit</tabstop>
-  <tabstop>spindleSpeedEdit</tabstop>
-  <tabstop>stepOverEdit</tabstop>
-  <tabstop>depthOfCutEdit</tabstop>
+  <tabstop>numberEdit</tabstop>
+  <tabstop>nameEdit</tabstop>
+  <tabstop>taperedBallTopDiameterEdit</tabstop>
+  <tabstop>taperedBallDiameterEdit</tabstop>
+  <tabstop>taperedBallCutLengthEdit</tabstop>
+  <tabstop>taperedBallToolLengthEdit</tabstop>
+  <tabstop>taperedBallShaftDiameterEdit</tabstop>
   <tabstop>straightDiameterEdit</tabstop>
   <tabstop>straightCutLengthEdit</tabstop>
   <tabstop>straightToolLengthEdit</tabstop>
@@ -564,11 +765,14 @@
   <tabstop>ballDiameterEdit</tabstop>
   <tabstop>ballToolLengthEdit</tabstop>
   <tabstop>ballShaftDiameterEdit</tabstop>
-  <tabstop>taperedBallTopDiameterEdit</tabstop>
-  <tabstop>taperedBallDiameterEdit</tabstop>
-  <tabstop>taperedBallCutLengthEdit</tabstop>
-  <tabstop>taperedBallToolLengthEdit</tabstop>
-  <tabstop>taperedBallShaftDiameterEdit</tabstop>
+  <tabstop>makeEdit</tabstop>
+  <tabstop>modelEdit</tabstop>
+  <tabstop>depthOfCutEdit</tabstop>
+  <tabstop>stepOverEdit</tabstop>
+  <tabstop>materialEdit</tabstop>
+  <tabstop>feedRateEdit</tabstop>
+  <tabstop>plungeRateEdit</tabstop>
+  <tabstop>spindleSpeedEdit</tabstop>
  </tabstops>
  <resources/>
  <connections/>
