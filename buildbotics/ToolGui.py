@@ -203,7 +203,6 @@ class ToolGui():
 		ui.buttonBox.buttons()[0].setEnabled(valid)
 		return valid
 		
-
 	def changeToolTypeWidget(self):
 		i = self.createToolUi.toolTypeCB.currentIndex()
 		self.createToolUi.stackedWidget.setCurrentIndex(i)
@@ -340,7 +339,7 @@ class ToolGui():
 		ui = self.createToolUi
 		ui.hide()
 		if self.selectedObject.ObjectType == "ToolTable":
-			self.tool = Tool(self.createToolUi, self.selectedObject)
+			self.tool = Tool(self.selectedObject)
 			self.setToolProperties(self.tool.getObject())
 			return True
 		elif self.selectedObject.ObjectType in self.toolTypes:

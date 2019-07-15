@@ -50,8 +50,8 @@ class ViewTool:
 		return None
 		
 	def __setstate__(self,state):
-		return None
-		
+		return
+
 	def getIcon(self):
 		return """
 /* XPM */
@@ -516,12 +516,11 @@ static char * taperedBallBitPic_xpm[] = {
 """
 			
 class Tool():
-	def __init__(self,ui,selectedObject):
+	def __init__(self,selectedObject):
 		obj = FreeCAD.ActiveDocument.addObject('App::FeaturePython', "Tool")
 		obj.Proxy = self
 		self.obj = obj
-		selectedObject.addObject(obj)
-		FreeCAD.ActiveDocument.recompute()
+		selectedObject.addObject(self.obj)
 		
 	def getObject(self):
 		return self.obj
@@ -542,7 +541,18 @@ class Tool():
 		elif obj.ToolType== "TaperedBall": ViewTaperedBallTool(obj.ViewObject)
 
 		obj.setEditorMode("ObjectType",("ReadOnly",))
-		FreeCAD.ActiveDocument.recompute()		
+		for prop in obj.PropertiesList:
+			obj.setEditorMode(prop,("ReadOnly",))
+		self.obj = obj
+		FreeCAD.ActiveDocument.recompute()
+		
+	def __getstate__(self):
+		state = {}
+		state["props"] = []
+		return state
+		
+	def __setstate__(self, state):
+		return		
 	
 	def IsActive(self):
 		return True

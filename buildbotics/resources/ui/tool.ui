@@ -220,9 +220,22 @@ background-color: 'white';
             </sizepolicy>
            </property>
            <property name="currentIndex">
-            <number>5</number>
+            <number>0</number>
            </property>
-           <widget class="QWidget" name="blankPage"/>
+           <widget class="QWidget" name="blankPage">
+            <layout class="QVBoxLayout" name="verticalLayout_7">
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>Select a tool</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
            <widget class="QWidget" name="straightPage">
             <layout class="QHBoxLayout" name="horizontalLayout_6">
              <item>
@@ -515,7 +528,6 @@ background-color: 'white';
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="page_2"/>
           </widget>
          </item>
         </layout>
