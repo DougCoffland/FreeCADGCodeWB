@@ -42,6 +42,21 @@ def validate(edit, label, required, valid, args):
 		setLabel(label,'INVALID')
 		return False
 
+def fromSystemValue(form,value):
+	if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units").GetInt("UserSchema") in [0, 1, 4, 6]:
+		userPref = 'METRIC'
+	else:
+		userPref = 'IMPERIAL'
+	if form == 'velocity':
+		if userPref == 'METRIC': return str(value)
+		value = eval(str(value).split()[0])
+		return str(round(value * 60 / 25.4, 2)) + ' in/min'
+	elif form == 'length':
+		if userPref == 'METRIC': return str(value)
+		value = eval(str(value).split()[0])
+		return str(round(value / 25.4,4)) + ' in'
+	elif form == 'angle': return str(value)
+
 def toSystemValue(edit,form):
 	if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units").GetInt("UserSchema") in [0, 1, 4, 6]:
 		userPref = 'METRIC'
@@ -94,30 +109,4 @@ class MyIntValidator(QtGui.QIntValidator):
             return(QtGui.QValidator.Invalid)
       return super(MyIntValidator,self).validate(text,pos)
 
-"""		
-class MyDoubleValidator(QtGui.QDoubleValidator):
-   def __init__(self, parent=None):
-      super(MyDoubleValidator, self).__init__()
-      super(MyDoubleValidator,self).setBottom(0.0)
-
-   def validate(self, text, pos):
-      if (pos == 1):
-         if text == "-":
-            return(QtGui.QValidator.Invalid)
-      return super(MyDoubleValidator,self).validate(text,pos)
-      
-def setComboBoxLabelBG(combo, label):
-	if combo.currentIndex() == 0:
-		label.setStyleSheet("QLabel {background-color: red}")
-		return False
-	label.setStyleSheet("QLabel {background-color: rgb(238, 238, 236)}")
-	return True
-
-def setLineEditLabelBG(edit, label):
-	if edit.text().strip() == "":
-		label.setStyleSheet("QLabel {background-color: red}")
-		return False
-	label.setStyleSheet("QLabel {background-color: rgb(238, 238, 236)}")
-	return True
-"""
  

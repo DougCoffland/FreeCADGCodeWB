@@ -532,7 +532,7 @@ class Tool():
 		for prop in p:
 			newprop = obj.addProperty(prop[0],prop[1])
 			setattr(newprop,prop[1],prop[2])
-		obj.Label = obj.Name
+		#obj.Label = obj.Name
 
 		if obj.ToolType == "Straight": ViewStraightTool(obj.ViewObject)
 		elif obj.ToolType == "Tapered": ViewTaperedTool(obj.ViewObject)

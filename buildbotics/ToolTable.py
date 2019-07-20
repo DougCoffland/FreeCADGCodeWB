@@ -25,6 +25,10 @@
 import FreeCAD,FreeCADGui
 from PySide import QtGui, QtCore
 import os
+import validator as VAL
+import ToolGui
+from Tool import Tool
+import json
 
 class ViewToolTable:
 	def __init__(self,obj):
@@ -195,36 +199,298 @@ static char * tooltable_xpm[] = {
 
 class ToolTable():
 	def __init__(self):
-		self.createTTUi =  FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + "/resources/ui/tooltable.ui")
-		self.createTTUi.buttonBox.accepted.connect(self.accept)
-		self.createTTUi.buttonBox.rejected.connect(self.reject)
+		self.createTTUi = FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + "/resources/ui/tooltable.ui")
+		ui = self.createTTUi
+		ui.buttonBox.accepted.connect(self.accept)
+		ui.buttonBox.rejected.connect(self.reject)
+		ui.buttonBox.button(QtGui.QDialogButtonBox.Apply).clicked.connect(self.apply)
+		ui.nameLE.textChanged.connect(self.validateAllFields)
+		ui.tableWidget.itemSelectionChanged.connect(self.setButtonStates)
+		ui.addBtn.clicked.connect(self.addTool)
+		ui.editBtn.clicked.connect(self.editTool)
+		ui.removeBtn.clicked.connect(self.removeTool)
+		ui.upBtn.clicked.connect(self.moveToolUp)
+		ui.downBtn.clicked.connect(self.moveToolDown)
+		ui.loadBtn.clicked.connect(self.onLoad)
+		ui.saveBtn.clicked.connect(self.onSave)
+		
+		self.waitingOnToolGui = False
+		self.dirty = False
+		self.toolList = []
+		self.validateAllFields()
 
 	def GetResources(self):
 		return {'Pixmap'  : os.path.dirname(__file__) +  "/resources/svg/tooltable.svg", # the name of a svg file available in the resources
                 'MenuText': "New Tool Table",
                 'ToolTip' : "Sets up a new tool table that an be used for creating G-Code paths from FreeCAD Shapes"}
 
-	def Activated(self):        
+	def addTool(self):
+		ToolGui.setGUIMode("AddingToolFromGUI")
+		FreeCADGui.runCommand('New_Tool')
+		self.waitingOnToolGui = True
+		self.validateAllFields()
+		
+	def editTool(self):
+		ui = self.createTTUi
+		row = ui.tableWidget.row(ui.tableWidget.selectedItems()[0])
+		ToolGui.setGUIProperties(self.toolList[row]['label'],self.toolList[row]['properties'])
+		ToolGui.setGUIMode("EditingToolFromGUI")
+		FreeCADGui.runCommand('New_Tool')
+		self.waitingOnToolGui = True
+		self.validateAllFields()
+		
+	def removeTool(self):
+		table = self.createTTUi.tableWidget
+		row = table.row(table.selectedItems()[0])
+		table.removeRow(row)
+		self.toolList.pop(row)
+		self.validateAllFields()
+		
+	def moveToolUp(self):
+		table = self.createTTUi.tableWidget
+		row = table.row(table.selectedItems()[0])
+		toolNumber = table.item(row,0).text()
+		toolType = table.item(row,1).text()
+		toolLabel = table.item(row,2).text()
+		line = self.toolList.pop(row)
+		self.toolList.insert(row-1,line)
+		table.removeRow(row)
+		table.insertRow(row-1)
+		table.setItem(row-1,0,QtGui.QTableWidgetItem(toolNumber))
+		table.setItem(row-1,1,QtGui.QTableWidgetItem(toolType))
+		table.setItem(row-1,2,QtGui.QTableWidgetItem(toolLabel))
+		table.item(row-1,0).setSelected(True)
+		self.validateAllFields()
+		
+	def moveToolDown(self):
+		table = self.createTTUi.tableWidget
+		row = table.row(table.selectedItems()[0])
+		toolNumber = table.item(row,0).text()
+		toolType = table.item(row,1).text()
+		toolLabel = table.item(row,2).text()
+		line = self.toolList.pop(row)
+		self.toolList.insert(row+1,line)
+		table.removeRow(row)
+		table.insertRow(row+1)
+		table.setItem(row+1,0,QtGui.QTableWidgetItem(toolNumber))
+		table.setItem(row+1,1,QtGui.QTableWidgetItem(toolType))
+		table.setItem(row+1,2,QtGui.QTableWidgetItem(toolLabel))
+		table.item(row+1,0).setSelected(True)
+		self.validateAllFields()
+		
+	def onLoad(self):
+		if len(self.toolList) > 0:
+			question = "Deleting all existing tools!\n\n\nClick Yes to continue"
+			areYouSure.questionLabel.setText(question)
+			if areYouSure.exec_() == False:
+				return
+		f = QtGui.QFileDialog.getOpenFileName(parent = None, caption = "Open File")
+		try:
+			fp = open(f[0],"rt")
+		except:
+			return
+		self.toolList = []
+		table = self.ui.tableWidget
+		self.toolList = fp.read()
+		for tool in self.toolList:
+			row = table.rowCount()
+			table.insertRow(row)
+			table.setItem(row,0,QtGui.QTableWidgetItem(toolNumber))
+			table.setItem(row,1,QtGui.QTableWidgetItem(toolType))
+			table.setItem(row,2,QtGui.QTableWidgetItem(toolLabel))
+		fp.close()
+		self.dirty = True
+		table.selectRow(0)
+		self.validateAllFields()
+	
+	def onSave(self):
+		f = QtGui.QFileDialog.getSaveFileName(parent = None, caption = "Select a File")
+		try:
+			fp = open(f[0],"wb")
+		except:
+			return
+		fp.write(self.toolList)
+		fp.close()
+
+
+	def processToolGuiResult(self):
+		ui = self.createTTUi
+		table = ui.tableWidget
+		self.waitingOnToolGui = False
+		mode = ToolGui.getGUIMode()
+		if mode == "AddingToolFromGUI":
+			props = ToolGui.getGUIProperties()
+			for prop in props["properties"]:
+				if prop[1] == 'ToolType': toolType = prop[2]
+				if prop[1] == 'Number': toolNumber = str(prop[2])
+			toolLabel = props["label"]
+			row = table.rowCount()
+			table.insertRow(row)
+			table.setItem(row,0,QtGui.QTableWidgetItem(toolNumber))
+			table.setItem(row,1,QtGui.QTableWidgetItem(toolType))
+			table.setItem(row,2,QtGui.QTableWidgetItem(toolLabel))
+			self.toolList.append(props)
+			self.dirty = True
+		elif mode == "EditingToolFromGUI":
+			props = ToolGui.getGUIProperties()
+			for prop in props["properties"]:
+				if prop[1] == 'ToolType': toolType = prop[2]
+				if prop[1] == 'Number': toolNumber = str(prop[2])
+			toolLabel = props["label"]
+			row = table.row(table.selectedItems()[0])
+			table.setItem(row,0,QtGui.QTableWidgetItem(toolNumber))
+			table.setItem(row,1,QtGui.QTableWidgetItem(toolType))
+			table.setItem(row,2,QtGui.QTableWidgetItem(toolLabel))
+			self.toolList.insert(row,props)
+			self.dirty = True
+		ToolGui.setGUIMode('None')
+		self.validateAllFields()
+				
+	def validateAllFields(self):
+		ui = self.createTTUi
+		valid = True
+		if ui.nameLE.text() == "":
+			valid = False
+			VAL.setLabel(ui.ttNameLabel,False)
+		self.dirty = True
+		self.setButtonStates()
+		return valid
+		
+	def setButtonStates(self):
+		ui = self.createTTUi
+		table = ui.tableWidget
+		ui.buttonBox.buttons()[0].setEnabled(self.dirty)
+		ui.buttonBox.button(QtGui.QDialogButtonBox.Apply).setEnabled(self.dirty)
+		if len(table.selectedItems()) == 1:
+			ui.editBtn.setEnabled(True)
+			ui.removeBtn.setEnabled(True)
+			row = table.row(table.selectedItems()[0])
+			if row == 0: ui.upBtn.setEnabled(False)
+			else: ui.upBtn.setEnabled(True)
+			if row == (table.rowCount() - 1): ui.downBtn.setEnabled(False)
+			else: ui.downBtn.setEnabled(True)
+		else:
+			ui.editBtn.setEnabled(False)
+			ui.removeBtn.setEnabled(False)
+			ui.upBtn.setEnabled(False)
+			ui.downBtn.setEnabled(False)
+		
+	def saveToolTableProperties(self,obj):
+		ui = self.createTTUi
+		ViewToolTable(obj.ViewObject)		
+		obj.addProperty("App::PropertyString","ObjectType").ObjectType = "ToolTable"
+		obj.Label = ui.nameLE.text()
+		
+		for prop in obj.PropertiesList:
+			obj.setEditorMode(prop,("ReadOnly",))
+			
+	def getPropertiesFromTool(self,tool):
+		p = []
+		S = "App::PropertyString"
+		I = "App::PropertyInteger"
+		L = "App::PropertyLength"
+		A = "App::PropertyAngle"
+		V = "App::PropertySpeed"
+		Q = "App::PropertyQuantity"	
+		p = [[S,	"ObjectType",		tool.ObjectType],
+		     [I,	"Number",			tool.Number],		     
+		     [S,	"ToolType",			tool.ToolType]]
+		if hasattr(tool,"Make"): p.append([S,'Make',tool.Make])
+		if hasattr(tool,"Model"): p.append([S,'Model',tool.Model])
+		if hasattr(tool,"StockMaterial"): p.append([S,'StockMaterial',tool.StockMaterial])
+		if hasattr(tool,"FeedRate"): p.append([V,'FeedRate',tool.FeedRate])
+		if hasattr(tool,"PlungeRate"): p.append([V,'PlungeRate',tool.PlungeRate])
+		if hasattr(tool,"SpindleSpeed"): p.append([S,'SpindleSpeed',tool.SpindleSpeed])
+		if hasattr(tool,"StepOver"): p.append([L,'StepOver',tool.StepOver])
+		if hasattr(tool,"DepthOfCut"): p.append([L,'DepthOfCut',tool.DepthOfCut])
+		
+		if hasattr(tool,"Diameter"): p.append([L,'Diameter',tool.Diameter])
+		if hasattr(tool,"CutLength"): p.append([L,'CutLength',tool.CutLength])
+		if hasattr(tool,"ToolLength"): p.append([L,'ToolLength',tool.ToolLength])
+		if hasattr(tool,"ShaftDiameter"): p.append([L,'ShaftDiameter',tool.ShaftDiameter])
+		if hasattr(tool,"TopDiameter"): p.append([L,'TopDiameter',tool.TopDiameter])
+		if hasattr(tool,"BottomDiameter"): p.append([L,'BottomDiameter',tool.BottomDiameter])
+		if hasattr(tool,"CutAngle"): p.append([A,'CutAngle',tool.CutAngle])
+		if hasattr(tool,"BallDiameter"): p.append([L,'BallDiameter',tool.BallDiameter])
+		return {'label': tool.Label, 'properties': p}
+
+	def Activated(self):
+		ui = self.createTTUi
+		if self.selectedObject == None:
+			self.toolList = []
+			ui.nameLE.setText("")
+			while ui.tableWidget.rowCount() > 0: ui.tableWidget.removeRow(0)
+		else:
+			ui.nameLE.setText(self.selectedObject.Label)
+			table = ui.tableWidget
+			while table.rowCount() > 0: ui.tableWidget.removeRow(0)
+			self.toolList = []
+			for tool in self.selectedObject.Group:
+				self.toolList.append(self.getPropertiesFromTool(tool))
+				row = table.rowCount()
+				table.insertRow(row)
+				table.setItem(row,0,QtGui.QTableWidgetItem(str(tool.Number)))
+				table.setItem(row,1,QtGui.QTableWidgetItem(tool.ToolType))
+				table.setItem(row,2,QtGui.QTableWidgetItem(tool.Label))
+
+		self.validateAllFields()
+		self.dirty = False        
 		self.createTTUi.show()       
 		return
-        
+		
+	def apply(self):
+		ui = self.createTTUi
+		if self.dirty == True:
+			if self.selectedObject == None:
+				obj = FreeCAD.ActiveDocument.addObject('App::DocumentObjectGroupPython', "ToolTable")
+				ViewToolTable(obj.ViewObject)
+				obj.addProperty("App::PropertyString","ObjectType")
+				obj.ObjectType = "ToolTable"
+				obj.setEditorMode("ObjectType",("ReadOnly",))
+				self.selectedObject = obj
+				FreeCADGui.Selection.clearSelection()
+				FreeCADGui.Selection.addSelection(obj)
+			for tool in self.selectedObject.Group:
+				FreeCAD.ActiveDocument.removeObject(tool.Name)				
+			for line in self.toolList:
+				tool = Tool(self.selectedObject)
+				tool.getObject().Label = line['label']
+				tool.setProperties(line['properties'], tool.getObject())
+			self.selectedObject.Label = ui.nameLE.text()
+			self.dirty = False
+			FreeCAD.ActiveDocument.recompute()
+			
 	def accept(self):
-		self.createTTUi.hide()
-		obj = FreeCAD.ActiveDocument.addObject('App::DocumentObjectGroupPython', "ToolTable")
-		ViewToolTable(obj.ViewObject)
-		obj.addProperty("App::PropertyString","ObjectType")
-		obj.ObjectType = "ToolTable"
-		obj.setEditorMode("ObjectType",("ReadOnly",))
-		FreeCAD.ActiveDocument.recompute()
+		ui = self.createTTUi
+		ui.hide()
+		while ui.tableWidget.rowCount() > 0: ui.tableWidget.removeRow(0)
+		self.apply()
 		return True
 		
 	def reject(self):
-		self.createTTUi.hide()
+		ui = self.createTTUi
+		ui.hide()
+		while ui.tableWidget.rowCount() > 0: ui.tableWidget.removeRow(0)
+		self.dirty = False
+		self.toolList = []
 		return False
 
 	def IsActive(self):
 		"""Here you can define if the command must be active or not (greyed) if certain conditions
 		are met or not. This function is optional."""
+		if self.waitingOnToolGui == True:
+			if ToolGui.getStatus() == 'hidden': self.processToolGuiResult()
+		mw = FreeCADGui.getMainWindow()
+		tree = mw.findChildren(QtGui.QTreeWidget)[0]
+		if len(tree.selectedItems()) != 1:
+			self.selectedObject = None
+			return True
+		item = tree.selectedItems()[0]
+		obj = FreeCAD.ActiveDocument.getObjectsByLabel(item.text(0))[0]
+		if obj.ObjectType == "ToolTable":
+			self.selectedObject = obj
+			return True
+		self.selectedObject = None
 		return True
 
 FreeCADGui.addCommand('New_Tooltable',ToolTable())

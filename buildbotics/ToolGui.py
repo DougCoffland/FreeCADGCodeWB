@@ -47,8 +47,33 @@ LENGTH = ['mm',
 		  'f', 'ft', "'"]
 ANGLE = ['degree', 'degrees','deg', 'd', 'rad', 'r', 'radian', 'radians']
 
+GUI_STATUS = 'hidden'
+def getStatus():
+	return GUI_STATUS
+	
+def setStatus(status):
+	global GUI_STATUS
+	GUI_STATUS = status
+
+GUI_MODE = 'None'
+def getGUIMode():
+	return GUI_MODE
+	
+def setGUIMode(mode):
+	global GUI_MODE
+	GUI_MODE = mode
+	
+GUI_PROPERTIES = {}
+def getGUIProperties():
+	return GUI_PROPERTIES
+	
+def setGUIProperties(label,properties):
+	global GUI_PROPERTIES
+	GUI_PROPERTIES["label"] = label
+	GUI_PROPERTIES["properties"] = properties
+ 
 class ToolGui():
-	def __init__(self):			
+	def __init__(self):		
 		self.createToolUi = FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + "/resources/ui/tool.ui")
 		
 		self.straightToolPic = QtGui.QPixmap(os.path.dirname(__file__) + "/resources/png/straightBitPic.png")				
@@ -102,6 +127,9 @@ class ToolGui():
 		ui.buttonBox.accepted.connect(self.accept)
 		ui.buttonBox.rejected.connect(self.reject)
 		ui.toolTypeCB.currentIndexChanged.connect(self.changeToolTypeWidget)
+		
+		self.selectedObject = None
+		self.currentToolNumber = -1
 		
 	def reset(self):
 		ui = self.createToolUi
@@ -159,7 +187,7 @@ class ToolGui():
 		else:
 			VAL.setLabel(ui.numberLabel, 'VALID') 
 			for tool in self.parent.Group:
-				if tool == self.selectedObject: continue
+				if tool.Number == self.currentToolNumber: continue
 				if str(tool.Number) == ui.numberEdit.text():
 					VAL.setLabel(ui.numberLabel,'INVALID')
 					valid = False
@@ -223,10 +251,7 @@ class ToolGui():
 			self.units = 'in'
 
 	def getToolProperties(self,obj):
-		ui = self.createToolUi
-		if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units").GetInt("UserSchema") in [0, 1, 4, 6]: units = 1
-		else: units = 1/25.4
-		
+		ui = self.createToolUi		
 		ui.stackedWidget.setCurrentIndex(self.toolTypes.index(obj.ObjectType) + 1)      
 		ui.nameEdit.setText(obj.Label)
 		ui.numberEdit.setText(str(obj.Number))
@@ -266,9 +291,52 @@ class ToolGui():
 			ui.taperedBallDiameterEdit.setText(obj.BallDiameter.UserString)
 			ui.taperedBallCutLengthEdit.setText(obj.CutAngle.UserString)
 			ui.taperedBallToolLengthEdit.setText(obj.ToolLength.UserString)
-			ui.taperedBallShaftDiameterEdit.setText(obj.ShaftDiameter.UserString)		
-					
-	def setToolProperties(self, obj):
+			ui.taperedBallShaftDiameterEdit.setText(obj.ShaftDiameter.UserString)
+	
+	def getToolPropertiesFromGUI(self,props):
+		ui = self.createToolUi
+		ui.nameEdit.setText(props['label'])
+		for prop in props['properties']:
+			if prop[1] == 'ToolType': toolType = prop[2]
+		for prop in props['properties']:
+			if prop[1] == 'Number': ui.numberEdit.setText(str(prop[2]))
+			elif prop[1] == 'Make': ui.makeEdit.setText(prop[2])
+			elif prop[1] == 'Model': ui.modelEdit.setText(prop[2])
+			elif prop[1] == 'ToolType': ui.toolTypeCB.setCurrentIndex(ui.toolTypeCB.findText(prop[2]))
+			elif prop[1] == 'StockMaterial': ui.materialEdit.setText(prop[2])
+			elif prop[1] == 'FeedRate': ui.feedRateEdit.setText(VAL.fromSystemValue('velocity',prop[2]))
+			elif prop[1] == 'PlungeRate': ui.plungeRateEdit.setText(VAL.fromSystemValue('velocity',prop[2]))
+			elif prop[1] == 'SpindleSpeed': ui.spindleSpeedEdit.setText(prop[2])
+			elif prop[1] == 'StepOver': ui.stepOverEdit.setText(VAL.fromSystemValue('length',prop[2]))
+			elif prop[1] == 'DepthOfCut': ui.depthOfCutEdit.setText(VAL.fromSystemValue('length',prop[2]))
+			elif toolType == "Straight":
+				if prop[1] == 'Diameter': ui.straightDiameterEdit.setText(VAL.fromSystemValue('length',prop[2]))
+				elif prop[1] == 'CutLength': ui.straightCutLengthEdit.setText(VAL.fromSystemValue('length',prop[2]))
+				elif prop[1] == 'ToolLength': ui.straightToolLengthEdit.setText(VAL.fromSystemValue('length',prop[2]))
+				elif prop[1] == 'ShaftDiameter': ui.straightShaftDiameterEdit.setText(VAL.fromSystemValue('length',prop[2]))
+			elif toolType == "Tapered":
+				if prop[1] == "TopDiameter": ui.taperedTopDiameterEdit.setText(VAL.fromSystemValue('length',prop[2]))
+				elif prop[1] == "BottomDiameter": ui.taperedBottomDiameterEdit.setText(VAL.fromSystemValue('length',prop[2]))
+				elif prop[1] == "CutLength": ui.taperedCutLengthEdit.setText(VAL.fromSystemValue('length',prop[2]))
+				elif prop[1] == "ToolLength": ui.taperedToolLengthEdit.setText(VAL.fromSystemValue('length',prop[2]))
+				elif prop[1] == "ShaftDiameter": ui.taperedShaftDiameterEdit.setText(VAL.fromSystemValue('length',prop[2]))
+			elif toolType == "Conical":
+				if prop[1] == "TopDiameter": ui.conicalTopDiameterEdit.setText(VAL.fromSystemValue('length',prop[2]))
+				elif prop[1] == 'CutAngle': ui.conicalCutAngleEdit.setText(VAL.fromSystemValue('angle',prop[2]))
+				elif prop[1] == 'ToolLength': ui.conicalToolLengthEdit.setText(VAL.fromSystemValue('length',prop[2]))
+				elif prop[1] == 'ShaftDiameter': ui.conicalShaftDiameterEdit.setText(VAL.fromSystemValue('length',prop[2]))
+			elif toolType == "Ball":
+				if prop[1] == "BallDiameter": ui.ballDiameterEdit.setText(VAL.fromSystemValue('length',prop[2]))
+				elif prop[1] == "ToolLength": ui.ballToolLengthEdit.setText(VAL.fromSystemValue('length',prop[2]))
+				elif prop[1] == "ShaftDiameter": ui.ballShaftDiameterEdit.setText(VAL.fromSystemValue('length',prop[2]))
+			elif toolType == "TaperedBall":
+				if prop[1] == "TopDiameter": ui.taperedBallTopDiameterEdit.setText(VAL.fromSystemValue('length',prop[2]))
+				elif prop[1] == "BallDiameter": ui.taperedBallDiameterEdit.setText(VAL.fromSystemValue('length',prop[2]))
+				elif prop[1] == "CutLength": ui.taperedBallCutLengthEdit.setText(VAL.fromSystemValue('length',prop[2]))
+				elif prop[1] == "ToolLength": ui.taperedBallToolLengthEdit.setText(VAL.fromSystemValue('length',prop[2]))
+				elif prop[1] == "ShaftDiameter": ui.taperedBallShaftDiameterEdit.setText(VAL.fromSystemValue('length',prop[2]))
+									
+	def setToolProperties(self):
 		ui = self.createToolUi
 		if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units").GetInt("UserSchema") in [0, 1, 4, 6]: units = 1
 		else: units = 25.4
@@ -279,8 +347,9 @@ class ToolGui():
 		V = "App::PropertySpeed"
 		Q = "App::PropertyQuantity"
 		tooltype = ui.toolTypeCB.currentText().replace(" ","")
+		#obj.Label = ui.nameEdit.text()
 		p = [[S,	"ObjectType",		tooltype + "Tool"],
-			 [S,	"Name",				ui.nameEdit.text()],
+			 #[S,	"Name",				ui.nameEdit.text()],
 		     [I,	"Number",			eval(ui.numberEdit.text())],		     
 		     [S,	"ToolType",			tooltype]]
 		if ui.makeEdit.text() != "": p.append([S,	"Make",				ui.makeEdit.text()])
@@ -318,43 +387,92 @@ class ToolGui():
 			p.append([L,			"ToolLength",		VAL.toSystemValue(ui.taperedBallToolLengthEdit, 'length')])
 			p.append([L,			"ShaftDiameter",	VAL.toSystemValue(ui.taperedBallShaftDiameterEdit, 'length')])
 
-		self.tool.setProperties(p, obj)				
+		return p
 		
+	def setSelectedObject(self,obj):
+		self.selectedObject = obj
+		
+	def setMode(self):
+		if self.selectedObject == None: mode = getGUIMode()
+		elif self.selectedObject.ObjectType in self.toolTypes: mode = "EditingToolFromIcon"
+		elif self.selectedObject.ObjectType == "ToolTable":
+			if getGUIMode() == 'None': mode = "AddingToolFromIcon"
+			else: mode = getGUIMode()
+		setGUIMode(mode)
+		return mode
+				
 	def Activated(self):
 		self.setUnits()
-		if self.selectedObject.ObjectType == "ToolTable":
+		mode = self.setMode()
+		if mode == "AddingToolFromIcon":
+			self.currentToolNumber = -1
 			self.reset()
 			self.parent = self.selectedObject
 			self.validateAllFields()
-		elif self.selectedObject.ObjectType in self.toolTypes:
+		elif mode == "EditingToolFromIcon":
+			self.currentToolNumber = self.selectedObject.Number
 			self.parent = self.selectedObject.getParentGroup()
 			self.getToolProperties(self.selectedObject)
 			self.validateAllFields()
+		elif mode == "AddingToolFromGUI":
+			self.currentToolNumber = -1
+			self.parent = self.selectedObject
+			self.reset()
+			self.validateAllFields()
+		elif mode == "EditingToolFromGUI":
+			self.parent = self.selectedObject
+			self.getToolPropertiesFromGUI(getGUIProperties())
+			self.currentToolNumber = eval(self.createToolUi.numberEdit.text())
+			self.validateAllFields()
 		else:
+			print "unexpected mode (" + mode +")"			
 			return False
-		self.createToolUi.show()       
+		self.createToolUi.show()
+		setStatus("showing")       
 		return True
         
 	def accept(self):
 		ui = self.createToolUi
 		ui.hide()
-		if self.selectedObject.ObjectType == "ToolTable":
+		setStatus("hidden")
+		mode = getGUIMode()
+		if mode == "AddingToolFromIcon":
 			self.tool = Tool(self.selectedObject)
-			self.setToolProperties(self.tool.getObject())
+			p = self.setToolProperties()
+			self.tool.getObject().Label = ui.nameEdit.text()
+			self.tool.setProperties(p, self.tool.getObject())
+			setGUIMode("None")				
 			return True
-		elif self.selectedObject.ObjectType in self.toolTypes:
+		elif mode == "EditingToolFromIcon":
 			self.tool = self.selectedObject.Proxy
-			self.setToolProperties(self.selectedObject)			
+			self.tool.Label = ui.nameEdit.text()
+			p = self.setToolProperties()			
+			self.tool.setProperties(p, self.selectedObject)
+			setGUIMode("None")				
 			return True
+		elif mode == "AddingToolFromGUI":
+			p = self.setToolProperties()
+			setGUIProperties(ui.nameEdit.text(), p)
+			return True
+		elif mode == "EditingToolFromGUI":
+			p = self.setToolProperties()
+			setGUIProperties(ui.nameEdit.text(), p)
+			return True
+		else:
+			print "unexpected mode (" + mode + ")"
 		return False
 		
 	def reject(self):
 		self.createToolUi.hide()
+		setStatus("hidden")
+		setGUIMode("None")
 		return False
 
 	def IsActive(self):
 		"""Here you can define if the command must be active or not (greyed) if certain conditions
 		are met or not. This function is optional."""
+		if getGUIMode() in ["EditingToolFromGUI", "AddingToolFromGUI"]:
+			return True
 		mw = FreeCADGui.getMainWindow()
 		tree = mw.findChildren(QtGui.QTreeWidget)[0]
 		if len(tree.selectedItems()) != 1: return False
