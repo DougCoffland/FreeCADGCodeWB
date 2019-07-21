@@ -130,6 +130,7 @@ class ToolGui():
 		
 		self.selectedObject = None
 		self.currentToolNumber = -1
+		self.originalToolName = ""
 		
 	def reset(self):
 		ui = self.createToolUi
@@ -196,6 +197,22 @@ class ToolGui():
 		if ui.nameEdit.text() == "":
 			valid = False
 			VAL.setLabel(ui.nameLabel,'INVALID')
+		mode = getGUIMode()
+		sameName = FreeCAD.ActiveDocument.getObjectsByLabel(ui.nameEdit.text())
+		if (len(sameName) > 0):
+			if len(sameName) > 1:
+				valid = False
+				VAL.setLabel(ui.nameLabel,'INVALID')
+			elif mode != 'EditingToolFromIcon' and mode != 'EditingToolFromGUI':
+				valid = False				
+				VAL.setLabel(ui.nameLabel,'INVALID')
+			else:
+				if ui.nameEdit.text() == self.originalToolName:
+					VAL.setLabel(ui.nameLabel,'VALID')
+				else:
+					VAL.setLabel(ui.nameLabel,'INVALID')
+					valid = False
+
 		valid = VAL.validate(ui.feedRateEdit,ui.feedRateL,False,valid,VELOCITY)
 		valid = VAL.validate(ui.plungeRateEdit,ui.plungeRateL,False,valid,VELOCITY)
 		valid = VAL.validate(ui.spindleSpeedEdit,ui.spindleSpeedLabel,False,valid,ANGULAR_VELOCITY)
@@ -225,7 +242,7 @@ class ToolGui():
 			valid = VAL.validate(ui.taperedBallTopDiameterEdit,ui.taperedBallTopDiameterL,True,valid,LENGTH)
 			valid = VAL.validate(ui.taperedBallDiameterEdit,ui.taperedBallBallDiameterL,True,valid,LENGTH)
 			valid = VAL.validate(ui.taperedBallCutLengthEdit,ui.taperedBallCutLengthL,True,valid,LENGTH)
-			valid = VAL.validate(ui.taperedBallToolLengthEdit,ui.TaperedBallToolLengthL,True,valid,LENGTH)
+			valid = VAL.validate(ui.taperedBallToolLengthEdit,ui.taperedBallToolLengthL,True,valid,LENGTH)
 			valid = VAL.validate(ui.taperedBallShaftDiameterEdit,ui.taperedBallShaftDiameterL,True,valid,LENGTH)
 				
 		ui.buttonBox.buttons()[0].setEnabled(valid)
@@ -289,7 +306,7 @@ class ToolGui():
 		elif toolType == "TaperedBall":
 			ui.taperedBallTopDiameterEdit.setText(obj.TopDiameter.UserString)
 			ui.taperedBallDiameterEdit.setText(obj.BallDiameter.UserString)
-			ui.taperedBallCutLengthEdit.setText(obj.CutAngle.UserString)
+			ui.taperedBallCutLengthEdit.setText(obj.CutLength.UserString)
 			ui.taperedBallToolLengthEdit.setText(obj.ToolLength.UserString)
 			ui.taperedBallShaftDiameterEdit.setText(obj.ShaftDiameter.UserString)
 	
@@ -302,7 +319,13 @@ class ToolGui():
 			if prop[1] == 'Number': ui.numberEdit.setText(str(prop[2]))
 			elif prop[1] == 'Make': ui.makeEdit.setText(prop[2])
 			elif prop[1] == 'Model': ui.modelEdit.setText(prop[2])
-			elif prop[1] == 'ToolType': ui.toolTypeCB.setCurrentIndex(ui.toolTypeCB.findText(prop[2]))
+			elif prop[1] == 'ToolType':
+				index = 0
+				while index < ui.toolTypeCB.count():
+					if prop[2] == ui.toolTypeCB.itemText(index):
+						ui.toolTypeCB.setCurrentIndex(index)
+						break
+					index = index + 1
 			elif prop[1] == 'StockMaterial': ui.materialEdit.setText(prop[2])
 			elif prop[1] == 'FeedRate': ui.feedRateEdit.setText(VAL.fromSystemValue('velocity',prop[2]))
 			elif prop[1] == 'PlungeRate': ui.plungeRateEdit.setText(VAL.fromSystemValue('velocity',prop[2]))
@@ -346,7 +369,7 @@ class ToolGui():
 		A = "App::PropertyAngle"
 		V = "App::PropertySpeed"
 		Q = "App::PropertyQuantity"
-		tooltype = ui.toolTypeCB.currentText().replace(" ","")
+		tooltype = ui.toolTypeCB.currentText()
 		#obj.Label = ui.nameEdit.text()
 		p = [[S,	"ObjectType",		tooltype + "Tool"],
 			 #[S,	"Name",				ui.nameEdit.text()],
@@ -406,16 +429,19 @@ class ToolGui():
 		mode = self.setMode()
 		if mode == "AddingToolFromIcon":
 			self.currentToolNumber = -1
+			self.originalToolName = ""
 			self.reset()
 			self.parent = self.selectedObject
 			self.validateAllFields()
 		elif mode == "EditingToolFromIcon":
 			self.currentToolNumber = self.selectedObject.Number
+			self.originalToolName = self.selectedObject.Label
 			self.parent = self.selectedObject.getParentGroup()
 			self.getToolProperties(self.selectedObject)
 			self.validateAllFields()
 		elif mode == "AddingToolFromGUI":
 			self.currentToolNumber = -1
+			self.originalToolName = ""
 			self.parent = self.selectedObject
 			self.reset()
 			self.validateAllFields()
@@ -423,6 +449,7 @@ class ToolGui():
 			self.parent = self.selectedObject
 			self.getToolPropertiesFromGUI(getGUIProperties())
 			self.currentToolNumber = eval(self.createToolUi.numberEdit.text())
+			self.originalToolName = self.createToolUi.nameEdit.text()
 			self.validateAllFields()
 		else:
 			print "unexpected mode (" + mode +")"			

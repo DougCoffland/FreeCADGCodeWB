@@ -111,7 +111,7 @@ background-color: 'white';
            </item>
            <item>
             <property name="text">
-             <string>Tapered Ball</string>
+             <string>TaperedBall</string>
             </property>
            </item>
           </widget>
@@ -220,7 +220,7 @@ background-color: 'white';
             </sizepolicy>
            </property>
            <property name="currentIndex">
-            <number>1</number>
+            <number>3</number>
            </property>
            <widget class="QWidget" name="blankPage">
             <layout class="QVBoxLayout" name="verticalLayout_7">

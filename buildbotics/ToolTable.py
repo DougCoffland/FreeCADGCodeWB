@@ -204,16 +204,14 @@ class ToolTable():
 		ui.buttonBox.accepted.connect(self.accept)
 		ui.buttonBox.rejected.connect(self.reject)
 		ui.buttonBox.button(QtGui.QDialogButtonBox.Apply).clicked.connect(self.apply)
-		ui.nameLE.textChanged.connect(self.validateAllFields)
-		ui.tableWidget.itemSelectionChanged.connect(self.setButtonStates)
+		ui.nameLE.textChanged.connect(self.onNameChanged)
+		ui.tableWidget.itemSelectionChanged.connect(self.validateAllFields)
 		ui.addBtn.clicked.connect(self.addTool)
 		ui.editBtn.clicked.connect(self.editTool)
 		ui.removeBtn.clicked.connect(self.removeTool)
 		ui.upBtn.clicked.connect(self.moveToolUp)
 		ui.downBtn.clicked.connect(self.moveToolDown)
-		ui.loadBtn.clicked.connect(self.onLoad)
-		ui.saveBtn.clicked.connect(self.onSave)
-		
+
 		self.waitingOnToolGui = False
 		self.dirty = False
 		self.toolList = []
@@ -244,6 +242,7 @@ class ToolTable():
 		row = table.row(table.selectedItems()[0])
 		table.removeRow(row)
 		self.toolList.pop(row)
+		self.dirty = True
 		self.validateAllFields()
 		
 	def moveToolUp(self):
@@ -260,6 +259,7 @@ class ToolTable():
 		table.setItem(row-1,1,QtGui.QTableWidgetItem(toolType))
 		table.setItem(row-1,2,QtGui.QTableWidgetItem(toolLabel))
 		table.item(row-1,0).setSelected(True)
+		self.dirty = True
 		self.validateAllFields()
 		
 	def moveToolDown(self):
@@ -276,42 +276,12 @@ class ToolTable():
 		table.setItem(row+1,1,QtGui.QTableWidgetItem(toolType))
 		table.setItem(row+1,2,QtGui.QTableWidgetItem(toolLabel))
 		table.item(row+1,0).setSelected(True)
-		self.validateAllFields()
-		
-	def onLoad(self):
-		if len(self.toolList) > 0:
-			question = "Deleting all existing tools!\n\n\nClick Yes to continue"
-			areYouSure.questionLabel.setText(question)
-			if areYouSure.exec_() == False:
-				return
-		f = QtGui.QFileDialog.getOpenFileName(parent = None, caption = "Open File")
-		try:
-			fp = open(f[0],"rt")
-		except:
-			return
-		self.toolList = []
-		table = self.ui.tableWidget
-		self.toolList = fp.read()
-		for tool in self.toolList:
-			row = table.rowCount()
-			table.insertRow(row)
-			table.setItem(row,0,QtGui.QTableWidgetItem(toolNumber))
-			table.setItem(row,1,QtGui.QTableWidgetItem(toolType))
-			table.setItem(row,2,QtGui.QTableWidgetItem(toolLabel))
-		fp.close()
 		self.dirty = True
-		table.selectRow(0)
 		self.validateAllFields()
-	
-	def onSave(self):
-		f = QtGui.QFileDialog.getSaveFileName(parent = None, caption = "Select a File")
-		try:
-			fp = open(f[0],"wb")
-		except:
-			return
-		fp.write(self.toolList)
-		fp.close()
 
+	def onNameChanged(self):
+		self.dirty = True
+		self.validateAllFields()
 
 	def processToolGuiResult(self):
 		ui = self.createTTUi
@@ -341,7 +311,7 @@ class ToolTable():
 			table.setItem(row,0,QtGui.QTableWidgetItem(toolNumber))
 			table.setItem(row,1,QtGui.QTableWidgetItem(toolType))
 			table.setItem(row,2,QtGui.QTableWidgetItem(toolLabel))
-			self.toolList.insert(row,props)
+			self.toolList[row] = props
 			self.dirty = True
 		ToolGui.setGUIMode('None')
 		self.validateAllFields()
@@ -349,18 +319,54 @@ class ToolTable():
 	def validateAllFields(self):
 		ui = self.createTTUi
 		valid = True
+		sameName = FreeCAD.ActiveDocument.getObjectsByLabel(ui.nameLE.text())
 		if ui.nameLE.text() == "":
 			valid = False
-			VAL.setLabel(ui.ttNameLabel,False)
-		self.dirty = True
-		self.setButtonStates()
+		elif len(sameName) > 1:
+			valid = False
+			VAL.setLabel(ui.ttNameLabel,'INVALID')
+		else:
+			for obj in sameName:
+				print obj
+				print self.selectedObject
+				if obj == self.selectedObject: continue
+				print 'not equal'
+				valid = False			
+		if valid == True: VAL.setLabel(ui.ttNameLabel,'VALID')
+		else: VAL.setLabel(ui.ttNameLabel,'INVALID')
+		
+		table = ui.tableWidget
+		for i in range(table.rowCount()):
+			name = table.item(i,2).text()
+			number = table.item(i,0).text()
+			names = [i]
+			numbers = [i]
+			for j in range(table.rowCount()):
+				if i == j: continue
+				if name == table.item(j,2).text():
+					names.append(j)
+				if number == table.item(j,0).text():
+					numbers.append(j)
+				if len(names) > 1:
+					valid = False
+					for k in names:
+						table.item(k,2).setBackground(QtGui.QColor('red'))					
+				if len(numbers) > 1:
+					valid = False
+					for k in numbers:
+						table.item(k,0).setBackground(QtGui.QColor('red'))					
+		self.setButtonStates(valid)
 		return valid
 		
-	def setButtonStates(self):
+	def setButtonStates(self,valid):
 		ui = self.createTTUi
 		table = ui.tableWidget
-		ui.buttonBox.buttons()[0].setEnabled(self.dirty)
-		ui.buttonBox.button(QtGui.QDialogButtonBox.Apply).setEnabled(self.dirty)
+		if valid == True:
+			ui.buttonBox.buttons()[0].setEnabled(self.dirty)
+			ui.buttonBox.button(QtGui.QDialogButtonBox.Apply).setEnabled(self.dirty)
+		else:
+			ui.buttonBox.buttons()[0].setEnabled(False)
+			ui.buttonBox.button(QtGui.QDialogButtonBox.Apply).setEnabled(False)			
 		if len(table.selectedItems()) == 1:
 			ui.editBtn.setEnabled(True)
 			ui.removeBtn.setEnabled(True)
@@ -374,15 +380,6 @@ class ToolTable():
 			ui.removeBtn.setEnabled(False)
 			ui.upBtn.setEnabled(False)
 			ui.downBtn.setEnabled(False)
-		
-	def saveToolTableProperties(self,obj):
-		ui = self.createTTUi
-		ViewToolTable(obj.ViewObject)		
-		obj.addProperty("App::PropertyString","ObjectType").ObjectType = "ToolTable"
-		obj.Label = ui.nameLE.text()
-		
-		for prop in obj.PropertiesList:
-			obj.setEditorMode(prop,("ReadOnly",))
 			
 	def getPropertiesFromTool(self,tool):
 		p = []
