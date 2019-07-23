@@ -25,7 +25,7 @@
 import FreeCAD,FreeCADGui
 from PySide import QtGui, QtCore
 import os
-import validator as VALID
+import validator as VAL
 
 class ViewGCode:
 	def __init__(self,obj):
@@ -173,60 +173,77 @@ class GCodeProject():
 	def __init__(self):
 		self.jobList = []
 		self.defineJobUi =  FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + '/resources/ui/createjob.ui')
-		self.defineJobUi.buttonBox.accepted.connect(self.accept)
-		self.defineJobUi.buttonBox.rejected.connect(self.reject)
-		#self.defineJobUi.nameLE.textChanged.connect(self.validate)
+		ui = self.defineJobUi
+		ui.logoL.setPixmap(QtGui.QPixmap(os.path.dirname(__file__) + "/resources/ui/logo side by side.png"))				
+		ui.buttonBox.accepted.connect(self.accept)
+		ui.buttonBox.rejected.connect(self.reject)
+		ui.nameLE.textChanged.connect(self.validateAllFields)
+		ui.toolTableCB.currentIndexChanged.connect(self.validateAllFields)
 		
-		"""
-		intValid = VALID.MyIntValidator()
-		doubleValid = VALID.MyDoubleValidator()	
-		"""
-
+		self.selectedObject = None
+		
 	def GetResources(self):
 		return {'Pixmap'  : os.path.dirname(__file__) + '/resources/svg/cnc.svg', # the name of a svg file available in the resources
                 'MenuText': "New GCode Project",
                 'ToolTip' : "Sets up a new project for creating G-Code paths from FreeCAD Shapes"}
 
-	def aGCodeJobIsSelected(self):
-		mw = FreeCADGui.getMainWindow()
-		tree = mw.findChildren(QtGui.QTreeWidget)[0]
-		numberOfInstances = 0
-		for item in tree.selectedItems():
-			obj = FreeCAD.ActiveDocument.getObjectsByLabel(item.text(0))[0]
-			try:
-				if obj.ObjectType == "GCodeJob": numberOfInstances += 1
-			except:
-				continue
-		if numberOfInstances != 1: return False
-		return True	
-		
-	"""
-	def validate(self):
+	def validateAllFields(self):
+		ui = self.defineJobUi
 		valid = True
-		if VALID.setLineEditLabelBG(self.defineJobUi.nameLE, self.defineJobUi.nameLabel) is not True: valid = False
-		name = self.defineJobUi.nameLE.text().strip()
-		if len(FreeCAD.ActiveDocument.getObjectsByLabel(name)) > 0:
-			self.defineJobUi.nameLabel.setStyleSheet("QLabel {background-color: red}")
+		if ui.nameLE.text().strip() == "": valid = False
+		else:
+			try:
+				sameName = FreeCAD.ActiveDocument.getObjectsByLabel(ui.nameLE.text().strip())
+				if len(sameName) == 0: pass
+				elif len(sameName) > 1: valid = False
+				elif self.selectedObject in sameName: pass
+				else: valid = False		
+			except:
+				pass
+		if valid == True: VAL.setLabel(ui.nameLabel,'VALID')
+		else: VAL.setLabel(ui.nameLabel,'INVALID')
+		
+		if ui.toolTableCB.currentIndex() == 0:
+			VAL.setLabel(ui.toolTableL,'INVALID')
 			valid = False
-			
+		else: VAL.setLabel(ui.toolTableL,'VALID')		
+		
+		ui.buttonBox.buttons()[0].setEnabled(valid)
 		return valid
-	"""
 		
 	def Activated(self):
-		if self.aGCodeJobIsSelected():
-			print "a job is selected"
-		else:
-			print "no job is selected"
-		self.defineJobUi.show()       
+		ui = self.defineJobUi
+		if self.selectedObject != None: ui.nameLE.setText(self.selectedObject.Label)
+		else: ui.nameLE.setText("")
+		ui.toolTableCB.clear()
+		ui.toolTableCB.addItem('None Selected...')
+		ui.toolTableCB.setCurrentIndex(0)
+		for obj in FreeCAD.ActiveDocument.Objects:
+			if hasattr(obj,"ObjectType") == True:
+				if obj.ObjectType == "ToolTable":
+					ui.toolTableCB.addItem(obj.Label)
+		if self.selectedObject != None and hasattr(self.selectedObject,'ToolTable') == True:
+			index = ui.toolTableCB.findText(self.selectedObject.ToolTable)
+			if index > 0: ui.toolTableCB.setCurrentIndex(index)
+					
+		self.validateAllFields()
+		ui.show()     
 		return
 		
 	def accept(self):
-		self.defineJobUi.hide()
-		obj = FreeCAD.ActiveDocument.addObject('App::DocumentObjectGroupPython', "GCodeJob")
-		ViewGCode(obj.ViewObject)
-		obj.addProperty("App::PropertyString","ObjectType").ObjectType = "GCodeJob"
-		obj.setEditorMode("ObjectType",("ReadOnly",))
-		obj.Label = self.defineJobUi.nameLE.text()
+		ui = self.defineJobUi
+		ui.hide()
+		if self.selectedObject == None:
+			obj = FreeCAD.ActiveDocument.addObject('App::DocumentObjectGroupPython', "GCodeJob")
+			ViewGCode(obj.ViewObject)
+		else: obj = self.selectedObject
+		obj.Label = ui.nameLE.text()
+		if hasattr(obj,"ObjectType") == False: obj.addProperty("App::PropertyString","ObjectType").ObjectType = "GCodeJob"
+		if ui.toolTableCB.currentIndex() > 0:
+			if hasattr(obj, 'ToolTable') == False:
+				obj.addProperty("App::PropertyString","ToolTable").ToolTable = ui.toolTableCB.currentText()
+		elif hasattr(obj,"ToolTable") == True: obj.removeProperty("ToolTable")
+
 		FreeCAD.ActiveDocument.recompute()
 		return True
 		
@@ -235,6 +252,16 @@ class GCodeProject():
 		return False
 
 	def IsActive(self):
+		mw = FreeCADGui.getMainWindow()
+		tree = mw.findChildren(QtGui.QTreeWidget)[0]
+		if len(tree.selectedItems()) != 1:
+			self.selectedObject = None
+		else:
+			item = tree.selectedItems()[0]
+			obj = FreeCAD.ActiveDocument.getObjectsByLabel(item.text(0))[0]
+			if obj.ObjectType == "GCodeJob":
+				self.selectedObject = obj
+			else: self.selectedObject = None			
 		return True
 
 FreeCADGui.addCommand('New_Project',GCodeProject())

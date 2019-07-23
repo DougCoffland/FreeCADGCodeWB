@@ -9,40 +9,133 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>530</width>
-    <height>421</height>
+    <width>598</width>
+    <height>455</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Define Tool Table</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">font: 75 italic 16pt &quot;Gentium&quot;;
-selection-background-color: rgb(255, 255, 255);
-background-color: rgb(249, 235, 192);
+   <string notr="true">QDialog {
+selection-background-color: lightblue;
+background-color:#cdcdcd;
+}
+
+QLabel {
+font: 75 16pt &quot;MathJax_SansSerif&quot;;
+color: fcfcfc;
+}
+
+QLabel#logoL {
+background-color: #fcfcfc;
+}
+
+QPushButton {
+font: 75 11pt &quot;MathJax_SansSerif&quot;;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  background-color: #fcfcfc;
+  padding: 4px;
+  color: #e5aa3d;
+  line-height: 1.5em;
+}
+QPushButton:hover {
+  color: #428bca;
+  background-color: #ddd;
+}
+
+QPushButton:disabled,
+QPushButton:hover:disabled,
+QPushButton.disabled,
+QPushButton.disabled:hover {
+  background: #ededed;
+  color: #888 !important;
+  border-color: #ddd;
+}
+
+QLineEdit {
+font: 75 11pt &quot;MathJax_SansSerif&quot;;
+padding: 1px;
+border-style: solid;
+border: 2px solid gray;
+border-radius: 8px;
+color: black;
+background-color: white;
+selection-background-color: lightblue;
+}
+
+QFrame {
+border-style: none;
+}
+
+QComboBox {
+font: 75 11pt &quot;MathJax_SansSerif&quot;;
+padding: 1px;
+border-style: solid;
+border: 2px solid gray;
+border-radius: 8px;
+background-color: 'white';
+selection-background-color: lightblue;
+}
+
+QTableWidget {
+font: 75 11pt &quot;MathJax_SansSerif&quot;;
+padding: 1px;
+border-style: solid;
+border: 2px solid gray;
+border-radius: 8px;
+selection-background-color: lightblue;
+}
 
 </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QFrame" name="frame">
+    <widget class="QFrame" name="frame_17">
      <property name="styleSheet">
-      <string notr="true">QLineEdit {
-padding: 1px;
-border-style: solid;
-border: 2px solid gray;
-border-radius: 8px;
-background-color: 'white';
-}
-
-QTableWidget {
-padding: 1px;
-border-style: solid;
-border: 2px solid gray;
-border-radius: 8px;
-background-color: 'white';
-}</string>
+      <string notr="true"/>
      </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_9">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="logoL">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:16pt; font-weight:600; color:#ffffff;&quot;&gt;Learn more at buildbotics.com!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap>logo side by side.png</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
@@ -72,23 +165,6 @@ background-color: 'white';
    </item>
    <item>
     <widget class="QFrame" name="frame_3">
-     <property name="styleSheet">
-      <string notr="true">QLineEdit {
-padding: 1px;
-border-style: solid;
-border: 2px solid gray;
-border-radius: 8px;
-background-color: 'white';
-}
-
-QTableWidget {
-padding: 1px;
-border-style: solid;
-border: 2px solid gray;
-border-radius: 8px;
-background-color: 'white';
-}</string>
-     </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>

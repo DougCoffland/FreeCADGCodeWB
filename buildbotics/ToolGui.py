@@ -86,6 +86,7 @@ class ToolGui():
 		
 		ui = self.createToolUi
 		iv = VAL.MyIntValidator()
+		ui.logoL.setPixmap(QtGui.QPixmap(os.path.dirname(__file__) + "/resources/ui/logo side by side.png"))				
 
 		ui.numberEdit.setValidator(iv)
 		ui.toolTypeCB.currentIndexChanged.connect(self.validateAllFields)

@@ -201,6 +201,7 @@ class ToolTable():
 	def __init__(self):
 		self.createTTUi = FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + "/resources/ui/tooltable.ui")
 		ui = self.createTTUi
+		ui.logoL.setPixmap(QtGui.QPixmap(os.path.dirname(__file__) + "/resources/ui/logo side by side.png"))				
 		ui.buttonBox.accepted.connect(self.accept)
 		ui.buttonBox.rejected.connect(self.reject)
 		ui.buttonBox.button(QtGui.QDialogButtonBox.Apply).clicked.connect(self.apply)
@@ -319,7 +320,10 @@ class ToolTable():
 	def validateAllFields(self):
 		ui = self.createTTUi
 		valid = True
-		sameName = FreeCAD.ActiveDocument.getObjectsByLabel(ui.nameLE.text())
+		try:
+			sameName = FreeCAD.ActiveDocument.getObjectsByLabel(ui.nameLE.text())
+		except:
+			return False
 		if ui.nameLE.text() == "":
 			valid = False
 		elif len(sameName) > 1:
@@ -327,10 +331,7 @@ class ToolTable():
 			VAL.setLabel(ui.ttNameLabel,'INVALID')
 		else:
 			for obj in sameName:
-				print obj
-				print self.selectedObject
 				if obj == self.selectedObject: continue
-				print 'not equal'
 				valid = False			
 		if valid == True: VAL.setLabel(ui.ttNameLabel,'VALID')
 		else: VAL.setLabel(ui.ttNameLabel,'INVALID')

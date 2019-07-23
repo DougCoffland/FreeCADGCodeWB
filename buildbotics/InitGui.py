@@ -87,8 +87,8 @@ class BuildboticsWorkbench (Workbench):
 	def Initialize(self):
 		"This function is executed when FreeCAD starts"
 		# import here all the needed files that create your FreeCAD commands
-		import GCodeProject, ToolTable, ToolGui
-		self.list = ["New_Project", "New_Tooltable", "New_Tool"] # A list of command names created in the line above
+		import GCodeProject, ToolTable, ToolGui, CutGui
+		self.list = ["New_Project", "New_Cut", "New_Tooltable", "New_Tool"] # A list of command names created in the line above
 		self.appendToolbar("My Commands",self.list) # creates a new toolbar with your commands
 		self.appendMenu("Actions",self.list) # creates a new menu
 		#self.appendMenu(["An existing Menu","My submenu"],self.list) # appends a submenu to an existing menu
