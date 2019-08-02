@@ -185,7 +185,7 @@ class CutGui():
 			 [S,	"ObjectType",		cuttype + "Cut"],	     
 		     [S,	"CutType",			cuttype],
 		     [S,	"Tool",				ui.toolCB.currentText().lstrip('0123456789 ')],
-		     [S,	"ToolNumber",		ui.toolCB.currentText().split()[0]],
+		     [I,	"ToolNumber",		eval(ui.toolCB.currentText().split()[0])],
 		     [L,	"SafeHeight",		VAL.toSystemValue(ui.safeHeightLE,'length')],
 		     [S,	"SpindleSpeed",		VAL.toSystemValue(ui.spindleSpeedE, 'angularVelocity')],
 		     [V,	"PlungeRate",		VAL.toSystemValue(ui.plungeRateE, 'velocity')],
@@ -249,7 +249,6 @@ class CutGui():
 			self.cut = self.selectedObject.Proxy
 			self.cut.Label = ui.nameLE.text()
 			self.cut.setProperties(p,self.selectedObject)
-		setGUIMode("None")
 		setStatus('hidden')
 		return True
 				
@@ -332,8 +331,7 @@ class CutGui():
 			group = FreeCAD.ActiveDocument.getObjectsByLabel(self.selectedObject.ToolTable)[0].Group
 			for tool in group:
 				ui.toolCB.addItem(str(tool.Number) + " " + tool.Label)
-			self.reset()
-			
+			self.reset()			
 		elif mode == "EditingCutFromIcon":
 			self.reset()
 			self.originalCutName = self.selectedObject.Label

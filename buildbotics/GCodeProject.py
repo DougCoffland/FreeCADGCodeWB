@@ -174,7 +174,8 @@ static char * cnc_xpm[] = {
 class GCodeProject():
 	def __init__(self):
 		self.jobList = []
-		self.defineJobUi =  FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + '/resources/ui/createjob.ui')
+		self.defineJobUi = FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + '/resources/ui/createjob.ui')
+		self.AYS = FreeCADGui.PySideUic.loadUi(os.path.dirname(__file__) + '/resources/ui/AreYouSure.ui')
 		ui = self.defineJobUi
 		ui.logoL.setPixmap(QtGui.QPixmap(os.path.dirname(__file__) + "/resources/ui/logo side by side.png"))				
 		ui.buttonBox.accepted.connect(self.accept)
@@ -193,6 +194,8 @@ class GCodeProject():
 		ui.tableWidget.itemSelectionChanged.connect(self.validateAllFields)
 		ui.addB.clicked.connect(self.addCut)
 		ui.editB.clicked.connect(self.editCut)
+		ui.deleteB.clicked.connect(self.deleteCut)
+		self.AYS.buttonBox.accepted.connect(self.removeCut)
 		
 		self.selectedObject = None
 		self.waitingOnCutGui = False
@@ -204,6 +207,21 @@ class GCodeProject():
                 'MenuText': "New GCode Project",
                 'ToolTip' : "Sets up a new project for creating G-Code paths from FreeCAD Shapes"}
 
+	def deleteCut(self):
+		table = self.defineJobUi.tableWidget
+		item = table.selectedItems()[0]
+		row = table.row(item)
+		self.AYS.questionLabel.setText('Deleting "' + table.item(row,2).text() + '"\nClick Cancel to abort')
+		self.AYS.show()
+		
+	def removeCut(self):
+		table = self.defineJobUi.tableWidget
+		item = table.selectedItems()[0]
+		row = table.row(item)
+		table.removeRow(row)
+		self.cutList.pop(row)
+		self.dirty = True
+	
 	def editCut(self):
 		ui = self.defineJobUi
 		CutGui.setGUIMode("EditingCutFromGUI")
@@ -354,12 +372,12 @@ class GCodeProject():
 			 [I,		"ToolNumber",	cut.ToolNumber],
 			 [S,		"CutType",		cut.CutType],
 			 [L,		"SafeHeight",	cut.SafeHeight],
-			 [L,		"SpindleSpeed",	cut.SpindleSpeed],			 
-			 [L,		"PlungeRate",	cut.PlungeRate],
+			 [S,		"SpindleSpeed",	cut.SpindleSpeed],			 
+			 [V,		"PlungeRate",	cut.PlungeRate],
 			 [L,		"XToolChangeLocation", cut.XToolChangeLocation],
 			 [L,		"YToolChangeLocation", cut.YToolChangeLocation],
 			 [L,		"ZToolChangeLocation", cut.ZToolChangeLocation]]
-		if hasattr(cut, "FeedRate"):	p.append([L,		"FeedRate",		cut.FeedRate])
+		if hasattr(cut, "FeedRate"):	p.append([V,		"FeedRate",		cut.FeedRate])
 		if hasattr(cut, "DrillDepth"):	p.append([L,		"DrillDepth",	cut.DrillDepth])
 		if hasattr(cut, "PeckDepth"):	p.append([L,		"PeckDepth",	cut.PeckDepth])
 		if hasattr(cut,	"FirstX"):		p.append([L,		"FirstX",		cut.FirstX])
@@ -440,7 +458,8 @@ class GCodeProject():
 			FreeCAD.ActiveDocument.removeObject(cut.Name)
 		for line in self.cutList:
 			cut = Cut(obj)
-			cut.setProperties(line)
+			cut.getObject().Label = ui.nameLE.text()
+			cut.setProperties(line,cut.getObject())
 		self.dirty = False		
 
 	def IsActive(self):

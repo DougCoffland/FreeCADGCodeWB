@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>dialog</class>
+ <widget class="QDialog" name="dialog">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>278</width>
+    <height>232</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Are You Sure?</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QDialog {
+selection-background-color: lightblue;
+background-color:#cdcdcd;
+}
+
+QWidget {
+background-color: #cdcdcd;
+}
+
+QLabel {
+font: 75 16pt &quot;MathJax_SansSerif&quot;;
+color: fcfcfc;
+}
+
+QLabel#logoL {
+background-color: #fcfcfc;
+}
+
+QPushButton {
+font: 75 11pt &quot;MathJax_SansSerif&quot;;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  background-color: #fcfcfc;
+  padding: 4px;
+  color: #e5aa3d;
+  line-height: 1.5em;
+}
+QPushButton:hover {
+  color: #428bca;
+  background-color: #ddd;
+}
+
+QPushButton:disabled,
+QPushButton:hover:disabled,
+QPushButton.disabled,
+QPushButton.disabled:hover {
+  background: #ededed;
+  color: #888 !important;
+  border-color: #ddd;
+}
+
+QLineEdit {
+font: 75 11pt &quot;MathJax_SansSerif&quot;;
+padding: 1px;
+border-style: solid;
+border: 2px solid gray;
+border-radius: 8px;
+color: black;
+background-color: white;
+selection-background-color: lightblue;
+}
+
+QFrame {
+border-style: none;
+}
+
+QComboBox {
+font: 75 11pt &quot;MathJax_SansSerif&quot;;
+padding: 1px;
+border-style: solid;
+border: 2px solid gray;
+border-radius: 8px;
+background-color: 'white';
+selection-background-color: lightblue;
+}
+
+QTableWidget {
+font: 75 11pt &quot;MathJax_SansSerif&quot;;
+padding: 1px;
+border-style: solid;
+border: 2px solid gray;
+border-radius: 8px;
+selection-background-color: lightblue;
+}</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QFrame" name="frame_2">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="questionLabel">
+        <property name="font">
+         <font>
+          <family>MathJax_SansSerif</family>
+          <pointsize>16</pointsize>
+          <weight>9</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QFrame {
+   background-color: rgb(238, 238, 236);
+   border-radius: 5px;
+}</string>
+        </property>
+        <property name="text">
+         <string>Change Me in Code</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Yes</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>dialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
