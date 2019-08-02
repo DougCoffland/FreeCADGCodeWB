@@ -103,8 +103,8 @@ class CutGui():
 		ui.spindleSpeedL.setText('Spindle Speed')
 		ui.feedRateL.setText('Feed Rate')
 		ui.plungeRateL.setText('Plunge Rate')
+		toolLabel = toolLabel.lstrip('0123456789 ')
 		if toolLabel != "None Selected...":
-			toolLabel = toolLabel.lstrip('0123456789 ')
 			obj = FreeCAD.ActiveDocument.getObjectsByLabel(toolLabel)[0]
 			if hasattr(obj,'SpindleSpeed'): ui.spindleSpeedL.setText('Spindle Speed (' + obj.SpindleSpeed + ')')
 			if hasattr(obj,'FeedRate'): ui.feedRateL.setText('Feed Rate (' + str(obj.FeedRate.UserString) + ')')
@@ -328,10 +328,11 @@ class CutGui():
 		mode = self.setMode()
 		if mode == "AddingCutFromIcon":
 			self.originalCutName = ''
-			self.reset()
+			while ui.toolCB.count() > 1: ui.toolCB.removeItem(ui.toolCB.count()-1)
 			group = FreeCAD.ActiveDocument.getObjectsByLabel(self.selectedObject.ToolTable)[0].Group
 			for tool in group:
 				ui.toolCB.addItem(str(tool.Number) + " " + tool.Label)
+			self.reset()
 			
 		elif mode == "EditingCutFromIcon":
 			self.reset()
@@ -343,6 +344,7 @@ class CutGui():
 			props = getGUIProperties()
 			for prop in props:
 				if prop[1] == "ToolTable": self.tooltable = prop[2]
+			while ui.toolCB.count() > 1: ui.toolCB.removeItem(ui.toolCB.count()-1)
 			group = FreeCAD.ActiveDocument.getObjectsByLabel(self.tooltable)[0].Group
 			for tool in group:
 				ui.toolCB.addItem(str(tool.Number) + " " + tool.Label)
@@ -350,6 +352,7 @@ class CutGui():
 			props = getGUIProperties()
 			for prop in props:
 				if prop[1] == "ToolTable": self.tooltable = prop[2]
+			while ui.toolCB.count() > 1: ui.toolCB.removeItem(ui.toolCB.count()-1)
 			group = FreeCAD.ActiveDocument.getObjectsByLabel(self.tooltable)[0].Group
 			for tool in group:
 				ui.toolCB.addItem(str(tool.Number) + " " + tool.Label)

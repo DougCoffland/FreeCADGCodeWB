@@ -394,6 +394,7 @@ class GCodeProject():
 			if index > 0: ui.workpieceCB.setCurrentIndex(index)
 		self.cutList = []
 		if self.selectedObject != None:
+			while ui.tableWidget.rowCount() > 0: ui.tableWidget.removeRow(0)
 			for cut in self.selectedObject.Group:
 				props = self.getPropertiesFromCut(cut)
 				for prop in props:
