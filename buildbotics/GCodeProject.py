@@ -195,6 +195,8 @@ class GCodeProject():
 		ui.addB.clicked.connect(self.addCut)
 		ui.editB.clicked.connect(self.editCut)
 		ui.deleteB.clicked.connect(self.deleteCut)
+		ui.upB.clicked.connect(self.moveUp)
+		ui.downB.clicked.connect(self.moveDown)
 		self.AYS.buttonBox.accepted.connect(self.removeCut)
 		
 		self.selectedObject = None
@@ -241,6 +243,38 @@ class GCodeProject():
 		self.waitingOnCutGui = True
 		self.validateAllFields()
 		
+	def moveUp(self):
+		table = self.defineJobUi.tableWidget
+		item = table.selectedItems()[0]
+		row = table.row(item)
+		cutType = table.takeItem(row,0)
+		toolNumber = table.takeItem(row,1)
+		cutName = table.takeItem(row,2)
+		table.removeRow(row)
+		table.insertRow(row-1)
+		table.setItem(row-1,0,cutType)
+		table.setItem(row-1,1,toolNumber)
+		table.setItem(row-1,2,cutName)
+		table.item(row-1,0).setSelected(True)
+		cut = self.cutList.pop(row)
+		self.cutList.insert(row-1,cut)
+	
+	def moveDown(self):
+		table = self.defineJobUi.tableWidget
+		item = table.selectedItems()[0]
+		row = table.row(item)
+		cutType = table.takeItem(row,0)
+		toolNumber = table.takeItem(row,1)
+		cutName = table.takeItem(row,2)
+		table.removeRow(row)
+		table.insertRow(row+1)
+		table.setItem(row+1,0,cutType)
+		table.setItem(row+1,1,toolNumber)
+		table.setItem(row+1,2,cutName)
+		table.item(row+1,0).setSelected(True)
+		cut = self.cutList.pop(row)
+		self.cutList.insert(row+1,cut)
+
 	def processCutGUIResult(self):
 		ui = self.defineJobUi
 		self.waitingOnCutGui = False
