@@ -25,6 +25,23 @@
 from PySide import QtGui, QtCore
 import FreeCAD, FreeCADGui
 
+ANGULAR_VELOCITY = ['rpm', 'r/m', 'rev/m','rev/min', 'rps', 'r/s', 'r/sec', 'rev/s', 'rev/sec']
+VELOCITY = ['mm/min','mm/m','mmpm',
+			'mm/sec', 'mm/s', 'mmps',
+			'm/min', 'm/m', 'mpm',
+			'm/s', 'm/sec', 'mps',
+            'in/m','in/min', '"/m',"/min", 'ipm',
+            'in/sec','in/s','"/s','"/sec', 'ips',
+            'f/s', 'ft/sec', 'fps',
+            'ft/m', 'ft/min', 'fpm',
+            'kph',
+            'mph']
+LENGTH = ['mm',
+		  'm',
+		  'in', '"',
+		  'f', 'ft', "'"]
+ANGLE = ['degree', 'degrees','deg', 'd', 'rad', 'r', 'radian', 'radians']
+
 def setLabel(label,valid):
 	if valid == 'INVALID':
 		label.setStyleSheet("QLabel {background-color: red;}")

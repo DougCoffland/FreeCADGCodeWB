@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>793</width>
-    <height>679</height>
+    <width>728</width>
+    <height>713</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -591,7 +591,7 @@ selection-background-color: lightblue;
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="workpieceL">
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -601,7 +601,7 @@ selection-background-color: lightblue;
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="comboBox">
+          <widget class="QComboBox" name="workpieceCB">
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -728,7 +728,7 @@ selection-background-color: lightblue;
                 <number>0</number>
                </property>
                <item>
-                <widget class="QLabel" name="label_14">
+                <widget class="QLabel" name="xaxisL">
                  <property name="styleSheet">
                   <string notr="true"/>
                  </property>
@@ -762,7 +762,7 @@ selection-background-color: lightblue;
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="QComboBox" name="comboBox_3">
+                   <widget class="QComboBox" name="xaxisCB">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -804,7 +804,7 @@ selection-background-color: lightblue;
                    </widget>
                   </item>
                   <item>
-                   <widget class="QLineEdit" name="lineEdit_4">
+                   <widget class="QLineEdit" name="xaxisLE">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -853,7 +853,7 @@ selection-background-color: lightblue;
                 <number>0</number>
                </property>
                <item>
-                <widget class="QLabel" name="label_15">
+                <widget class="QLabel" name="yaxisL">
                  <property name="styleSheet">
                   <string notr="true"/>
                  </property>
@@ -887,7 +887,7 @@ selection-background-color: lightblue;
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="QComboBox" name="comboBox_4">
+                   <widget class="QComboBox" name="yaxisCB">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -929,7 +929,7 @@ selection-background-color: lightblue;
                    </widget>
                   </item>
                   <item>
-                   <widget class="QLineEdit" name="lineEdit_5">
+                   <widget class="QLineEdit" name="yaxisLE">
                     <property name="minimumSize">
                      <size>
                       <width>100</width>
@@ -972,7 +972,7 @@ selection-background-color: lightblue;
                 <number>0</number>
                </property>
                <item>
-                <widget class="QLabel" name="label_16">
+                <widget class="QLabel" name="zaxisL">
                  <property name="styleSheet">
                   <string notr="true"/>
                  </property>
@@ -1006,7 +1006,7 @@ selection-background-color: lightblue;
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="QComboBox" name="comboBox_5">
+                   <widget class="QComboBox" name="zaxisCB">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -1048,7 +1048,7 @@ selection-background-color: lightblue;
                    </widget>
                   </item>
                   <item>
-                   <widget class="QLineEdit" name="lineEdit_6">
+                   <widget class="QLineEdit" name="zaxisLE">
                     <property name="minimumSize">
                      <size>
                       <width>100</width>
@@ -1128,7 +1128,7 @@ selection-background-color: lightblue;
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="add">
+          <widget class="QPushButton" name="addB">
            <property name="enabled">
             <bool>true</bool>
            </property>
@@ -1154,7 +1154,7 @@ selection-background-color: lightblue;
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="delete_2">
+          <widget class="QPushButton" name="deleteB">
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -1168,7 +1168,7 @@ selection-background-color: lightblue;
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="edit">
+          <widget class="QPushButton" name="editB">
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -1182,7 +1182,7 @@ selection-background-color: lightblue;
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="up">
+          <widget class="QPushButton" name="upB">
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -1196,7 +1196,7 @@ selection-background-color: lightblue;
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="down">
+          <widget class="QPushButton" name="downB">
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -1210,7 +1210,7 @@ selection-background-color: lightblue;
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="skip">
+          <widget class="QPushButton" name="skipB">
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -1263,6 +1263,52 @@ selection-background-color: lightblue;
          </property>
         </column>
        </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame_18">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_10">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Output Units</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radioButton">
+        <property name="text">
+         <string>&amp;Metric</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radioButton_2">
+        <property name="text">
+         <string>&amp;Imperial</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>
@@ -1436,12 +1482,36 @@ selection-background-color: lightblue;
       <string notr="true"/>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>nameLE</tabstop>
+  <tabstop>toolTableCB</tabstop>
+  <tabstop>workpieceCB</tabstop>
+  <tabstop>xaxisCB</tabstop>
+  <tabstop>xaxisLE</tabstop>
+  <tabstop>yaxisCB</tabstop>
+  <tabstop>yaxisLE</tabstop>
+  <tabstop>zaxisCB</tabstop>
+  <tabstop>zaxisLE</tabstop>
+  <tabstop>radioButton</tabstop>
+  <tabstop>radioButton_2</tabstop>
+  <tabstop>tableWidget</tabstop>
+  <tabstop>addB</tabstop>
+  <tabstop>deleteB</tabstop>
+  <tabstop>editB</tabstop>
+  <tabstop>upB</tabstop>
+  <tabstop>downB</tabstop>
+  <tabstop>skipB</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>pushButton_3</tabstop>
+  <tabstop>pushButton_4</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -30,23 +30,6 @@ import os
 from Tool import Tool
 import validator as VAL
 
-ANGULAR_VELOCITY = ['rpm', 'r/m', 'rev/m','rev/min', 'rps', 'r/s', 'r/sec', 'rev/s', 'rev/sec']
-VELOCITY = ['mm/min','mm/m','mmpm',
-			'mm/sec', 'mm/s', 'mmps',
-			'm/min', 'm/m', 'mpm',
-			'm/s', 'm/sec', 'mps',
-            'in/m','in/min', '"/m',"/min", 'ipm',
-            'in/sec','in/s','"/s','"/sec', 'ips',
-            'f/s', 'ft/sec', 'fps',
-            'ft/m', 'ft/min', 'fpm',
-            'kph',
-            'mph']
-LENGTH = ['mm',
-		  'm',
-		  'in', '"',
-		  'f', 'ft', "'"]
-ANGLE = ['degree', 'degrees','deg', 'd', 'rad', 'r', 'radian', 'radians']
-
 GUI_STATUS = 'hidden'
 def getStatus():
 	return GUI_STATUS
@@ -214,37 +197,37 @@ class ToolGui():
 					VAL.setLabel(ui.nameLabel,'INVALID')
 					valid = False
 
-		valid = VAL.validate(ui.feedRateEdit,ui.feedRateL,False,valid,VELOCITY)
-		valid = VAL.validate(ui.plungeRateEdit,ui.plungeRateL,False,valid,VELOCITY)
-		valid = VAL.validate(ui.spindleSpeedEdit,ui.spindleSpeedLabel,False,valid,ANGULAR_VELOCITY)
-		valid = VAL.validate(ui.stepOverEdit,ui.stepOverL,False,valid,LENGTH)
-		valid = VAL.validate(ui.depthOfCutEdit,ui.docL,False,valid,LENGTH)
+		valid = VAL.validate(ui.feedRateEdit,ui.feedRateL,False,valid,VAL.VELOCITY)
+		valid = VAL.validate(ui.plungeRateEdit,ui.plungeRateL,False,valid,VAL.VELOCITY)
+		valid = VAL.validate(ui.spindleSpeedEdit,ui.spindleSpeedLabel,False,valid,VAL.ANGULAR_VELOCITY)
+		valid = VAL.validate(ui.stepOverEdit,ui.stepOverL,False,valid,VAL.LENGTH)
+		valid = VAL.validate(ui.depthOfCutEdit,ui.docL,False,valid,VAL.LENGTH)
 		if toolType == "Straight":
-			valid = VAL.validate(ui.straightDiameterEdit,ui.straightDiameterL,True,valid,LENGTH)
-			valid = VAL.validate(ui.straightCutLengthEdit,ui.straightCutLenL,True,valid,LENGTH)
-			valid = VAL.validate(ui.straightToolLengthEdit,ui.straightToolLenL,True,valid,LENGTH)
-			valid = VAL.validate(ui.straightShaftDiameterEdit,ui.staightShaftDiameterL,True,valid,LENGTH)
+			valid = VAL.validate(ui.straightDiameterEdit,ui.straightDiameterL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.straightCutLengthEdit,ui.straightCutLenL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.straightToolLengthEdit,ui.straightToolLenL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.straightShaftDiameterEdit,ui.staightShaftDiameterL,True,valid,VAL.LENGTH)
 		elif toolType == "Tapered":
-			valid = VAL.validate(ui.taperedTopDiameterEdit,ui.taperedTopDiameterL,True,valid,LENGTH)
-			valid = VAL.validate(ui.taperedBottomDiameterEdit,ui.taperedBottomDiameterL,True,valid,LENGTH)
-			valid = VAL.validate(ui.taperedCutLengthEdit,ui.taperedCutLengthL,True,valid,LENGTH)
-			valid = VAL.validate(ui.taperedToolLengthEdit,ui.taperedToolLengthL,True,valid,LENGTH)
-			valid = VAL.validate(ui.taperedShaftDiameterEdit,ui.taperedShaftDiameterL,True,valid,LENGTH)
+			valid = VAL.validate(ui.taperedTopDiameterEdit,ui.taperedTopDiameterL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.taperedBottomDiameterEdit,ui.taperedBottomDiameterL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.taperedCutLengthEdit,ui.taperedCutLengthL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.taperedToolLengthEdit,ui.taperedToolLengthL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.taperedShaftDiameterEdit,ui.taperedShaftDiameterL,True,valid,VAL.LENGTH)
 		elif toolType == "Conical":
-			valid = VAL.validate(ui.conicalTopDiameterEdit,ui.conicalTopDiameterL,True,valid,LENGTH)
-			valid = VAL.validate(ui.conicalCutAngleEdit,ui.conicalCutAngleL,True,valid,ANGLE)
-			valid = VAL.validate(ui.conicalToolLengthEdit,ui.conicalToolLengthL,True,valid,LENGTH)
-			valid = VAL.validate(ui.conicalShaftDiameterEdit,ui.conicalShaftDiameterL,True,valid,LENGTH)
+			valid = VAL.validate(ui.conicalTopDiameterEdit,ui.conicalTopDiameterL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.conicalCutAngleEdit,ui.conicalCutAngleL,True,valid,VAL.ANGLE)
+			valid = VAL.validate(ui.conicalToolLengthEdit,ui.conicalToolLengthL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.conicalShaftDiameterEdit,ui.conicalShaftDiameterL,True,valid,VAL.LENGTH)
 		elif toolType == "Ball":
-			valid = VAL.validate(ui.ballDiameterEdit,ui.ballDiameterL,True,valid,LENGTH)
-			valid = VAL.validate(ui.ballToolLengthEdit,ui.ballToolLengthL,True,valid,LENGTH)
-			valid = VAL.validate(ui.ballShaftDiameterEdit,ui.ballShaftDiameterL,True,valid,LENGTH)
+			valid = VAL.validate(ui.ballDiameterEdit,ui.ballDiameterL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.ballToolLengthEdit,ui.ballToolLengthL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.ballShaftDiameterEdit,ui.ballShaftDiameterL,True,valid,VAL.LENGTH)
 		elif toolType == "TaperedBall":
-			valid = VAL.validate(ui.taperedBallTopDiameterEdit,ui.taperedBallTopDiameterL,True,valid,LENGTH)
-			valid = VAL.validate(ui.taperedBallDiameterEdit,ui.taperedBallBallDiameterL,True,valid,LENGTH)
-			valid = VAL.validate(ui.taperedBallCutLengthEdit,ui.taperedBallCutLengthL,True,valid,LENGTH)
-			valid = VAL.validate(ui.taperedBallToolLengthEdit,ui.taperedBallToolLengthL,True,valid,LENGTH)
-			valid = VAL.validate(ui.taperedBallShaftDiameterEdit,ui.taperedBallShaftDiameterL,True,valid,LENGTH)
+			valid = VAL.validate(ui.taperedBallTopDiameterEdit,ui.taperedBallTopDiameterL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.taperedBallDiameterEdit,ui.taperedBallBallDiameterL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.taperedBallCutLengthEdit,ui.taperedBallCutLengthL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.taperedBallToolLengthEdit,ui.taperedBallToolLengthL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.taperedBallShaftDiameterEdit,ui.taperedBallShaftDiameterL,True,valid,VAL.LENGTH)
 				
 		ui.buttonBox.buttons()[0].setEnabled(valid)
 		return valid
@@ -497,8 +480,6 @@ class ToolGui():
 		return False
 
 	def IsActive(self):
-		"""Here you can define if the command must be active or not (greyed) if certain conditions
-		are met or not. This function is optional."""
 		if getGUIMode() in ["EditingToolFromGUI", "AddingToolFromGUI"]:
 			return True
 		mw = FreeCADGui.getMainWindow()

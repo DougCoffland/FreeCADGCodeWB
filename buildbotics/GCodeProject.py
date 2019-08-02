@@ -24,6 +24,8 @@
 #***************************************************************************/
 import FreeCAD,FreeCADGui
 from PySide import QtGui, QtCore
+import CutGui
+from Cut import Cut
 import os
 import validator as VAL
 
@@ -177,16 +179,133 @@ class GCodeProject():
 		ui.logoL.setPixmap(QtGui.QPixmap(os.path.dirname(__file__) + "/resources/ui/logo side by side.png"))				
 		ui.buttonBox.accepted.connect(self.accept)
 		ui.buttonBox.rejected.connect(self.reject)
+		ui.buttonBox.button(QtGui.QDialogButtonBox.Apply).clicked.connect(self.apply)
 		ui.nameLE.textChanged.connect(self.validateAllFields)
 		ui.toolTableCB.currentIndexChanged.connect(self.validateAllFields)
+		ui.workpieceCB.currentIndexChanged.connect(self.validateAllFields)
+		ui.xaxisCB.currentIndexChanged.connect(self.validateAllFields)
+		ui.xaxisLE.textChanged.connect(self.validateAllFields)
+		ui.yaxisCB.currentIndexChanged.connect(self.validateAllFields)
+		ui.yaxisLE.textChanged.connect(self.validateAllFields)
+		ui.zaxisCB.currentIndexChanged.connect(self.validateAllFields)
+		ui.zaxisLE.textChanged.connect(self.validateAllFields)
+		
+		ui.tableWidget.itemSelectionChanged.connect(self.validateAllFields)
+		ui.addB.clicked.connect(self.addCut)
+		ui.editB.clicked.connect(self.editCut)
 		
 		self.selectedObject = None
+		self.waitingOnCutGui = False
+		self.dirty = False
+		self.cutList = []
 		
 	def GetResources(self):
 		return {'Pixmap'  : os.path.dirname(__file__) + '/resources/svg/cnc.svg', # the name of a svg file available in the resources
                 'MenuText': "New GCode Project",
                 'ToolTip' : "Sets up a new project for creating G-Code paths from FreeCAD Shapes"}
 
+	def editCut(self):
+		ui = self.defineJobUi
+		CutGui.setGUIMode("EditingCutFromGUI")
+		props = self.cutList[ui.tableWidget.currentRow()]
+		props.append(["App::PropertyString", "ToolTable", ui.toolTableCB.currentText()])
+		CutGui.setGUIProperties(props)
+		FreeCADGui.runCommand('New_Cut')
+		self.waitingOnCutGui = True
+		self.validateAllFields()
+	
+	def addCut(self):
+		ui = self.defineJobUi
+		CutGui.setGUIMode("AddingCutFromGUI")
+		props = [["App::PropertyString", "ToolTable", ui.toolTableCB.currentText()]]
+		CutGui.setGUIProperties(props)
+		FreeCADGui.runCommand('New_Cut')
+		self.waitingOnCutGui = True
+		self.validateAllFields()
+		
+	def processCutGUIResult(self):
+		ui = self.defineJobUi
+		self.waitingOnCutGui = False
+		mode = CutGui.getGUIMode()
+		if mode == "AddingCutFromGUI":
+			props = CutGui.getGUIProperties()
+			self.cutList.append(props)
+			row = ui.tableWidget.rowCount()
+			ui.tableWidget.insertRow(row)
+			for prop in props:
+				if prop[1] == 'CutType': ui.tableWidget.setItem(row,0,QtGui.QTableWidgetItem(prop[2]))
+				elif prop[1] == 'ToolNumber': ui.tableWidget.setItem(row,1,QtGui.QTableWidgetItem(str(prop[2])))
+				elif prop[1] == 'CutName': ui.tableWidget.setItem(row,2,QtGui.QTableWidgetItem(prop[2]))
+			self.dirty = True
+		elif mode == "EditingCutFromGUI":
+			props = CutGui.getGUIProperties()
+			row = ui.tableWidget.currentRow()
+			self.cutList[row] = props
+			for prop in props:
+				if prop[1] == 'CutType': ui.tableWidget.setItem(row,0,QtGui.QTableWidgetItem(prop[2]))
+				elif prop[1] == 'ToolNumber': ui.tableWidget.setItem(row,1,QtGui.QTableWidgetItem(str(prop[2])))
+				elif prop[1] == 'CutName': ui.tableWidget.setItem(row,2,QtGui.QTableWidgetItem(prop[2]))
+			self.validateAllFields()
+		CutGui.setGUIMode('None')
+							    
+	def setAxis(self,axis):
+		ui = self.defineJobUi		
+		wpcb = ui.workpieceCB
+		if axis == 'x':
+			cb = ui.xaxisCB
+			le = ui.xaxisLE
+		elif axis == 'y':
+			cb = ui.yaxisCB
+			le = ui.yaxisLE
+		else:
+			cb = ui.zaxisCB
+			le = ui.zaxisLE
+		if wpcb.currentIndex() <= 0:
+			cb.setEnabled(False)
+			le.setEnabled(False)
+		else:
+			cb.setEnabled(True)
+			sel = cb.currentText()
+			if sel == 'Custom': le.setEnabled(True)
+			else: le.setEnabled(False)
+			obj = FreeCAD.ActiveDocument.getObjectsByLabel(wpcb.currentText())[0]
+			box = obj.Shape.BoundBox
+			if axis == 'x':
+				if sel == 'Left': le.setText("0.")
+				elif sel == 'Middle': le.setText(str((box.XMax - box.XMin) / 2.))
+				elif sel == 'Right': le.setText(str(box.XMax - box.XMin))
+			elif axis == 'y':
+				if sel == 'Front': le.setText("0.")
+				elif sel == 'Middle': le.setText(str((box.YMax - box.YMin) / 2.))
+				elif sel == 'Back': le.setText(str(box.YMax - box.YMin))
+			elif axis == 'z':
+				if sel == 'Top': le.setText(str(box.ZMax - box.ZMin))
+				elif sel == 'Middle': le.setText(str((box.ZMax - box.ZMin) / 2.))
+				elif sel == 'Bottom': le.setText("0.")
+
+	def setButtonStates(self,valid):
+		ui = self.defineJobUi
+		table = ui.tableWidget
+		if valid == True:
+			ui.buttonBox.buttons()[0].setEnabled(self.dirty)
+			ui.buttonBox.button(QtGui.QDialogButtonBox.Apply).setEnabled(self.dirty)
+		else:
+			ui.buttonBox.buttons()[0].setEnabled(False)
+			ui.buttonBox.button(QtGui.QDialogButtonBox.Apply).setEnabled(False)			
+		if len(table.selectedItems()) == 1:
+			ui.editB.setEnabled(True)
+			ui.deleteB.setEnabled(True)
+			row = table.row(table.selectedItems()[0])
+			if row == 0: ui.upB.setEnabled(False)
+			else: ui.upB.setEnabled(True)
+			if row == (table.rowCount() - 1): ui.downB.setEnabled(False)
+			else: ui.downB.setEnabled(True)
+		else:
+			ui.editB.setEnabled(False)
+			ui.deleteB.setEnabled(False)
+			ui.upB.setEnabled(False)
+			ui.downB.setEnabled(False)					
+	
 	def validateAllFields(self):
 		ui = self.defineJobUi
 		valid = True
@@ -208,9 +327,48 @@ class GCodeProject():
 			valid = False
 		else: VAL.setLabel(ui.toolTableL,'VALID')		
 		
-		ui.buttonBox.buttons()[0].setEnabled(valid)
+		if ui.workpieceCB.currentIndex() == 0:
+			VAL.setLabel(ui.workpieceL,'INVALID')
+			valid = False
+		else:
+			VAL.setLabel(ui.workpieceL,'VALID')
+		self.setAxis('x')		
+		self.setAxis('y')		
+		self.setAxis('z')
+		
+		self.dirty = True
+		self.setButtonStates(valid)
 		return valid
 		
+	def getPropertiesFromCut(self,cut):
+		p = []
+		S = "App::PropertyString"
+		I = "App::PropertyInteger"
+		L = "App::PropertyLength"
+		A = "App::PropertyAngle"
+		V = "App::PropertySpeed"
+		Q = "App::PropertyQuantity"	
+		p = [[S,		"ObjectType",	cut.ObjectType],
+			 [S,		"CutName",		cut.CutName],
+			 [S,		"Tool",			cut.Tool],
+			 [I,		"ToolNumber",	cut.ToolNumber],
+			 [S,		"CutType",		cut.CutType],
+			 [L,		"SafeHeight",	cut.SafeHeight],
+			 [L,		"SpindleSpeed",	cut.SpindleSpeed],			 
+			 [L,		"PlungeRate",	cut.PlungeRate],
+			 [L,		"XToolChangeLocation", cut.XToolChangeLocation],
+			 [L,		"YToolChangeLocation", cut.YToolChangeLocation],
+			 [L,		"ZToolChangeLocation", cut.ZToolChangeLocation]]
+		if hasattr(cut, "FeedRate"):	p.append([L,		"FeedRate",		cut.FeedRate])
+		if hasattr(cut, "DrillDepth"):	p.append([L,		"DrillDepth",	cut.DrillDepth])
+		if hasattr(cut, "PeckDepth"):	p.append([L,		"PeckDepth",	cut.PeckDepth])
+		if hasattr(cut,	"FirstX"):		p.append([L,		"FirstX",		cut.FirstX])
+		if hasattr(cut,	"SecondX"):		p.append([L,		"SecondX",		cut.SecondX])
+		if hasattr(cut,	"FirstY"):		p.append([L,		"FirstY",		cut.FirstY])
+		if hasattr(cut,	"SecondY"):		p.append([L,		"SecondY",		cut.SecondY])
+		if hasattr(cut, "RegistrationAxis"): p.append([S,	"RegistrationAxis",cut.RegistrationAxis])
+		return p
+
 	def Activated(self):
 		ui = self.defineJobUi
 		if self.selectedObject != None: ui.nameLE.setText(self.selectedObject.Label)
@@ -225,7 +383,30 @@ class GCodeProject():
 		if self.selectedObject != None and hasattr(self.selectedObject,'ToolTable') == True:
 			index = ui.toolTableCB.findText(self.selectedObject.ToolTable)
 			if index > 0: ui.toolTableCB.setCurrentIndex(index)
-					
+		ui.workpieceCB.clear()
+		ui.workpieceCB.addItem("None Selected...")
+		ui.workpieceCB.setCurrentIndex(0)	
+		for obj in FreeCAD.ActiveDocument.Objects:
+			if hasattr(obj,"Shape"):
+				ui.workpieceCB.addItem(obj.Label)
+		if self.selectedObject != None and hasattr(self.selectedObject,'WorkPiece') == True:
+			index = ui.workpieceCB.findText(self.selectedObject.WorkPiece)
+			if index > 0: ui.workpieceCB.setCurrentIndex(index)
+		self.cutList = []
+		if self.selectedObject != None:
+			for cut in self.selectedObject.Group:
+				props = self.getPropertiesFromCut(cut)
+				for prop in props:
+					if prop[1] == "CutType": cutType = prop[2]
+					if prop[1] == "ToolNumber": toolNumber = prop[2]
+					if prop[1] == "CutName": name = prop[2]
+				row = ui.tableWidget.rowCount()
+				ui.tableWidget.insertRow(row)
+				ui.tableWidget.setItem(row,0,QtGui.QTableWidgetItem(cutType))
+				ui.tableWidget.setItem(row,1,QtGui.QTableWidgetItem(toolNumber))
+				ui.tableWidget.setItem(row,2,QtGui.QTableWidgetItem(name))
+				self.cutList.append(props)
+
 		self.validateAllFields()
 		ui.show()     
 		return
@@ -233,17 +414,7 @@ class GCodeProject():
 	def accept(self):
 		ui = self.defineJobUi
 		ui.hide()
-		if self.selectedObject == None:
-			obj = FreeCAD.ActiveDocument.addObject('App::DocumentObjectGroupPython', "GCodeJob")
-			ViewGCode(obj.ViewObject)
-		else: obj = self.selectedObject
-		obj.Label = ui.nameLE.text()
-		if hasattr(obj,"ObjectType") == False: obj.addProperty("App::PropertyString","ObjectType").ObjectType = "GCodeJob"
-		if ui.toolTableCB.currentIndex() > 0:
-			if hasattr(obj, 'ToolTable') == False:
-				obj.addProperty("App::PropertyString","ToolTable").ToolTable = ui.toolTableCB.currentText()
-		elif hasattr(obj,"ToolTable") == True: obj.removeProperty("ToolTable")
-
+		self.apply()
 		FreeCAD.ActiveDocument.recompute()
 		return True
 		
@@ -251,7 +422,29 @@ class GCodeProject():
 		self.defineJobUi.hide()
 		return False
 
+	def apply(self):
+		ui = self.defineJobUi
+		if self.selectedObject == None:
+			obj = FreeCAD.ActiveDocument.addObject('App::DocumentObjectGroupPython', "GCodeJob")
+			ViewGCode(obj.ViewObject)
+			self.selectedObject = obj
+		obj = self.selectedObject
+		obj.Label = ui.nameLE.text()
+		if hasattr(obj,"ObjectType") == False: obj.addProperty("App::PropertyString","ObjectType").ObjectType = "GCodeJob"
+		if hasattr(obj, 'ToolTable') == False: obj.addProperty("App::PropertyString","ToolTable")
+		obj.ToolTable = ui.toolTableCB.currentText()
+		if hasattr(obj, 'WorkPiece') == False: obj.addProperty("App::PropertyString","WorkPiece")
+		obj.WorkPiece = ui.workpieceCB.currentText()
+		for cut in obj.Group:
+			FreeCAD.ActiveDocument.removeObject(cut.Name)
+		for line in self.cutList:
+			cut = Cut(obj)
+			cut.setProperties(line)
+		self.dirty = False		
+
 	def IsActive(self):
+		if self.waitingOnCutGui == True:
+			if CutGui.getStatus() == 'hidden': self.processCutGUIResult()
 		mw = FreeCADGui.getMainWindow()
 		tree = mw.findChildren(QtGui.QTreeWidget)[0]
 		if len(tree.selectedItems()) != 1:
