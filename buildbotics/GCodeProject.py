@@ -28,6 +28,7 @@ import CutGui
 from Cut import Cut
 import os
 import validator as VAL
+import run
 
 class ViewGCode:
 	def __init__(self,obj):
@@ -197,18 +198,40 @@ class GCodeProject():
 		ui.deleteB.clicked.connect(self.deleteCut)
 		ui.upB.clicked.connect(self.moveUp)
 		ui.downB.clicked.connect(self.moveDown)
+		ui.metricRB.clicked.connect(self.validateAllFields)
+		ui.imperialRB.clicked.connect(self.validateAllFields)
+		ui.outFileB.clicked.connect(self.setOutputFile)
+		ui.runB.clicked.connect(self.run)
 		self.AYS.buttonBox.accepted.connect(self.removeCut)
 		
 		self.selectedObject = None
 		self.waitingOnCutGui = False
 		self.dirty = False
 		self.cutList = []
+		self.outputState = 'Idle'
 		
 	def GetResources(self):
 		return {'Pixmap'  : os.path.dirname(__file__) + '/resources/svg/cnc.svg', # the name of a svg file available in the resources
                 'MenuText': "New GCode Project",
                 'ToolTip' : "Sets up a new project for creating G-Code paths from FreeCAD Shapes"}
 
+	def reset(self):
+		ui = self.defineJobUi
+		ui.nameLE.setText("")
+		ui.toolTableCB.setCurrentIndex(0)
+		ui.workpieceCB.setCurrentIndex(0)
+		ui.xaxisCB.setCurrentIndex(0)
+		ui.yaxisCB.setCurrentIndex(0)
+		ui.zaxisCB.setCurrentIndex(0)
+		ui.xaxisLE.setText("")
+		ui.yaxisLE.setText("")
+		ui.zaxisLE.setText("")
+		self.cutList = []
+		while ui.tableWidget.rowCount() > 0: ui.tableWidget.removeRow(0)
+		ui.metricRB.setChecked(False)
+		ui.imperialRB.setChecked(False)
+		ui.outFileL.setText('None Selected...')
+			
 	def deleteCut(self):
 		table = self.defineJobUi.tableWidget
 		item = table.selectedItems()[0]
@@ -275,6 +298,31 @@ class GCodeProject():
 		cut = self.cutList.pop(row)
 		self.cutList.insert(row+1,cut)
 
+	def setOutputFile(self):
+		ui = self.defineJobUi
+		filename = QtGui.QFileDialog.getSaveFileName(caption='Select output file')[0]
+		if filename != "": ui.outFileL.setText(filename)
+		self.validateAllFields()
+
+	def run(self):
+		ui = self.defineJobUi
+		try:
+			fp = open(ui.outFileL.text(),'w+')
+			self.outputState = "Running"
+		except:
+			ui.actionLabel.setText("failed to open " + ui.outFileL.text() + " for writing")
+			self.outputState = "Idle"
+			return
+		if ui.metricRB.isChecked() == True: fp.write("G21\n")
+		else: fp.write("G20\n")
+		for i in range(len(self.cutList)):			
+			for prop in self.cutList[i]:
+				if prop[1] == 'CutName': name = prop[2]
+			cut = FreeCAD.ActiveDocument.getObjectsByLabel(name)[0]
+			cut.Proxy.run()
+		fp.write('M2\n%\n')
+		fp.close()
+		
 	def processCutGUIResult(self):
 		ui = self.defineJobUi
 		self.waitingOnCutGui = False
@@ -315,6 +363,10 @@ class GCodeProject():
 		if wpcb.currentIndex() <= 0:
 			cb.setEnabled(False)
 			le.setEnabled(False)
+		elif cb.currentText() == 'None Selected...':
+			le.setText("")
+			le.setEnabled(False)
+			cb.setEnabled(True)
 		else:
 			cb.setEnabled(True)
 			sel = cb.currentText()
@@ -323,17 +375,17 @@ class GCodeProject():
 			obj = FreeCAD.ActiveDocument.getObjectsByLabel(wpcb.currentText())[0]
 			box = obj.Shape.BoundBox
 			if axis == 'x':
-				if sel == 'Left': le.setText("0.")
-				elif sel == 'Middle': le.setText(str((box.XMax - box.XMin) / 2.))
-				elif sel == 'Right': le.setText(str(box.XMax - box.XMin))
+				if sel == 'Left': le.setText(VAL.fromSystemValue('length',0))
+				elif sel == 'Middle': le.setText(VAL.fromSystemValue('length',(box.XMax - box.XMin) / 2.))
+				elif sel == 'Right': le.setText(VAL.fromSystemValue('length',box.XMax - box.XMin))
 			elif axis == 'y':
-				if sel == 'Front': le.setText("0.")
-				elif sel == 'Middle': le.setText(str((box.YMax - box.YMin) / 2.))
-				elif sel == 'Back': le.setText(str(box.YMax - box.YMin))
+				if sel == 'Front': le.setText(VAL.fromSystemValue('length',0))
+				elif sel == 'Middle': le.setText(VAL.fromSystemValue('length',(box.YMax - box.YMin) / 2.))
+				elif sel == 'Back': le.setText(VAL.fromSystemValue('length',box.YMax - box.YMin))
 			elif axis == 'z':
-				if sel == 'Top': le.setText(str(box.ZMax - box.ZMin))
-				elif sel == 'Middle': le.setText(str((box.ZMax - box.ZMin) / 2.))
-				elif sel == 'Bottom': le.setText("0.")
+				if sel == 'Top': le.setText(VAL.fromSystemValue('length',box.ZMax - box.ZMin))
+				elif sel == 'Middle': le.setText(VAL.fromSystemValue('length',(box.ZMax - box.ZMin) / 2.))
+				elif sel == 'Bottom': le.setText(VAL.fromSystemValue('length',0))
 
 	def setButtonStates(self,valid):
 		ui = self.defineJobUi
@@ -356,7 +408,23 @@ class GCodeProject():
 			ui.editB.setEnabled(False)
 			ui.deleteB.setEnabled(False)
 			ui.upB.setEnabled(False)
-			ui.downB.setEnabled(False)					
+			ui.downB.setEnabled(False)
+		if ui.outFileL.text() == 'No File Selected...':
+			ui.runB.setEnabled(False)
+			ui.pauseB.setEnabled(False)
+			ui.stopB.setEnabled(False)
+		elif self.outputState == 'Idle':
+			ui.runB.setEnabled(True)
+			ui.pauseB.setEnabled(False)
+			ui.stopB.setEnabled(False)
+		elif self.outPutState == 'Running':
+			ui.runB.setEnabled(False)
+			ui.pauseB.setEnabled(True)
+			ui.stopB.setEnabled(True)
+		elif self.outPutState == "Paused":
+			self.runB.setEnabled(True)
+			self.pauseB.setEnabled(False)
+			self.stopB.setEnabled(True)				
 	
 	def validateAllFields(self):
 		ui = self.defineJobUi
@@ -387,6 +455,26 @@ class GCodeProject():
 		self.setAxis('x')		
 		self.setAxis('y')		
 		self.setAxis('z')
+		if ui.xaxisCB.currentText() == 'None Selected...' or (ui.xaxisCB.currentText() == 'Custom' and ui.xaxisLE.text() == ''):
+			VAL.setLabel(ui.xaxisL,'INVALID')
+			valid = False
+		else:
+			VAL.setLabel(ui.xaxisL,'VALID')
+		if ui.yaxisCB.currentText() == 'None Selected...' or (ui.yaxisCB.currentText() == 'Custom' and ui.yaxisLE.text() == ''):
+			VAL.setLabel(ui.yaxisL,'INVALID')
+			valid = False
+		else:
+			VAL.setLabel(ui.yaxisL,'VALID')
+		if ui.zaxisCB.currentText() == 'None Selected...' or (ui.zaxisCB.currentText() == 'Custom' and ui.zaxisLE.text() == ''):
+			VAL.setLabel(ui.zaxisL,'INVALID')
+			valid = False
+		else:
+			VAL.setLabel(ui.zaxisL,'VALID')
+		if ui.metricRB.isChecked() == False and ui.imperialRB.isChecked() == False:
+			VAL.setLabel(ui.outputUnitsL,'INVALID')
+			valid = False
+		else:
+			VAL.setLabel(ui.outputUnitsL, 'VALID')
 		
 		self.dirty = True
 		self.setButtonStates(valid)
@@ -423,8 +511,7 @@ class GCodeProject():
 
 	def Activated(self):
 		ui = self.defineJobUi
-		if self.selectedObject != None: ui.nameLE.setText(self.selectedObject.Label)
-		else: ui.nameLE.setText("")
+		self.reset()
 		ui.toolTableCB.clear()
 		ui.toolTableCB.addItem('None Selected...')
 		ui.toolTableCB.setCurrentIndex(0)
@@ -432,20 +519,27 @@ class GCodeProject():
 			if hasattr(obj,"ObjectType") == True:
 				if obj.ObjectType == "ToolTable":
 					ui.toolTableCB.addItem(obj.Label)
-		if self.selectedObject != None and hasattr(self.selectedObject,'ToolTable') == True:
-			index = ui.toolTableCB.findText(self.selectedObject.ToolTable)
-			if index > 0: ui.toolTableCB.setCurrentIndex(index)
 		ui.workpieceCB.clear()
 		ui.workpieceCB.addItem("None Selected...")
 		ui.workpieceCB.setCurrentIndex(0)	
 		for obj in FreeCAD.ActiveDocument.Objects:
 			if hasattr(obj,"Shape"):
 				ui.workpieceCB.addItem(obj.Label)
-		if self.selectedObject != None and hasattr(self.selectedObject,'WorkPiece') == True:
-			index = ui.workpieceCB.findText(self.selectedObject.WorkPiece)
-			if index > 0: ui.workpieceCB.setCurrentIndex(index)
 		self.cutList = []
 		if self.selectedObject != None:
+			ui.nameLE.setText(self.selectedObject.Label)
+			if hasattr(self.selectedObject,'ToolTable') == True:
+				index = ui.toolTableCB.findText(self.selectedObject.ToolTable)
+				if index > 0: ui.toolTableCB.setCurrentIndex(index)
+			if hasattr(self.selectedObject,'WorkPiece') == True:
+				index = ui.workpieceCB.findText(self.selectedObject.WorkPiece)
+				if index > 0: ui.workpieceCB.setCurrentIndex(index)
+			ui.xaxisCB.setCurrentIndex(ui.xaxisCB.findText(self.selectedObject.XOrigin))
+			ui.xaxisLE.setText(VAL.fromSystemValue('length',self.selectedObject.XOriginValue))
+			ui.yaxisCB.setCurrentIndex(ui.yaxisCB.findText(self.selectedObject.YOrigin))
+			ui.yaxisLE.setText(VAL.fromSystemValue('length',self.selectedObject.YOriginValue))
+			ui.zaxisCB.setCurrentIndex(ui.zaxisCB.findText(self.selectedObject.ZOrigin))
+			ui.zaxisLE.setText(VAL.fromSystemValue('length',self.selectedObject.ZOriginValue))
 			while ui.tableWidget.rowCount() > 0: ui.tableWidget.removeRow(0)
 			for cut in self.selectedObject.Group:
 				props = self.getPropertiesFromCut(cut)
@@ -456,9 +550,11 @@ class GCodeProject():
 				row = ui.tableWidget.rowCount()
 				ui.tableWidget.insertRow(row)
 				ui.tableWidget.setItem(row,0,QtGui.QTableWidgetItem(cutType))
-				ui.tableWidget.setItem(row,1,QtGui.QTableWidgetItem(toolNumber))
+				ui.tableWidget.setItem(row,1,QtGui.QTableWidgetItem(str(toolNumber)))
 				ui.tableWidget.setItem(row,2,QtGui.QTableWidgetItem(name))
 				self.cutList.append(props)
+			if self.selectedObject.OutputUnits == 'METRIC': ui.metricRB.setChecked(True)
+			else: ui.imperialRB.setChecked(True)
 
 		self.validateAllFields()
 		ui.show()     
@@ -488,12 +584,27 @@ class GCodeProject():
 		obj.ToolTable = ui.toolTableCB.currentText()
 		if hasattr(obj, 'WorkPiece') == False: obj.addProperty("App::PropertyString","WorkPiece")
 		obj.WorkPiece = ui.workpieceCB.currentText()
+		if hasattr(obj, 'XOrigin') == False: obj.addProperty("App::PropertyString","XOrigin")
+		obj.XOrigin = ui.xaxisCB.currentText()
+		if hasattr(obj, 'XOriginValue') == False: obj.addProperty("App::PropertyLength","XOriginValue")
+		obj.XOriginValue = VAL.toSystemValue(ui.xaxisLE,'length')
+		if hasattr(obj, 'YOrigin') == False: obj.addProperty("App::PropertyString","YOrigin")
+		obj.YOrigin = ui.yaxisCB.currentText()
+		if hasattr(obj, 'YOriginValue') == False: obj.addProperty("App::PropertyLength","YOriginValue")
+		obj.YOriginValue = VAL.toSystemValue(ui.yaxisLE, 'length')
+		if hasattr(obj, 'ZOrigin') == False: obj.addProperty("App::PropertyString","ZOrigin")
+		obj.ZOrigin = ui.zaxisCB.currentText()
+		if hasattr(obj, 'ZOriginValue') == False: obj.addProperty("App::PropertyLength","ZOriginValue")
+		obj.ZOriginValue = VAL.toSystemValue(ui.zaxisLE,'length')
 		for cut in obj.Group:
 			FreeCAD.ActiveDocument.removeObject(cut.Name)
 		for line in self.cutList:
 			cut = Cut(obj)
 			cut.getObject().Label = ui.nameLE.text()
 			cut.setProperties(line,cut.getObject())
+		if hasattr(obj,"OutputUnits") == False: obj.addProperty("App::PropertyString","OutputUnits")
+		if ui.metricRB.isChecked() == True: obj.OutputUnits = 'METRIC'
+		else: obj.OutputUnits = 'IMPERIAL'
 		self.dirty = False		
 
 	def IsActive(self):

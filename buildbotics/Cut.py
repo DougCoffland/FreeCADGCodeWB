@@ -106,6 +106,7 @@ static char * registration_xpm[] = {
 "           +@+           ",
 "           +@+           ",
 "           .+.           "};"""
+
 					
 class Cut():
 	def __init__(self,selectedObject):
@@ -116,6 +117,9 @@ class Cut():
 		
 	def getObject(self):
 		return self.obj
+		
+	def run(self):
+		print "running registration cut"
 		
 	def setProperties(self,p,obj):
 		if hasattr(obj,'PropertiesList'):

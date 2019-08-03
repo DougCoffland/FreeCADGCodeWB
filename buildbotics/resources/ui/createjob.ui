@@ -783,6 +783,11 @@ selection-background-color: lightblue;
                     </property>
                     <item>
                      <property name="text">
+                      <string>None Selected...</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
                       <string>Left</string>
                      </property>
                     </item>
@@ -908,6 +913,11 @@ selection-background-color: lightblue;
                     </property>
                     <item>
                      <property name="text">
+                      <string>None Selected...</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
                       <string>Front</string>
                      </property>
                     </item>
@@ -1025,6 +1035,11 @@ selection-background-color: lightblue;
                     <property name="sizeAdjustPolicy">
                      <enum>QComboBox::AdjustToContents</enum>
                     </property>
+                    <item>
+                     <property name="text">
+                      <string>None Selected...</string>
+                     </property>
+                    </item>
                     <item>
                      <property name="text">
                       <string>Top</string>
@@ -1277,21 +1292,21 @@ selection-background-color: lightblue;
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_10">
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="outputUnitsL">
         <property name="text">
          <string>Output Units</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="radioButton">
+       <widget class="QRadioButton" name="metricRB">
         <property name="text">
          <string>&amp;Metric</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="radioButton_2">
+       <widget class="QRadioButton" name="imperialRB">
         <property name="text">
          <string>&amp;Imperial</string>
         </property>
@@ -1329,7 +1344,7 @@ selection-background-color: lightblue;
        <number>11</number>
       </property>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="outFileB">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -1349,7 +1364,7 @@ selection-background-color: lightblue;
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="runB">
         <property name="styleSheet">
          <string notr="true"/>
         </property>
@@ -1363,7 +1378,7 @@ selection-background-color: lightblue;
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_3">
+       <widget class="QPushButton" name="pauseB">
         <property name="styleSheet">
          <string notr="true"/>
         </property>
@@ -1377,7 +1392,7 @@ selection-background-color: lightblue;
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_4">
+       <widget class="QPushButton" name="stopB">
         <property name="styleSheet">
          <string notr="true"/>
         </property>
@@ -1394,22 +1409,44 @@ selection-background-color: lightblue;
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label_8">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <widget class="QFrame" name="frame_19">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
      </property>
-     <property name="styleSheet">
-      <string notr="true"/>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
      </property>
-     <property name="text">
-      <string>No File Selected...</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_11">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Output File Name: </string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="outFileL">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>No File Selected...</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -1465,7 +1502,7 @@ selection-background-color: lightblue;
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLabel" name="label_13">
+      <widget class="QLabel" name="actionLabel">
        <property name="styleSheet">
         <string notr="true"/>
        </property>
@@ -1498,8 +1535,8 @@ selection-background-color: lightblue;
   <tabstop>yaxisLE</tabstop>
   <tabstop>zaxisCB</tabstop>
   <tabstop>zaxisLE</tabstop>
-  <tabstop>radioButton</tabstop>
-  <tabstop>radioButton_2</tabstop>
+  <tabstop>metricRB</tabstop>
+  <tabstop>imperialRB</tabstop>
   <tabstop>tableWidget</tabstop>
   <tabstop>addB</tabstop>
   <tabstop>deleteB</tabstop>
@@ -1507,10 +1544,10 @@ selection-background-color: lightblue;
   <tabstop>upB</tabstop>
   <tabstop>downB</tabstop>
   <tabstop>skipB</tabstop>
-  <tabstop>pushButton</tabstop>
-  <tabstop>pushButton_2</tabstop>
-  <tabstop>pushButton_3</tabstop>
-  <tabstop>pushButton_4</tabstop>
+  <tabstop>outFileB</tabstop>
+  <tabstop>runB</tabstop>
+  <tabstop>pauseB</tabstop>
+  <tabstop>stopB</tabstop>
  </tabstops>
  <resources/>
  <connections/>
