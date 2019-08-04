@@ -26,6 +26,7 @@ import FreeCAD,FreeCADGui
 from PySide import QtGui, QtCore, QtWebKit
 from pivy import coin
 import os
+import math
 
 class ViewCut:
 	def __init__(self,obj):
@@ -54,59 +55,6 @@ class ViewCut:
 
 	def getIcon(self):
 		return ""
-		
-class ViewRegistrationCut(ViewCut):
-	def getIcon(self):
-		return """
-/* XPM */
-static char * registration_xpm[] = {
-"25 25 20 1",
-" 	c None",
-".	c #170017",
-"+	c #3A003A",
-"@	c #7F007F",
-"#	c #700070",
-"$	c #720072",
-"%	c #7C007C",
-"&	c #7B007B",
-"*	c #000000",
-"=	c #100010",
-"-	c #0A000A",
-";	c #710071",
-">	c #7E007E",
-",	c #790079",
-"'	c #740074",
-")	c #7D007D",
-"!	c #230023",
-"~	c #520052",
-"{	c #6F006F",
-"]	c #180018",
-"           .+.           ",
-"           +@+           ",
-"           +@+           ",
-"           +@+           ",
-"           .+.           ",
-"           #$#           ",
-"           %@%           ",
-"           &@&           ",
-"            @            ",
-"            @            ",
-"            &            ",
-"***=-;&           >,.+++.",
-"+@@@+'@@@@)   %@@@@@+@@@+",
-"!~~~!'>>         ))@.+++.",
-"            &            ",
-"            @            ",
-"            @            ",
-"            @&           ",
-"           %@%           ",
-"           #${           ",
-"           ]+.           ",
-"           +@+           ",
-"           +@+           ",
-"           +@+           ",
-"           .+.           "};"""
-
 					
 class Cut():
 	def __init__(self,selectedObject):
@@ -114,12 +62,35 @@ class Cut():
 		obj.Proxy = self
 		self.obj = obj
 		selectedObject.addObject(self.obj)
+		self.outputUnits = ""
 		
 	def getObject(self):
 		return self.obj
 		
+	def writeGCodeLine(self,line):
+		self.fp.write(line + '\n')
+		try:
+			lc = int(self.ui.lcL.text())
+		except:
+			lc = 0
+		self.ui.lcL.setText(str(lc + 1))		
+		
 	def run(self):
-		print "running registration cut"
+		print "running cut"
+		
+	def cut(self,x=None,y=None,z=None):
+		line = 'G1'
+		if x != None: line = line + 'X' + str(self.toOutputUnits(x,'length') + self.xOff)
+		if y != None: line = line + 'Y' + str(self.toOutputUnits(y,'length') + self.yOff)
+		if z != None: line = line + 'Z' + str(self.toOutputUnits(z,'length') + self.zOff)
+		self.writeGCodeLine(line)
+
+	def rapid(self,x=None,y=None,z=None):
+		line = 'G0'
+		if x != None: line = line + 'X' + str(self.toOutputUnits(x,'length') + self.xOff)
+		if y != None: line = line + 'Y' + str(self.toOutputUnits(y,'length') + self.yOff)
+		if z != None: line = line + 'Z' + str(self.toOutputUnits(z,'length') + self.zOff)
+		self.writeGCodeLine(line)
 		
 	def setProperties(self,p,obj):
 		if hasattr(obj,'PropertiesList'):
@@ -130,11 +101,84 @@ class Cut():
 			setattr(newprop,prop[1],prop[2])
 		obj.Label = obj.CutName
 
-		if obj.CutType == "Registration": ViewRegistrationCut(obj.ViewObject)
+		ViewCut(obj.ViewObject)
 
 		for prop in obj.PropertiesList:
 			obj.setEditorMode(prop,("ReadOnly",))
 		FreeCAD.ActiveDocument.recompute()
+		
+	def setUserUnits(self):
+		userPref = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units").GetInt("UserSchema")
+		def setUnits(l,t,v):
+			self.userLengthUnit = l
+			self.userTimeUnit = t
+			self.userVelocityUnit = v
+		if userPref in [0,1]: setUnits('mm','s','mm/s')
+		elif userPref == 2: setUnits('m', 's', 'm/s')
+		elif userPref in [3,4]: setUnits('in','min','ipm')
+		elif userPref == 6: setUnits('mm','min','mm/min')
+		else:
+			print "WARNING: units unknown"
+			setUnits('mm','s','mm/s')
+			
+	def toOutputUnits(self,s,form):
+		if hasattr(s,"UserString") == False: return s
+		s = s.UserString
+		sUnit = s.lstrip('-+0123456789.e\ ')
+		sValue = eval(s[:len(s) - len(sUnit)])
+		sUnit = sUnit.strip()
+		if sUnit == "":
+			if form == 'velocity': sUnit = self.userVelocityUnit
+			elif form == 'length': sUnit = self.userLengthUnit
+			elif form == 'time': sUnit = self.userTimeUnit
+		if self.outputUnits == 'METRIC':
+			if form == 'length':
+				if sUnit in ['"','in']: sValue = sValue * 25.4
+				elif sUnit in ["'",'f','ft']: sValue = sValue * 25.4 * 12
+				elif sUnit == 'm': sValue = SValue * 1000
+			elif form == 'velocity':
+				if sUnit in ['mm/sec', 'mm/s', 'mmps']: sValue = sValue / 60
+				elif sUnit in ['m/min', 'm/m', 'mpm']: sValue = sValue * 1000
+				elif sUnit in ['m/s', 'm/sec', 'mps']: sValue = sValue * 1000 * 60
+				elif sUnit in ['in/m','in/min', '"/m','"/min', 'ipm']: sValue = sValue * 25.4
+				elif sUnit in ['in/sec','in/s','"/s','"/sec', 'ips']: sValue = sValue * 25.4 * 60
+				elif sUnit in ['f/s', 'ft/sec', 'fps']: sValue = sValue * 12 * 25.4 * 60
+				elif sUnit in ['ft/m', 'ft/min', 'fpm']: sValue = sValue * 12 * 25.4
+				elif sUnit == 'kph': sValue = sValue * 1,000,000 / 60
+				elif sUnit == 'mph': sValue = sValue * 5280 * 12 * 25.4 / 60
+		else:
+			if form == 'length':
+				if sUnit == 'mm': sValue = sValue / 25.4
+				elif sUnit == 'm': sValue = sValue * 39.37
+				elif sUnit in ['f', 'ft', "'"]: sValue = sValue * 12
+			elif form == 'velocity':
+				if sUnit in ['mm/min','mm/m','mmpm']: sValue = sValue / 25.4
+				elif sUnit in ['mm/sec', 'mm/s', 'mmps']: sValue = sValue / 25.4 * 60
+				elif sUnit in ['m/min', 'm/m', 'mpm']: sValue = sValue * 39.37
+				elif sUnit in ['m/s', 'm/sec', 'mps']: sValue = sValue * 39.37 * 60
+				elif sUnit in ['in/sec','in/s','"/s','"/sec', 'ips']: sValue = sValue * 60
+				elif sUnit in ['f/s', 'ft/sec', 'fps']: sValue = sValue * 12 * 60
+				elif sUnit in ['ft/m', 'ft/min', 'fpm']: sValue = sValue * 12
+				elif sUnit == 'kph': sValue = sValue * 1000 * 39.37 / 60
+				elif sUnit == 'mph': sValue = sValue * 5280 * 12 / 60
+		if form == 'time':
+			if sUnit in ['s', 'sec']: sValue = sValue / 60
+			if sUnit in ['hr', 'hour']: sValue = sValue * 60			
+		elif form == 'angularVelocity':
+			if sUnit in ['rps', 'r/s', 'r/sec', 'rev/s', 'rev/sec']: sValue = sValue / 60
+		elif form == 'angle':
+			if sUnit in ['rad', 'r', 'radian', 'radians']: sValue = sValue / math.pi
+		return sValue
+				
+	def resetOffset(self):
+		self.xOff = 0.
+		self.yOff = 0.
+		self.zOff = 0.
+
+	def setOffset(self, origin):
+		self.xOff = self.toOutputUnits(origin[0],'length')
+		self.yOff = self.toOutputUnits(origin[1],'length')
+		self.zOff = self.toOutputUnits(origin[2],'length')		
 		
 	def __getstate__(self):
 		state = {}

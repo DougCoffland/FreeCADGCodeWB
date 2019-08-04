@@ -28,6 +28,7 @@ from PySide import QtGui, QtCore
 import os
 
 from Cut import Cut
+from RegistrationCut import RegistrationCut
 import validator as VAL
 
 GUI_STATUS = 'hidden'
@@ -241,7 +242,10 @@ class CutGui():
 		if mode in ["AddingCutFromGUI", "EditingCutFromGUI"]:
 			setGUIProperties(p)
 		elif mode == "AddingCutFromIcon":
-			self.cut = Cut(self.selectedObject)
+			for prop in p:
+				if prop[1] == "CutType":
+					if prop[2] == "Registration": self.cut = RegistrationCut(self.selectedObject)
+					else: self.cut = Cut(self.selectedObject)
 			self.cut.getObject().Label = ui.nameLE.text()
 			self.cut.setProperties(p,self.cut.getObject())
 			setGUIMode("None")				

@@ -26,9 +26,9 @@ import FreeCAD,FreeCADGui
 from PySide import QtGui, QtCore
 import CutGui
 from Cut import Cut
+from RegistrationCut import RegistrationCut
 import os
 import validator as VAL
-import run
 
 class ViewGCode:
 	def __init__(self,obj):
@@ -202,13 +202,13 @@ class GCodeProject():
 		ui.imperialRB.clicked.connect(self.validateAllFields)
 		ui.outFileB.clicked.connect(self.setOutputFile)
 		ui.runB.clicked.connect(self.run)
-		self.AYS.buttonBox.accepted.connect(self.removeCut)
 		
 		self.selectedObject = None
 		self.waitingOnCutGui = False
 		self.dirty = False
 		self.cutList = []
 		self.outputState = 'Idle'
+		self.origin = (0,0,0)
 		
 	def GetResources(self):
 		return {'Pixmap'  : os.path.dirname(__file__) + '/resources/svg/cnc.svg', # the name of a svg file available in the resources
@@ -237,12 +237,7 @@ class GCodeProject():
 		item = table.selectedItems()[0]
 		row = table.row(item)
 		self.AYS.questionLabel.setText('Deleting "' + table.item(row,2).text() + '"\nClick Cancel to abort')
-		self.AYS.show()
-		
-	def removeCut(self):
-		table = self.defineJobUi.tableWidget
-		item = table.selectedItems()[0]
-		row = table.row(item)
+		if self.AYS.exec_() == QtGui.QDialog.Rejected: return
 		table.removeRow(row)
 		self.cutList.pop(row)
 		self.dirty = True
@@ -304,24 +299,47 @@ class GCodeProject():
 		if filename != "": ui.outFileL.setText(filename)
 		self.validateAllFields()
 
+	def writeGCodeLine(self,line):
+		ui = self.defineJobUi
+		self.fp.write(line + '\n')
+		try:
+			lc = int(ui.lcL.text())
+		except:
+			lc = 0
+		ui.lcL.setText(str(lc + 1))		
+	
 	def run(self):
 		ui = self.defineJobUi
+		ui.lcL.setText("")
+		outFile = ui.outFileL.text()
+		obj = self.selectedObject
+		if os.path.exists(outFile) == True:
+			self.AYS.questionLabel.setText('Overwriting "' + outFile + '"\nClick Cancel to abort')
+			if self.AYS.exec_() == QtGui.QDialog.Rejected: return
 		try:
-			fp = open(ui.outFileL.text(),'w+')
+			self.fp = open(ui.outFileL.text(),'w+')
 			self.outputState = "Running"
 		except:
 			ui.actionLabel.setText("failed to open " + ui.outFileL.text() + " for writing")
 			self.outputState = "Idle"
 			return
-		if ui.metricRB.isChecked() == True: fp.write("G21\n")
-		else: fp.write("G20\n")
+		origin = [obj.XOriginValue,obj.YOriginValue,obj.ZOriginValue]
+		if ui.metricRB.isChecked() == True:
+			outputUnits = 'METRIC'
+			self.writeGCodeLine("G21")
+		else:
+			outputUnits = 'IMPERIAL'
+			self.writeGCodeLine("G20")
 		for i in range(len(self.cutList)):			
 			for prop in self.cutList[i]:
 				if prop[1] == 'CutName': name = prop[2]
 			cut = FreeCAD.ActiveDocument.getObjectsByLabel(name)[0]
-			cut.Proxy.run()
-		fp.write('M2\n%\n')
-		fp.close()
+			if cut.CutType == "Registration": cut.Proxy.run(ui, self.fp,cut,outputUnits)
+		self.writeGCodeLine("M2")
+		self.writeGCodeLine("%")
+		self.fp.close()
+		self.outputState = "Idle"
+		self.validateAllFields()
 		
 	def processCutGUIResult(self):
 		ui = self.defineJobUi
@@ -417,7 +435,7 @@ class GCodeProject():
 			ui.runB.setEnabled(True)
 			ui.pauseB.setEnabled(False)
 			ui.stopB.setEnabled(False)
-		elif self.outPutState == 'Running':
+		elif self.outputState == 'Running':
 			ui.runB.setEnabled(False)
 			ui.pauseB.setEnabled(True)
 			ui.stopB.setEnabled(True)
@@ -555,6 +573,7 @@ class GCodeProject():
 				self.cutList.append(props)
 			if self.selectedObject.OutputUnits == 'METRIC': ui.metricRB.setChecked(True)
 			else: ui.imperialRB.setChecked(True)
+			ui.outFileL.setText(self.selectedObject.OutputFile)
 
 		self.validateAllFields()
 		ui.show()     
@@ -599,12 +618,17 @@ class GCodeProject():
 		for cut in obj.Group:
 			FreeCAD.ActiveDocument.removeObject(cut.Name)
 		for line in self.cutList:
-			cut = Cut(obj)
+			for prop in line:
+				if prop[1] == "CutType":
+					if prop[2] == "Registration": cut = RegistrationCut(obj)
+					else: cut = Cut(obj)
 			cut.getObject().Label = ui.nameLE.text()
 			cut.setProperties(line,cut.getObject())
 		if hasattr(obj,"OutputUnits") == False: obj.addProperty("App::PropertyString","OutputUnits")
 		if ui.metricRB.isChecked() == True: obj.OutputUnits = 'METRIC'
 		else: obj.OutputUnits = 'IMPERIAL'
+		if hasattr(obj,"OutputFile") == False: obj.addProperty("App::PropertyString","OutputFile")
+		obj.OutputFile = ui.outFileL.text()
 		self.dirty = False		
 
 	def IsActive(self):
