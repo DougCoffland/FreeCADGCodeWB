@@ -27,6 +27,7 @@ from PySide import QtGui, QtCore
 import CutGui
 from Cut import Cut
 from RegistrationCut import RegistrationCut
+from DrillCut import DrillCut
 import os
 import validator as VAL
 
@@ -208,6 +209,7 @@ class GCodeProject():
 		self.dirty = False
 		self.cutList = []
 		self.outputState = 'Idle'
+		CutGui.setGUIMode('None')
 		self.origin = (0,0,0)
 		
 	def GetResources(self):
@@ -334,7 +336,7 @@ class GCodeProject():
 			for prop in self.cutList[i]:
 				if prop[1] == 'CutName': name = prop[2]
 			cut = FreeCAD.ActiveDocument.getObjectsByLabel(name)[0]
-			if cut.CutType == "Registration": cut.Proxy.run(ui, self.fp,cut,outputUnits)
+			cut.Proxy.run(ui,cut,outputUnits,self.fp)
 		self.writeGCodeLine("M2")
 		self.writeGCodeLine("%")
 		self.fp.close()
@@ -354,7 +356,6 @@ class GCodeProject():
 				if prop[1] == 'CutType': ui.tableWidget.setItem(row,0,QtGui.QTableWidgetItem(prop[2]))
 				elif prop[1] == 'ToolNumber': ui.tableWidget.setItem(row,1,QtGui.QTableWidgetItem(str(prop[2])))
 				elif prop[1] == 'CutName': ui.tableWidget.setItem(row,2,QtGui.QTableWidgetItem(prop[2]))
-			self.dirty = True
 		elif mode == "EditingCutFromGUI":
 			props = CutGui.getGUIProperties()
 			row = ui.tableWidget.currentRow()
@@ -364,6 +365,7 @@ class GCodeProject():
 				elif prop[1] == 'ToolNumber': ui.tableWidget.setItem(row,1,QtGui.QTableWidgetItem(str(prop[2])))
 				elif prop[1] == 'CutName': ui.tableWidget.setItem(row,2,QtGui.QTableWidgetItem(prop[2]))
 			self.validateAllFields()
+		self.dirty = True
 		CutGui.setGUIMode('None')
 							    
 	def setAxis(self,axis):
@@ -413,7 +415,9 @@ class GCodeProject():
 			ui.buttonBox.button(QtGui.QDialogButtonBox.Apply).setEnabled(self.dirty)
 		else:
 			ui.buttonBox.buttons()[0].setEnabled(False)
-			ui.buttonBox.button(QtGui.QDialogButtonBox.Apply).setEnabled(False)			
+			ui.buttonBox.button(QtGui.QDialogButtonBox.Apply).setEnabled(False)				
+		if ui.toolTableCB.currentIndex() == 0: ui.addB.setEnabled(False)
+		else: ui.addB.setEnabled(True)		
 		if len(table.selectedItems()) == 1:
 			ui.editB.setEnabled(True)
 			ui.deleteB.setEnabled(True)
@@ -442,7 +446,7 @@ class GCodeProject():
 		elif self.outPutState == "Paused":
 			self.runB.setEnabled(True)
 			self.pauseB.setEnabled(False)
-			self.stopB.setEnabled(True)				
+			self.stopB.setEnabled(True)
 	
 	def validateAllFields(self):
 		ui = self.defineJobUi
@@ -494,8 +498,8 @@ class GCodeProject():
 		else:
 			VAL.setLabel(ui.outputUnitsL, 'VALID')
 		
-		self.dirty = True
 		self.setButtonStates(valid)
+		self.dirty = True
 		return valid
 		
 	def getPropertiesFromCut(self,cut):
@@ -505,7 +509,8 @@ class GCodeProject():
 		L = "App::PropertyLength"
 		A = "App::PropertyAngle"
 		V = "App::PropertySpeed"
-		Q = "App::PropertyQuantity"	
+		Q = "App::PropertyQuantity"
+		VL = "App::PropertyVectorList"	
 		p = [[S,		"ObjectType",	cut.ObjectType],
 			 [S,		"CutName",		cut.CutName],
 			 [S,		"Tool",			cut.Tool],
@@ -525,6 +530,7 @@ class GCodeProject():
 		if hasattr(cut,	"FirstY"):		p.append([L,		"FirstY",		cut.FirstY])
 		if hasattr(cut,	"SecondY"):		p.append([L,		"SecondY",		cut.SecondY])
 		if hasattr(cut, "RegistrationAxis"): p.append([S,	"RegistrationAxis",cut.RegistrationAxis])
+		if hasattr(cut, "DrillPointList"): p.append([VL,	"DrillPointList", cut.DrillPointList])
 		return p
 
 	def Activated(self):
@@ -533,16 +539,18 @@ class GCodeProject():
 		ui.toolTableCB.clear()
 		ui.toolTableCB.addItem('None Selected...')
 		ui.toolTableCB.setCurrentIndex(0)
-		for obj in FreeCAD.ActiveDocument.Objects:
-			if hasattr(obj,"ObjectType") == True:
-				if obj.ObjectType == "ToolTable":
-					ui.toolTableCB.addItem(obj.Label)
+		if hasattr(FreeCAD.ActiveDocument,"Objects"):
+			for obj in FreeCAD.ActiveDocument.Objects:
+				if hasattr(obj,"ObjectType") == True:
+					if obj.ObjectType == "ToolTable":
+						ui.toolTableCB.addItem(obj.Label)
 		ui.workpieceCB.clear()
 		ui.workpieceCB.addItem("None Selected...")
 		ui.workpieceCB.setCurrentIndex(0)	
-		for obj in FreeCAD.ActiveDocument.Objects:
-			if hasattr(obj,"Shape"):
-				ui.workpieceCB.addItem(obj.Label)
+		if hasattr(FreeCAD.ActiveDocument,"Objects"):
+			for obj in FreeCAD.ActiveDocument.Objects:
+				if hasattr(obj,"Shape"):
+					ui.workpieceCB.addItem(obj.Label)
 		self.cutList = []
 		if self.selectedObject != None:
 			ui.nameLE.setText(self.selectedObject.Label)
@@ -621,6 +629,7 @@ class GCodeProject():
 			for prop in line:
 				if prop[1] == "CutType":
 					if prop[2] == "Registration": cut = RegistrationCut(obj)
+					elif prop[2] == "Drill": cut = DrillCut(obj)
 					else: cut = Cut(obj)
 			cut.getObject().Label = ui.nameLE.text()
 			cut.setProperties(line,cut.getObject())

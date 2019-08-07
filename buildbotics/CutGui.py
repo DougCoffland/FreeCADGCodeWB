@@ -29,6 +29,7 @@ import os
 
 from Cut import Cut
 from RegistrationCut import RegistrationCut
+from DrillCut import DrillCut
 import validator as VAL
 
 GUI_STATUS = 'hidden'
@@ -86,17 +87,72 @@ class CutGui():
 		ui.registrationPeckDepthE.textChanged.connect(self.validateAllFields)
 		ui.registrationXAxisRB.clicked.connect(self.validateAllFields)
 		ui.registrationYAxisRB.clicked.connect(self.validateAllFields)
-				
+		ui.drillTW.itemSelectionChanged.connect(self.validateAllFields)
+		ui.drillAddB.clicked.connect(self.addDrillPoint)
+		ui.drillRemoveB.clicked.connect(self.removeDrillPoint)
+		ui.drillUpB.clicked.connect(self.moveDrillPointUp)
+		ui.drillDownB.clicked.connect(self.moveDrillPointDown)
+		ui.drillSaveB.clicked.connect(self.saveDrillList)
+		ui.drillLoadB.clicked.connect(self.loadDrillList)
+		ui.drillPeckDepthE.textChanged.connect(self.validateAllFields)
 		ui.buttonBox.accepted.connect(self.accept)
 		ui.buttonBox.rejected.connect(self.reject)
 		
 		self.originalCutName = ''
 		self.selectedObject = None
+		setGUIMode('None')
 		
 	def GetResources(self):
 		return {'Pixmap'  : os.path.dirname(__file__) +  "/resources/svg/cutsymbol.svg", # the name of a svg file available in the resources
                 'MenuText': "New Cut",
                 'ToolTip' : "Sets up a new cut that can be added to a g-code job"}
+	
+	def addDrillPoint(self):
+		tw = self.createCutUi.drillTW
+		row = tw.rowCount()
+		tw.insertRow(row)
+		if row != 0:
+			tw.setItem(row,0,tw.item(row-1,0).clone())
+			tw.setItem(row,1,tw.item(row-1,1).clone())
+			tw.setItem(row,2,tw.item(row-1,2).clone())
+		else:
+			tw.setItem(row,0,QtGui.QTableWidgetItem())
+			tw.setItem(row,1,QtGui.QTableWidgetItem())
+			tw.setItem(row,2,QtGui.QTableWidgetItem())
+
+		tw.editItem(tw.item(row,0))
+		
+	def removeDrillPoint(self):
+		tw = self.createCutUi.drillTW
+		row = tw.row(tw.selectedItems()[0])
+		tw.removeRow(row)
+		self.validateAllFields()
+		
+	def moveDrillPointUp(self):
+		tw = self.createCutUi.drillTW
+		row = tw.row(tw.selectedItems()[0])
+		x = tw.item(row,0).text()
+		y = tw.item(row,1).text()
+		z = tw.item(row,2).text()
+		tw.removeRow(row)
+		tw.insertRow(row-1)
+		tw.setItem(row-1,0,QtGui.QTableWidgetItem(x))
+		tw.setItem(row-1,1,QtGui.QTableWidgetItem(y))
+		tw.setItem(row-1,2,QtGui.QTableWidgetItem(z))
+		tw.setCurrentCell(row-1,0)
+		
+	def moveDrillPointDown(self):
+		tw = self.createCutUi.drillTW
+		row = tw.row(tw.selectedItems()[0])
+		x = tw.item(row,0).text()
+		y = tw.item(row,1).text()
+		z = tw.item(row,2).text()
+		tw.removeRow(row)
+		tw.insertRow(row+1)
+		tw.setItem(row+1,0,QtGui.QTableWidgetItem(x))
+		tw.setItem(row+1,1,QtGui.QTableWidgetItem(y))
+		tw.setItem(row+1,2,QtGui.QTableWidgetItem(z))
+		tw.setCurrentCell(row+1,0)
 	
 	def makeRecommendationsFromTool(self):
 		ui = self.createCutUi
@@ -110,6 +166,49 @@ class CutGui():
 			if hasattr(obj,'SpindleSpeed'): ui.spindleSpeedL.setText('Spindle Speed (' + obj.SpindleSpeed + ')')
 			if hasattr(obj,'FeedRate'): ui.feedRateL.setText('Feed Rate (' + str(obj.FeedRate.UserString) + ')')
 			if hasattr(obj,'PlungeRate'): ui.plungeRateL.setText('Plunge Rate (' + str(obj.PlungeRate.UserString) + ')')
+			
+	def saveDrillList(self):
+		filename = QtGui.QFileDialog.getSaveFileName(caption='Select output file')[0]
+		if filename != "":
+			tw = self.createCutUi.drillTW
+			fp = open(filename,'w+')
+			for line in range(tw.rowCount()):
+				fp.write(tw.item(line,0).text() + ',' + tw.item(line,1).text() + ',' + tw.item(line,2).text() + '\n')
+			fp.close()
+	
+	def loadDrillList(self):	
+		filename = QtGui.QFileDialog.getOpenFileName(caption='Select drill file')[0]
+		if filename != "":
+			fp = open(filename,'r')
+			tw = self.createCutUi.drillTW
+			while tw.rowCount() > 0: tw.removeRow(0)
+			row = 0
+			for line in fp:
+				tw.insertRow(row)
+				tw.setItem(row,0,QtGui.QTableWidgetItem(line.strip().split(',')[0]))
+				tw.setItem(row,1,QtGui.QTableWidgetItem(line.strip().split(',')[1]))
+				tw.setItem(row,2,QtGui.QTableWidgetItem(line.strip().split(',')[2]))
+				row = row + 1
+			fp.close()
+			self.validateAllFields()		
+	
+	def setDrillButtonStates(self):
+		ui = self.createCutUi
+		tw = ui.drillTW
+		items = tw.selectedItems()
+		ui.drillRemoveB.setEnabled(True)
+		ui.drillUpB.setEnabled(True)
+		ui.drillDownB.setEnabled(True)
+		ui.drillSaveB.setEnabled(True)
+		if tw.rowCount() == 0: ui.drillSaveB.setEnabled(False)
+		if len(items) == 0:
+			ui.drillRemoveB.setEnabled(False)
+		if len(items) > 1:
+			ui.drillUpB.setEnabled(False)
+			ui.drillDownB.setEnabled(False)
+		if len(items) == 1:
+			if tw.row(items[0]) == 0: ui.drillUpB.setEnabled(False)
+			if tw.row(items[0]) == tw.rowCount() - 1: ui.drillDownB.setEnabled(False)
 
 	def validateAllFields(self):
 		ui = self.createCutUi
@@ -147,7 +246,7 @@ class CutGui():
 			VAL.setLabel(ui.toolL,'VALID')
 		self.makeRecommendationsFromTool()
 		
-		valid = VAL.validate(ui.feedRateE,ui.feedRateL,True if cutType != "Registration" else False ,valid,VAL.VELOCITY)
+		valid = VAL.validate(ui.feedRateE,ui.feedRateL,False if cutType in ["Registration", "Drill"] else True ,valid,VAL.VELOCITY)
 		valid = VAL.validate(ui.plungeRateE,ui.plungeRateL,True,valid,VAL.VELOCITY)
 		valid = VAL.validate(ui.spindleSpeedE,ui.spindleSpeedL,True,valid,VAL.ANGULAR_VELOCITY)
 		valid = VAL.validate(ui.safeHeightLE,ui.safeHeightL,True,valid,VAL.LENGTH)
@@ -167,7 +266,14 @@ class CutGui():
 			else:
 				VAL.setLabel(ui.registrationAORL,'INVALID')
 				valid = False
-						
+		elif cutType == "Drill":
+			tw = ui.drillTW
+			for row in range(tw.rowCount()):
+				valid = VAL.validateTableCell(tw.item(row,0),valid,VAL.LENGTH)
+				valid = VAL.validateTableCell(tw.item(row,1),valid,VAL.LENGTH)
+				valid = VAL.validateTableCell(tw.item(row,2),valid,VAL.LENGTH)
+			self.setDrillButtonStates()
+			valid = VAL.validate(ui.drillPeckDepthE,ui.drillPeckDepthL,True,valid,VAL.LENGTH)				
 		ui.buttonBox.buttons()[0].setEnabled(valid)		
 		return valid
 
@@ -181,6 +287,7 @@ class CutGui():
 		A = "App::PropertyAngle"
 		V = "App::PropertySpeed"
 		Q = "App::PropertyQuantity"
+		VL = "App::PropertyVectorList"
 		cuttype = ui.cutTypeCB.currentText()
 		p = [[S,	"CutName",				ui.nameLE.text()],
 			 [S,	"ObjectType",		cuttype + "Cut"],	     
@@ -202,7 +309,18 @@ class CutGui():
 			p.append([L, "SecondY",		VAL.toSystemValue(ui.registrationSecondYE, 'length')])
 			if ui.registrationXAxisRB.isChecked() == True: axis = "X Axis"
 			else: axis = "Y Axis"
-			p.append([S, "RegistrationAxis",	axis])			
+			p.append([S, "RegistrationAxis",	axis])
+		elif cuttype == "Drill":
+			p.append([L, "PeckDepth",	VAL.toSystemValue(ui.drillPeckDepthE,'length')])
+			vl = []
+			fv = FreeCAD.Vector
+			tw = ui.drillTW
+			for row in range(tw.rowCount()):
+				x = VAL.toSystemValue(tw.item(row,0),'length')
+				y = VAL.toSystemValue(tw.item(row,1),'length')
+				z = VAL.toSystemValue(tw.item(row,2),'length')
+				vl.append(fv(x,y,z))
+			p.append([VL, "DrillPointList", vl])		
 		return p
 	
 	def getCutProperties(self,props):
@@ -233,6 +351,18 @@ class CutGui():
 				elif p[1] == "SecondX":	ui.registrationSecondXE.setText(VAL.fromSystemValue('length',p[2]))
 				elif p[1] == "FirstY":	ui.registrationFirstYE.setText(VAL.fromSystemValue('length',p[2]))
 				elif p[1] == "SecondY":	ui.registrationSecondYE.setText(VAL.fromSystemValue('length',p[2]))	
+		elif cutType == "Drill":
+			for p in props:
+				if p[1] == "PeckDepth": ui.drillPeckDepthE.setText(VAL.fromSystemValue('length',p[2]))
+				if p[1] == "DrillPointList":
+					tw = ui.drillTW
+					while tw.rowCount() > 0: tw.removeRow(0)
+					for point in p[2]:
+						row = tw.rowCount()
+						tw.insertRow(row)
+						tw.setItem(row,0,QtGui.QTableWidgetItem(VAL.fromSystemValue('length',point[0])))
+						tw.setItem(row,1,QtGui.QTableWidgetItem(VAL.fromSystemValue('length',point[1])))
+						tw.setItem(row,2,QtGui.QTableWidgetItem(VAL.fromSystemValue('length',point[2])))
 
 	def accept(self):
 		ui = self.createCutUi
@@ -245,6 +375,7 @@ class CutGui():
 			for prop in p:
 				if prop[1] == "CutType":
 					if prop[2] == "Registration": self.cut = RegistrationCut(self.selectedObject)
+					elif prop[2] == "Drill": self.cut = DrillCut(self.selectedObject)
 					else: self.cut = Cut(self.selectedObject)
 			self.cut.getObject().Label = ui.nameLE.text()
 			self.cut.setProperties(p,self.cut.getObject())
@@ -272,6 +403,7 @@ class CutGui():
 		ui.nameLE.clear()
 		ui.cutTypeCB.setCurrentIndex(0)
 		ui.toolCB.setCurrentIndex(0)
+		ui.stackedWidget.setCurrentIndex(0)
 		ui.safeHeightLE.clear()
 		ui.spindleSpeedE.clear()
 		ui.feedRateE.clear()
@@ -288,6 +420,10 @@ class CutGui():
 		ui.registrationFirstYE.clear()
 		ui.registrationSecondXE.clear()
 		ui.registrationSecondYE.clear()
+		
+		ui.drillPeckDepthE.setText("")
+		tw = ui.drillTW
+		while tw.rowCount() > 0: tw.removeRow(0)
 
 	def setMode(self):
 		if self.selectedObject == None: mode = getGUIMode()
@@ -315,7 +451,6 @@ class CutGui():
 		ui.tclXLE.setText(VAL.fromSystemValue('length',obj.XToolChangeLocation))
 		ui.tclYLE.setText(VAL.fromSystemValue('length',obj.YToolChangeLocation))
 		ui.tclZLE.setText(VAL.fromSystemValue('length',obj.ZToolChangeLocation))
-		
 		if obj.CutType == "Registration":
 			ui.registrationDrillDepthE.setText(VAL.fromSystemValue('length',obj.DrillDepth))
 			ui.registrationPeckDepthE.setText(VAL.fromSystemValue('length',obj.PeckDepth))
@@ -325,6 +460,16 @@ class CutGui():
 			ui.registrationSecondYE.setText(VAL.fromSystemValue('length',obj.SecondY))
 			if obj.RegistrationAxis == "X Axis": ui.registrationXAxisRB.setChecked(True)
 			else: ui.registrationYAxisRB.setChecked(True)
+		elif obj.CutType == "Drill":
+			ui.drillPeckDepthE.setText(VAL.fromSystemValue('length',obj.PeckDepth))
+			tw = ui.drillTW
+			while tw.rowCount() > 0: tw.removeRow(0)
+			for point in obj.DrillPointList:
+				row = tw.rowCount()
+				tw.insertRow(row)
+				tw.setItem(row,0,QtGui.QTableWidgetItem(VAL.fromSystemValue('length',point[0])))
+				tw.setItem(row,1,QtGui.QTableWidgetItem(VAL.fromSystemValue('length',point[1])))
+				tw.setItem(row,2,QtGui.QTableWidgetItem(VAL.fromSystemValue('length',point[2])))
 		
 	def Activated(self):
 		ui = self.createCutUi

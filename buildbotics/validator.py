@@ -82,7 +82,34 @@ def validate(edit, label, required, valid, args):
 	except:
 		setLabel(label,'INVALID')
 		return False
-
+		
+def validateTableCell(item,valid,args):
+	WHITE = QtGui.QBrush(QtGui.QColor(255, 255, 255, 255))
+	RED = QtGui.QBrush(QtGui.QColor(255, 0, 0, 255))
+	s = item.text().lower().strip()
+	i = len(s)
+	if i == 0:
+		item.setBackground(RED)
+		return False
+	while i > 0:
+		if isfloat(s[0:i]) is True: break
+		else: i = i - 1
+	val = s[0:i]
+	if val == "":
+		item.setBackground(RED)
+		return False
+	s = s.strip()[i:]
+	if len(s) == 0:
+		item.setBackground(WHITE)
+		return valid
+	try:
+		args.index(s)
+		item.setBackground(WHITE)
+		return valid
+	except:
+		item.setBackground(RED)
+		return False
+		
 def fromSystemValue(form,value):
 	if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units").GetInt("UserSchema") in [0, 1, 4, 6]:
 		userPref = 'METRIC'

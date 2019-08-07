@@ -27,60 +27,81 @@ from PySide import QtGui, QtCore, QtWebKit
 from pivy import coin
 import os
 from Cut import Cut, ViewCut
+import validator as VAL
 
-class ViewRegistrationCut(ViewCut):
+class ViewDrillCut(ViewCut):
 	def getIcon(self):
 		return """
 /* XPM */
-static char * registration_xpm[] = {
-"25 25 20 1",
+static char * drill_xpm[] = {
+"25 20 44 1",
 " 	c None",
-".	c #170017",
-"+	c #3A003A",
-"@	c #7F007F",
-"#	c #700070",
-"$	c #720072",
-"%	c #7C007C",
-"&	c #7B007B",
-"*	c #000000",
-"=	c #100010",
-"-	c #0A000A",
-";	c #710071",
-">	c #7E007E",
-",	c #790079",
-"'	c #740074",
-")	c #7D007D",
-"!	c #230023",
-"~	c #520052",
-"{	c #6F006F",
-"]	c #180018",
-"           .+.           ",
-"           +@+           ",
-"           +@+           ",
-"           +@+           ",
-"           .+.           ",
-"           #$#           ",
-"           %@%           ",
-"           &@&           ",
-"            @            ",
-"            @            ",
-"            &            ",
-"***=-;&           >,.+++.",
-"+@@@+'@@@@)   %@@@@@+@@@+",
-"!~~~!'>>         ))@.+++.",
-"            &            ",
-"            @            ",
-"            @            ",
-"            @&           ",
-"           %@%           ",
-"           #${           ",
-"           ]+.           ",
-"           +@+           ",
-"           +@+           ",
-"           +@+           ",
-"           .+.           "};"""
+".	c #000000",
+"+	c #716100",
+"@	c #AB9400",
+"#	c #B49D00",
+"$	c #C3A900",
+"%	c #AE9700",
+"&	c #816F00",
+"*	c #AD9600",
+"=	c #D7BB00",
+"-	c #BEA500",
+";	c #706000",
+">	c #C2A900",
+",	c #5D5000",
+"'	c #675900",
+")	c #B59D00",
+"!	c #CBB100",
+"~	c #423800",
+"{	c #A58F00",
+"]	c #D3B800",
+"^	c #A18C00",
+"/	c #2E2700",
+"(	c #272828",
+"_	c #B9BDBE",
+":	c #BCC0C1",
+"<	c #AAADAE",
+"[	c #707273",
+"}	c #868989",
+"|	c #989B9C",
+"1	c #444546",
+"2	c #B5B9BA",
+"3	c #A7ABAC",
+"4	c #606263",
+"5	c #7F8283",
+"6	c #8C8F90",
+"7	c #3A3C3C",
+"8	c #AFB3B4",
+"9	c #B2B6B6",
+"0	c #474949",
+"a	c #393A3A",
+"b	c #AAAEAF",
+"c	c #A5A8A9",
+"d	c #999C9D",
+"e	c #393A3B",
+" ...........             ",
+".+@#$$$$$%@&..           ",
+".*==========-;.          ",
+".>============, ....     ",
+".$============'    .     ",
+".$============'    ......",
+".$============'   ..     ",
+".)===========!~ ...      ",
+".{=========]^/.          ",
+" ............            ",
+"   ......                ",
+"   (_::<. ..             ",
+"  .[:::}....             ",
+"  .|:::1 ..              ",
+"  .2::3....              ",
+" .4:::5.                 ",
+" .6:::7                  ",
+" .8::90.                 ",
+" abbbcde                 ",
+"........                 "};
+"""
 
-class RegistrationCut(Cut):	
+class DrillCut(Cut):	
 	def setProperties(self,p,obj):
 		if hasattr(obj,'PropertiesList'):
 			for prop in obj.PropertiesList:
@@ -90,23 +111,23 @@ class RegistrationCut(Cut):
 			setattr(newprop,prop[1],prop[2])
 		obj.Label = obj.CutName
 		
-		if obj.CutType == "Registration": ViewRegistrationCut(obj.ViewObject)
+		if obj.CutType == "Drill": ViewDrillCut(obj.ViewObject)
 
 		for prop in obj.PropertiesList:
 			obj.setEditorMode(prop,("ReadOnly",))
 		FreeCAD.ActiveDocument.recompute()
-		
-	def drill(self,x,y,safeHeight,drillDepth,peckDepth):
+				
+	def drill(self,x,y,zed,safeHeight,peckDepth):
 		self.rapid(z=safeHeight)
 		self.rapid(x,y)
 		depth = 0
-		while depth + peckDepth < drillDepth:
+		while depth + peckDepth < zed:
 			depth = depth + peckDepth
 			self.cut(z=-depth)
 			self.rapid(z=safeHeight)
-		self.cut(z=-drillDepth)
-				
-	def run(self, ui, obj, outputUnits, fp):
+		self.cut(z = -zed)
+		
+	def run(self, ui, obj, outputUnits,fp):
 		self.fp = fp
 		self.ui = ui
 		out = self.writeGCodeLine
@@ -121,8 +142,14 @@ class RegistrationCut(Cut):
 		rapid(z=obj.ZToolChangeLocation)
 		rapid(obj.XToolChangeLocation,obj.YToolChangeLocation)
 		out('T' + tool + 'M6')
-		self.drill(obj.FirstX,obj.FirstY,safeHeight,self.toOutputUnits(obj.DrillDepth,'length'),self.toOutputUnits(obj.PeckDepth,'length'))
-		self.drill(obj.SecondX,obj.SecondY,safeHeight,self.toOutputUnits(obj.DrillDepth,'length'),self.toOutputUnits(obj.PeckDepth,'length'))
+		for point in obj.DrillPointList:
+			if outputUnits == 'IMPERIAL': mult = 1/25.4
+			else: mult = 1
+			x = point[0] * mult
+			y = point[1] * mult
+			z = point[2] * mult
+			s = obj.SafeHeight.Value * mult
+			p = obj.PeckDepth.Value * mult
+			self.drill(x,y,z,s,p)
 		rapid(z=safeHeight)
 		
-
