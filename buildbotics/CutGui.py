@@ -30,6 +30,7 @@ import os
 from Cut import Cut
 from RegistrationCut import RegistrationCut
 from DrillCut import DrillCut
+from FaceCut import FaceCut
 import validator as VAL
 
 GUI_STATUS = 'hidden'
@@ -79,6 +80,7 @@ class CutGui():
 		ui.tclXLE.textChanged.connect(self.validateAllFields)
 		ui.tclYLE.textChanged.connect(self.validateAllFields)
 		ui.tclZLE.textChanged.connect(self.validateAllFields)
+		
 		ui.registrationFirstXE.textChanged.connect(self.validateAllFields)
 		ui.registrationSecondXE.textChanged.connect(self.validateAllFields)
 		ui.registrationFirstYE.textChanged.connect(self.validateAllFields)
@@ -87,6 +89,7 @@ class CutGui():
 		ui.registrationPeckDepthE.textChanged.connect(self.validateAllFields)
 		ui.registrationXAxisRB.clicked.connect(self.validateAllFields)
 		ui.registrationYAxisRB.clicked.connect(self.validateAllFields)
+		
 		ui.drillTW.itemSelectionChanged.connect(self.validateAllFields)
 		ui.drillAddB.clicked.connect(self.addDrillPoint)
 		ui.drillRemoveB.clicked.connect(self.removeDrillPoint)
@@ -95,6 +98,14 @@ class CutGui():
 		ui.drillSaveB.clicked.connect(self.saveDrillList)
 		ui.drillLoadB.clicked.connect(self.loadDrillList)
 		ui.drillPeckDepthE.textChanged.connect(self.validateAllFields)
+		
+		ui.facePatternCB.currentIndexChanged.connect(self.validateAllFields)
+		ui.faceCutAreaCB.currentIndexChanged.connect(self.validateAllFields)
+		ui.faceStartHeightE.textChanged.connect(self.validateAllFields)
+		ui.faceDepthE.textChanged.connect(self.validateAllFields)
+		ui.faceStepOverE.textChanged.connect(self.validateAllFields)
+		ui.faceStepDownE.textChanged.connect(self.validateAllFields)
+		
 		ui.buttonBox.accepted.connect(self.accept)
 		ui.buttonBox.rejected.connect(self.reject)
 		
@@ -273,8 +284,22 @@ class CutGui():
 				valid = VAL.validateTableCell(tw.item(row,1),valid,VAL.LENGTH)
 				valid = VAL.validateTableCell(tw.item(row,2),valid,VAL.LENGTH)
 			self.setDrillButtonStates()
-			valid = VAL.validate(ui.drillPeckDepthE,ui.drillPeckDepthL,True,valid,VAL.LENGTH)				
-		ui.buttonBox.buttons()[0].setEnabled(valid)		
+			valid = VAL.validate(ui.drillPeckDepthE,ui.drillPeckDepthL,True,valid,VAL.LENGTH)
+		elif cutType == "Facing":
+			if ui.facePatternCB.currentIndex() == 0:
+				VAL.setLabel(ui.facePatternL,'INVALID')
+				valid = False
+			else: VAL.setLabel(ui.facePatternL,'VALID')	
+			if ui.faceCutAreaCB.currentIndex() == 0:			
+				VAL.setLabel(ui.faceCutAreaL,'INVALID')
+				valid = False
+			else: VAL.setLabel(ui.faceCutAreaL,'VALID')
+			valid = VAL.validate(ui.faceStartHeightE,ui.faceStartHeightL,True,valid,VAL.LENGTH)	
+			valid = VAL.validate(ui.faceDepthE,ui.faceDepthL,True,valid,VAL.LENGTH)	
+			valid = VAL.validate(ui.faceStepOverE,ui.faceStepOverL,True,valid,VAL.LENGTH)	
+			valid = VAL.validate(ui.faceStepDownE,ui.faceStepDownL,True,valid,VAL.LENGTH)	
+		ui.buttonBox.buttons()[0].setEnabled(valid)
+		FreeCAD.ActiveDocument.recompute()	
 		return valid
 
 	def setCutProperties(self):
@@ -300,6 +325,8 @@ class CutGui():
 		     [L,	"XToolChangeLocation",VAL.toSystemValue(ui.tclXLE, 'length')],	
 		     [L,	"YToolChangeLocation",VAL.toSystemValue(ui.tclYLE, 'length')],	
 		     [L,	"ZToolChangeLocation",VAL.toSystemValue(ui.tclZLE, 'length')]]
+		if cuttype not in ["Registration", "Drill"]:
+			p.append([V,	"FeedRate",		VAL.toSystemValue(ui.feedRateE, 'velocity')])
 		if cuttype == "Registration":
 			p.append([L, "DrillDepth",		VAL.toSystemValue(ui.registrationDrillDepthE, 'length')])
 			p.append([L, "PeckDepth",		VAL.toSystemValue(ui.registrationPeckDepthE, 'length')])
@@ -320,7 +347,14 @@ class CutGui():
 				y = VAL.toSystemValue(tw.item(row,1),'length')
 				z = VAL.toSystemValue(tw.item(row,2),'length')
 				vl.append(fv(x,y,z))
-			p.append([VL, "DrillPointList", vl])		
+			p.append([VL, "DrillPointList", vl])
+		elif cuttype == "Facing":
+			p.append([S,	"FacingPattern",	ui.facePatternCB.currentText()])
+			p.append([S,	"CutArea",			ui.faceCutAreaCB.currentText()])
+			p.append([L,	"StartHeight",		VAL.toSystemValue(ui.faceStartHeightE, 'length')])		
+			p.append([L,	"Depth",			VAL.toSystemValue(ui.faceDepthE, 'length')])		
+			p.append([L,	"StepOver",			VAL.toSystemValue(ui.faceStepOverE, 'length')])		
+			p.append([L,	"StepDown",			VAL.toSystemValue(ui.faceStepDownE, 'length')])		
 		return p
 	
 	def getCutProperties(self,props):
@@ -363,6 +397,14 @@ class CutGui():
 						tw.setItem(row,0,QtGui.QTableWidgetItem(VAL.fromSystemValue('length',point[0])))
 						tw.setItem(row,1,QtGui.QTableWidgetItem(VAL.fromSystemValue('length',point[1])))
 						tw.setItem(row,2,QtGui.QTableWidgetItem(VAL.fromSystemValue('length',point[2])))
+		elif cutType == "Facing":
+			for p in props:
+				if p[1] == "FacingPattern": ui.facePatternCB.setCurrentIndex(ui.facePatternCB.findText(p[2]))
+				if p[1] == "CutArea":		ui.faceCutAreaCB.setCurrentIndex(ui.faceCutAreaCB.findText(p[2]))
+				if p[1] == "Depth":			ui.faceDepthE.setText(VAL.fromSystemValue('length',p[2]))
+				if p[1] == "StartHeight":	ui.faceStartHeightE.setText(VAL.fromSystemValue('length',p[2]))
+				if p[1] == "StepOver":		ui.faceStepOverE.setText(VAL.fromSystemValue('length',p[2]))
+				if p[1] == "StepDown":		ui.faceStepDownE.setText(VAL.fromSystemValue('length',p[2]))
 
 	def accept(self):
 		ui = self.createCutUi
@@ -376,6 +418,7 @@ class CutGui():
 				if prop[1] == "CutType":
 					if prop[2] == "Registration": self.cut = RegistrationCut(self.selectedObject)
 					elif prop[2] == "Drill": self.cut = DrillCut(self.selectedObject)
+					elif prop[2] == "Facing": self.cut = FaceCut(self.selectedObject)
 					else: self.cut = Cut(self.selectedObject)
 			self.cut.getObject().Label = ui.nameLE.text()
 			self.cut.setProperties(p,self.cut.getObject())
@@ -424,6 +467,13 @@ class CutGui():
 		ui.drillPeckDepthE.setText("")
 		tw = ui.drillTW
 		while tw.rowCount() > 0: tw.removeRow(0)
+		
+		ui.facePatternCB.setCurrentIndex(0)
+		ui.faceCutAreaCB.setCurrentIndex(0)
+		ui.faceStartHeightE.clear()
+		ui.faceDepthE.clear()
+		ui.faceStepOverE.clear()
+		ui.faceStepDownE.clear()
 
 	def setMode(self):
 		if self.selectedObject == None: mode = getGUIMode()
@@ -436,17 +486,18 @@ class CutGui():
 
 	def getPropertiesFromExistingCut(self,obj):
 		ui = self.createCutUi
+		fc = FreeCAD.ActiveDocument
 		ui.cutTypeCB.setCurrentIndex(ui.cutTypeCB.findText(obj.CutType))
 		ui.nameLE.setText(obj.CutName)
 
 		ttName = obj.getParentGroup().ToolTable
-		group = FreeCAD.ActiveDocument.getObjectsByLabel(ttName)[0].Group		
+		group = fc.getObjectsByLabel(ttName)[0].Group		
 		for tool in group:
 			ui.toolCB.addItem(str(tool.Number) + " " + tool.Label)
 		ui.toolCB.setCurrentIndex(ui.toolCB.findText(str(obj.ToolNumber) + ' ' + obj.Tool))
 		ui.safeHeightLE.setText(VAL.fromSystemValue('length',obj.SafeHeight))
 		ui.spindleSpeedE.setText(obj.SpindleSpeed)
-		if hasattr(obj,"FeedRate"): ui.FeedRateE.setText(VAL.fromSystemValue('velocity',obj.FeedRate))
+		if hasattr(obj,"FeedRate"): ui.feedRateE.setText(VAL.fromSystemValue('velocity',obj.FeedRate))
 		ui.plungeRateE.setText(VAL.fromSystemValue('velocity',obj.PlungeRate))
 		ui.tclXLE.setText(VAL.fromSystemValue('length',obj.XToolChangeLocation))
 		ui.tclYLE.setText(VAL.fromSystemValue('length',obj.YToolChangeLocation))
@@ -470,9 +521,24 @@ class CutGui():
 				tw.setItem(row,0,QtGui.QTableWidgetItem(VAL.fromSystemValue('length',point[0])))
 				tw.setItem(row,1,QtGui.QTableWidgetItem(VAL.fromSystemValue('length',point[1])))
 				tw.setItem(row,2,QtGui.QTableWidgetItem(VAL.fromSystemValue('length',point[2])))
+		elif obj.CutType == "Facing":
+			ui.facePatternCB.setCurrentIndex(ui.facePatternCB.findText(obj.FacingPattern))
+			ui.faceCutAreaCB.setCurrentIndex(ui.faceCutAreaCB.findText(obj.CutArea))
+			ui.faceStartHeightE.setText(VAL.fromSystemValue('length',obj.StartHeight))
+			ui.faceDepthE.setText(VAL.fromSystemValue('length',obj.Depth))
+			ui.faceStepOverE.setText(VAL.fromSystemValue('length',obj.StepOver))
+			ui.faceStepDownE.setText(VAL.fromSystemValue('length',obj.StepDown))
 		
 	def Activated(self):
 		ui = self.createCutUi
+		self.reset()
+		
+		if hasattr(FreeCAD.ActiveDocument,"Objects"):
+			while ui.faceCutAreaCB.count() > 1: ui.faceCutAreaCB.removeItem(1)
+			for obj in FreeCAD.ActiveDocument.Objects:
+				if hasattr(obj,"Shape"):
+					ui.faceCutAreaCB.addItem(obj.Label)
+		
 		mode = self.setMode()
 		if mode == "AddingCutFromIcon":
 			self.originalCutName = ''
@@ -484,6 +550,9 @@ class CutGui():
 		elif mode == "EditingCutFromIcon":
 			self.reset()
 			self.originalCutName = self.selectedObject.Label
+			while ui.toolCB.count() > 1: ui.toolCB.removeItem(ui.toolCB.count()-1)
+			parent = self.selectedObject.getParentGroup()
+			group = FreeCAD.ActiveDocument.getObjectsByLabel(parent.ToolTable)[0].Group
 			self.getPropertiesFromExistingCut(self.selectedObject)
 		elif mode == "AddingCutFromGUI":
 			self.originalCutName = ""

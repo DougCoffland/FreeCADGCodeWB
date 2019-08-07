@@ -28,6 +28,7 @@ import CutGui
 from Cut import Cut
 from RegistrationCut import RegistrationCut
 from DrillCut import DrillCut
+from FaceCut import FaceCut
 import os
 import validator as VAL
 
@@ -531,6 +532,12 @@ class GCodeProject():
 		if hasattr(cut,	"SecondY"):		p.append([L,		"SecondY",		cut.SecondY])
 		if hasattr(cut, "RegistrationAxis"): p.append([S,	"RegistrationAxis",cut.RegistrationAxis])
 		if hasattr(cut, "DrillPointList"): p.append([VL,	"DrillPointList", cut.DrillPointList])
+		if hasattr(cut, "FacingPattern"): p.append([S,		"FacingPattern", cut.FacingPattern])
+		if hasattr(cut,	"CutArea"):		p.append([S,		"CutArea",		cut.CutArea])
+		if hasattr(cut, "StartHeight"):  p.append([L,		"StartHeight",	cut.SafeHeight])
+		if hasattr(cut, "Depth"):		p.append([L,		"Depth",		cut.Depth])
+		if hasattr(cut, "StepOver"):	p.append([L,		"StepOver",		cut.StepOver])
+		if hasattr(cut, "StepDown"):	p.append([L,		"StepDown",		cut.StepDown])
 		return p
 
 	def Activated(self):
@@ -630,6 +637,7 @@ class GCodeProject():
 				if prop[1] == "CutType":
 					if prop[2] == "Registration": cut = RegistrationCut(obj)
 					elif prop[2] == "Drill": cut = DrillCut(obj)
+					elif prop[2] == "Facing": cut = FaceCut(obj)
 					else: cut = Cut(obj)
 			cut.getObject().Label = ui.nameLE.text()
 			cut.setProperties(line,cut.getObject())
