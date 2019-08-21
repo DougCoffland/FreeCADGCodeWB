@@ -29,7 +29,7 @@ import os
 from Cut import Cut, ViewCut
 import validator as VAL
 
-class ViewDrillCut(ViewCut):
+class ViewFaceCut(ViewCut):
 	def getIcon(self):
 		return """
 /* XPM */
@@ -202,30 +202,110 @@ class FaceCut(Cut):
 		for prop in p:
 			newprop = obj.addProperty(prop[0],prop[1])
 			setattr(newprop,prop[1],prop[2])
-		obj.Label = obj.CutName
-		
-		if obj.CutType == "Facing": ViewDrillCut(obj.ViewObject)
-
+		obj.Label = obj.CutName		
+		ViewFaceCut(obj.ViewObject)
 		for prop in obj.PropertiesList:
 			obj.setEditorMode(prop,("ReadOnly",))
 		FreeCAD.ActiveDocument.recompute()
-				
-
 		
-	def run(self, ui, obj, outputUnits,fp):
+	def runZigZag(self):
+		pass
+		
+	def runCircular(self,obj):
+		offset = -self.bitWidth/2
+		self.updateActionLabel("Getting Boundaries")
+		polys = self.getBoundaries(obj.CutArea, self.getOrigin(obj),obj.Depth.Value)
+		self.updateActionLabel("Getting Offsets")
+		offsetPolys = self.getOffset(polys, offset)
+		polyList = offsetPolys
+		while len(offsetPolys) > 0:
+			offset = offset - obj.StepOver.Value
+			offsetPolys = self.getOffset(polys, offset)
+			polyList = polyList + offsetPolys
+		currentDepth = obj.StartHeight.Value
+		while currentDepth >= -obj.Depth.Value:
+			self.updateActionLabel("Writing G-code for z = " + str(currentDepth))
+			currentList = polyList[:]
+			while len(currentList) > 0:
+				poly = self.shortestPoly(currentList)
+				outerArea = self.areaOfPoly(poly)
+				outerLength = self.lengthOfPoly(poly)
+				lengthTimesWidth = outerLength * obj.StepOver.Value
+				self.rapid(z=self.safeHeight)
+				self.rapid(poly[0][0],poly[0][1])
+				self.cut(z=currentDepth)
+				if obj.MillingMethod != "Climb": self.cutPolyInsideClimb(poly)
+				else: self.cutPolyInsideConventional(poly)
+				currentList.remove(poly)
+				poly = self.nextPoly(poly[0][0],poly[0][1],currentList,self.bitWidth)
+				while poly != None:
+					if outerArea - lengthTimesWidth > self.areaOfPoly(poly): break
+					if obj.MillingMethod != "Climb": self.cutPolyInsideClimb(poly)
+					else: self.cutPolyInsideConventional(poly)
+					outerArea = self.areaOfPoly(poly)
+					outerLength = self.lengthOfPoly(poly)
+					lengthTimesWidth = outerLength * obj.StepOver.Value
+					currentList.remove(poly)
+					poly = self.nextPoly(poly[0][0],poly[0][1],currentList,self.bitWidth)
+			if currentDepth == -obj.Depth.Value: break
+			if currentDepth - obj.StepDown.Value <= -obj.Depth.Value: currentDepth = -obj.Depth.Value
+			else: currentDepth = currentDepth - obj.StepDown.Value
+			
+		self.rapid(z = self.safeHeight)
+	
+	def runCircularOld(self,obj):
+		offset = -self.bitWidth/2
+		self.updateActionLabel("Getting Boundaries at offset: " + str(offset))
+		polys = self.getBoundaries(obj.CutArea, self.getOrigin(obj),obj.Depth.Value)
+		offsetPolys = self.getOffset(polys, offset)
+		polyList = offsetPolys
+		while len(offsetPolys) > 0:
+			self.updateActionLabel("Writing G-Code Cuts for offset: " + str(offset))
+			for poly in offsetPolys:
+				self.rapid(z=self.safeHeight)
+				if obj.MillingMethod == "Climb":
+					i = len(poly) - 1
+					self.rapid(poly[i][0],poly[i][1])
+					self.cut(z=-obj.Depth.Value)
+					i = i-1
+					while (i >= 0):
+						self.cut(poly[i][0],poly[i][1])
+						i = i - 1
+				else:
+					self.rapid(poly[0][0],poly[0][1])
+					self.cut(z=-obj.Depth.Value)
+					i = 1
+					while i < len(poly):
+						self.cut(poly[i][0],poly[i][1])
+						i = i + 1
+			self.rapid(z = self.safeHeight)
+			offset = offset - self.bitWidth/2
+			offsetPolys = self.getOffset(polys, offset)
+			polyList = polyList + offsetPolys
+		print str(len(polyList)) + " polys"
+		
+	def run(self, ui, obj, outputUnits, fp):		
+		self.parent = obj.getParentGroup()
 		self.fp = fp
 		self.ui = ui
-		out = self.writeGCodeLine
 		self.outputUnits = outputUnits
-		safeHeight = self.toOutputUnits(obj.SafeHeight,'length')
+		out = self.writeGCodeLine
+		self.safeHeight = obj.SafeHeight.Value
 		tool = str(obj.ToolNumber)
 		rapid = self.rapid
+		cut = self.cut
+		self.setBitWidth(obj)
 		out("(Starting " + obj.CutName + ')')
 		self.setUserUnits()
-		self.resetOffset()
-		out('F' + str(self.toOutputUnits(obj.PlungeRate,'velocity')))
-		rapid(z=obj.ZToolChangeLocation)
-		rapid(obj.XToolChangeLocation,obj.YToolChangeLocation)
+		self.setOffset(self.parent.XOriginValue.Value, self.parent.YOriginValue.Value, self.parent.ZOriginValue.Value)
+		self.updateActionLabel("Setting feeds and speeds")
+		out('F' + str(self.toOutputUnits(obj.FeedRate,'velocity')))
+		rapid(z=obj.ZToolChangeLocation.Value)
+		rapid(obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)
 		out('T' + tool + 'M6')
+		out('S' + str(obj.SpindleSpeed).split()[0])
+		if obj.FacingPattern == "Circular": self.runCircular(obj)
+		elif obj.FacingPattern == "Zig Zag": self.runZigZag()
+		rapid(z=self.safeHeight)
+		self.updateActionLabel("Cut completed")
 
-		rapid(z=safeHeight)

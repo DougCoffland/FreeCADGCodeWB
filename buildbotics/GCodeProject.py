@@ -207,11 +207,11 @@ class GCodeProject():
 		
 		self.selectedObject = None
 		self.waitingOnCutGui = False
-		self.dirty = False
 		self.cutList = []
 		self.outputState = 'Idle'
 		CutGui.setGUIMode('None')
 		self.origin = (0,0,0)
+		self.dirty = False
 		
 	def GetResources(self):
 		return {'Pixmap'  : os.path.dirname(__file__) + '/resources/svg/cnc.svg', # the name of a svg file available in the resources
@@ -337,10 +337,16 @@ class GCodeProject():
 			for prop in self.cutList[i]:
 				if prop[1] == 'CutName': name = prop[2]
 			cut = FreeCAD.ActiveDocument.getObjectsByLabel(name)[0]
+			ui.cutNameL.setText(cut.CutName)
+			FreeCADGui.updateGui()
 			cut.Proxy.run(ui,cut,outputUnits,self.fp)
+			ui.cutNameL.clear()
+			ui.actionL.clear()
 		self.writeGCodeLine("M2")
 		self.writeGCodeLine("%")
 		self.fp.close()
+		ui.actionL.setText("All cuts completed")
+		FreeCADGui.updateGui()
 		self.outputState = "Idle"
 		self.validateAllFields()
 		
@@ -500,6 +506,7 @@ class GCodeProject():
 			VAL.setLabel(ui.outputUnitsL, 'VALID')
 		
 		self.setButtonStates(valid)
+		ui.runB.setEnabled(False)
 		self.dirty = True
 		return valid
 		
@@ -590,7 +597,8 @@ class GCodeProject():
 			else: ui.imperialRB.setChecked(True)
 			ui.outFileL.setText(self.selectedObject.OutputFile)
 
-		self.validateAllFields()
+		if self.validateAllFields() == True: ui.runB.setEnabled(True)
+		else: ui.runB.setEnabled(False)
 		ui.show()     
 		return
 		
@@ -646,7 +654,8 @@ class GCodeProject():
 		else: obj.OutputUnits = 'IMPERIAL'
 		if hasattr(obj,"OutputFile") == False: obj.addProperty("App::PropertyString","OutputFile")
 		obj.OutputFile = ui.outFileL.text()
-		self.dirty = False		
+		self.dirty = False
+		ui.runB.setEnabled(True)		
 
 	def IsActive(self):
 		if self.waitingOnCutGui == True:

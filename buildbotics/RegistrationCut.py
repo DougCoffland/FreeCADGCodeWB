@@ -89,9 +89,7 @@ class RegistrationCut(Cut):
 			newprop = obj.addProperty(prop[0],prop[1])
 			setattr(newprop,prop[1],prop[2])
 		obj.Label = obj.CutName
-		
-		if obj.CutType == "Registration": ViewRegistrationCut(obj.ViewObject)
-
+		ViewRegistrationCut(obj.ViewObject)
 		for prop in obj.PropertiesList:
 			obj.setEditorMode(prop,("ReadOnly",))
 		FreeCAD.ActiveDocument.recompute()
@@ -111,18 +109,18 @@ class RegistrationCut(Cut):
 		self.ui = ui
 		out = self.writeGCodeLine
 		self.outputUnits = outputUnits
-		safeHeight = self.toOutputUnits(obj.SafeHeight,'length')
+		safeHeight = obj.SafeHeight.Value
 		tool = str(obj.ToolNumber)
 		rapid = self.rapid
 		out("(Starting " + obj.CutName + ')')
 		self.setUserUnits()
-		self.resetOffset()
+		self.setOffset(0,0,0)
 		out('F' + str(self.toOutputUnits(obj.PlungeRate,'velocity')))
-		rapid(z=obj.ZToolChangeLocation)
-		rapid(obj.XToolChangeLocation,obj.YToolChangeLocation)
+		rapid(z=obj.ZToolChangeLocation.Value)
+		rapid(obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)
 		out('T' + tool + 'M6')
-		self.drill(obj.FirstX,obj.FirstY,safeHeight,self.toOutputUnits(obj.DrillDepth,'length'),self.toOutputUnits(obj.PeckDepth,'length'))
-		self.drill(obj.SecondX,obj.SecondY,safeHeight,self.toOutputUnits(obj.DrillDepth,'length'),self.toOutputUnits(obj.PeckDepth,'length'))
+		self.drill(obj.FirstX.Value,obj.FirstY.Value,safeHeight,obj.DrillDepth.Value,obj.PeckDepth.Value)
+		self.drill(obj.SecondX.Value,obj.SecondY.Value,safeHeight,obj.DrillDepth.Value,obj.PeckDepth.Value)
 		rapid(z=safeHeight)
 		
 

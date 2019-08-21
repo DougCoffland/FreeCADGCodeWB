@@ -27,6 +27,9 @@ from PySide import QtGui, QtCore, QtWebKit
 from pivy import coin
 import os
 import math
+import Mesh, MeshPart, Part
+from FreeCAD import Base
+import pyclipper
 
 class ViewCut:
 	def __init__(self,obj):
@@ -63,10 +66,12 @@ class Cut():
 		self.obj = obj
 		selectedObject.addObject(self.obj)
 		self.outputUnits = ""
+		self.currentCut = None
+		self.ui = None
 		
 	def getObject(self):
 		return self.obj
-		
+	
 	def writeGCodeLine(self,line):
 		self.fp.write(line + '\n')
 		try:
@@ -76,20 +81,20 @@ class Cut():
 		self.ui.lcL.setText(str(lc + 1))		
 		
 	def run(self):
-		print "running cut"
+		print "overide run program in derived cut type"
 		
 	def cut(self,x=None,y=None,z=None):
 		line = 'G1'
-		if x != None: line = line + 'X' + str(self.toOutputUnits(x,'length') + self.xOff)
-		if y != None: line = line + 'Y' + str(self.toOutputUnits(y,'length') + self.yOff)
-		if z != None: line = line + 'Z' + str(self.toOutputUnits(z,'length') + self.zOff)
+		if x != None: line = line + 'X' + str(round(self.toOutputUnits(x - self.xOff,'length'),4))
+		if y != None: line = line + 'Y' + str(round(self.toOutputUnits(y - self.yOff,'length'),4))
+		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z + self.zOff,'length'),4))
 		self.writeGCodeLine(line)
 
 	def rapid(self,x=None,y=None,z=None):
 		line = 'G0'
-		if x != None: line = line + 'X' + str(self.toOutputUnits(x,'length') + self.xOff)
-		if y != None: line = line + 'Y' + str(self.toOutputUnits(y,'length') + self.yOff)
-		if z != None: line = line + 'Z' + str(self.toOutputUnits(z,'length') + self.zOff)
+		if x != None: line = line + 'X' + str(round(self.toOutputUnits(x - self.xOff,'length'),4))
+		if y != None: line = line + 'Y' + str(round(self.toOutputUnits(y - self.yOff,'length'),4))
+		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z + self.zOff,'length'),4))
 		self.writeGCodeLine(line)
 		
 	def setProperties(self,p,obj):
@@ -122,7 +127,9 @@ class Cut():
 			setUnits('mm','s','mm/s')
 			
 	def toOutputUnits(self,s,form):
-		if hasattr(s,"UserString") == False: return s
+		if hasattr(s,"UserString") == False:
+			if self.outputUnits == 'METRIC': return s
+			return s/25.4
 		s = s.UserString
 		sUnit = s.lstrip('-+0123456789.e\ ')
 		sValue = eval(s[:len(s) - len(sUnit)])
@@ -169,17 +176,162 @@ class Cut():
 		elif form == 'angle':
 			if sUnit in ['rad', 'r', 'radian', 'radians']: sValue = sValue / math.pi
 		return sValue
-				
-	def resetOffset(self):
-		self.xOff = 0.
-		self.yOff = 0.
-		self.zOff = 0.
 
-	def setOffset(self, origin):
-		self.xOff = self.toOutputUnits(origin[0],'length')
-		self.yOff = self.toOutputUnits(origin[1],'length')
-		self.zOff = self.toOutputUnits(origin[2],'length')		
+	def setOffset(self, x,y,z):
+		self.xOff = x
+		self.yOff = y
+		self.zOff = z			
+	
+	def updateActionLabel(self,s):
+		self.ui.actionL.setText(s)
+		FreeCADGui.updateGui()		
+	
+	def getOrigin(self,obj):
+		x = self.toOutputUnits(obj.getParentGroup().XOriginValue,'length')
+		y = self.toOutputUnits(obj.getParentGroup().YOriginValue,'length')
+		z = self.toOutputUnits(obj.getParentGroup().ZOriginValue,'length')
+		return (x,y,z)
+	
+	def setBitWidth(self,obj):
+		tool = FreeCAD.ActiveDocument.getObjectsByLabel(obj.Tool)[0]
+		self.bitWidth = tool.Diameter.Value
+	
+	def getLabel(self,s):
+		i = 0
+		while len(FreeCAD.ActiveDocument.getObjectsByLabel(s)) > 0:
+			i = i + 1
+			s = s + str(i)
+		if i == 0: return s
+		return s + str(i)
 		
+	def wiresToPolys(self,wires):
+		polys = []
+		for wire in wires:
+			poly = []
+			for vertex in wire.Vertexes:
+				x = vertex.Point[0]
+				y = vertex.Point[1]
+				poly.append([x,y])
+			polys.append(poly)
+		return polys
+		
+	def scalePolyToClipper(self,poly,sf):
+		scaledPoly = []
+		for point in poly:
+			x = int(round(point[0] * sf))
+			y = int(round(point[1] * sf))
+			scaledPoly.append((x,y))
+		return scaledPoly
+		
+	def scaleToClipper(self,polys,sf):
+		scaledPolys = []
+		for poly in polys:
+			scaledPoly = []
+			for point in poly:
+				x = int(round(point[0] * sf))
+				y = int(round(point[1] * sf))
+				scaledPoly.append((x,y))
+			scaledPolys.append(scaledPoly)
+			return scaledPolys
+			
+	def scaleFromClipper(self,polys,sf):
+		scaledPolys = []
+		for poly in polys:
+			scaledPoly = []
+			for point in poly:
+				x = float(point[0] * sf)
+				y = float(point[1] * sf)
+				scaledPoly.append((x,y))
+			scaledPolys.append(scaledPoly)
+		return scaledPolys
+		
+	def areaOfPoly(self,poly):
+		sum1 = 0.
+		sum2 = 0.
+		for i in range(len(poly) - 1):
+			sum1 = sum1 + poly[i][0] * poly[i+1][1]
+			sum2 = sum2 + poly[i][1] * poly[i+1][0]
+		return (sum1 - sum2) / 2
+					
+	def lengthOfPoly(self,poly):
+		l = 0.
+		for i in range(len(poly) - 1):
+			x1 = poly[i][0]
+			y1 = poly[i][1]
+			x2 = poly[i+1][0]
+			y2 = poly[i+1][1]
+			l = l + math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1))
+		return l
+		
+	def shortestPoly(self,polys):
+		shortest = polys[0]
+		shortestLength = self.lengthOfPoly(polys[0])
+		for poly in polys:
+			l = self.lengthOfPoly(poly)
+			if l < shortestLength:
+				shortestLength = l
+				shortest = poly
+		return shortest
+		
+	def nextPoly(self,x,y,polys,delta):
+		nearestPoly = None
+		for poly in polys:
+			d = math.sqrt((x - poly[0][0]) * (x - poly[0][0]) + (y - poly[0][1]) * (y - poly[0][1]))
+			if d <= delta:
+				nearestPoly = poly
+				delta = d
+		return nearestPoly
+				
+	def sortPolysByLength(self,polys):
+		for poly in polys:
+			print 'length = ' + str(self.lengthOfPoly(poly)) + ' mm, area = ' + str(self.areaOfPoly(poly))
+		
+	def cutPolyInsideClimb(self,poly):
+		i = 1
+		while i < len(poly):
+			self.cut(poly[i][0],poly[i][1])
+			i = i + 1
+		
+	def cutPolyInsideConventional(self,poly):
+		i = len(poly) - 1
+		while (i >= 0):
+			self.cut(poly[i][0],poly[i][1])
+			i = i - 1
+		
+	def cutPolyOutsideClimb(self,poly):
+		pass
+		
+	def cutPolyOutsideConventional(self,poly):
+		pass
+		
+	def getOffset(self, polys, offset):
+		pco = pyclipper.PyclipperOffset()
+		for poly in polys:
+			bigPoly = self.scalePolyToClipper(poly,1000000.0)
+			pco.AddPath(bigPoly, pyclipper.JT_ROUND, pyclipper.ET_CLOSEDPOLYGON)
+		offsetPolys = self.scaleFromClipper(pco.Execute(offset * 1000000),1/1000000.)
+		for poly in offsetPolys:
+			poly.append(poly[0])
+		return offsetPolys		
+							
+	def getBoundaries(self, shapeName, origin, height):
+		fc = FreeCAD.ActiveDocument
+		mesh = fc.addObject("Mesh::Feature","Mesh")
+		part = fc.getObjectsByLabel(shapeName)[0]
+		mesh.Mesh = MeshPart.meshFromShape(Shape = part.Shape, MaxLength = 6.35)		
+		s = self.getLabel(part.Name + '_mesh_')
+		newshape = fc.addObject("Part::Feature",s)
+		shape = Part.Shape()
+		shape.makeShapeFromMesh(mesh.Mesh.Topology,0.1)
+		wires = list()
+		for i in shape.slice(Base.Vector(0,0,1),8):
+			wires.append(i)
+		fc.removeObject(mesh.Name)
+		fc.removeObject(newshape.Name)
+		del mesh, part
+		polys = self.wiresToPolys(wires)
+		return polys
+	
 	def __getstate__(self):
 		state = {}
 		state["props"] = []

@@ -105,6 +105,9 @@ class CutGui():
 		ui.faceDepthE.textChanged.connect(self.validateAllFields)
 		ui.faceStepOverE.textChanged.connect(self.validateAllFields)
 		ui.faceStepDownE.textChanged.connect(self.validateAllFields)
+		ui.faceConventionalRB.clicked.connect(self.validateAllFields)
+		ui.faceClimbRB.clicked.connect(self.validateAllFields)
+		ui.faceEitherRB.clicked.connect(self.validateAllFields)
 		
 		ui.buttonBox.accepted.connect(self.accept)
 		ui.buttonBox.rejected.connect(self.reject)
@@ -297,7 +300,12 @@ class CutGui():
 			valid = VAL.validate(ui.faceStartHeightE,ui.faceStartHeightL,True,valid,VAL.LENGTH)	
 			valid = VAL.validate(ui.faceDepthE,ui.faceDepthL,True,valid,VAL.LENGTH)	
 			valid = VAL.validate(ui.faceStepOverE,ui.faceStepOverL,True,valid,VAL.LENGTH)	
-			valid = VAL.validate(ui.faceStepDownE,ui.faceStepDownL,True,valid,VAL.LENGTH)	
+			valid = VAL.validate(ui.faceStepDownE,ui.faceStepDownL,True,valid,VAL.LENGTH)
+			if ui.faceConventionalRB.isChecked() == True or ui.faceClimbRB.isChecked() == True or ui.faceEitherRB.isChecked() == True:
+				VAL.setLabel(ui.faceMillingMethodL,'VALID')
+			else:
+				VAL.setLabel(ui.faceMillingMethodL,'INVALID')
+				valid = False	
 		ui.buttonBox.buttons()[0].setEnabled(valid)
 		FreeCAD.ActiveDocument.recompute()	
 		return valid
@@ -354,7 +362,11 @@ class CutGui():
 			p.append([L,	"StartHeight",		VAL.toSystemValue(ui.faceStartHeightE, 'length')])		
 			p.append([L,	"Depth",			VAL.toSystemValue(ui.faceDepthE, 'length')])		
 			p.append([L,	"StepOver",			VAL.toSystemValue(ui.faceStepOverE, 'length')])		
-			p.append([L,	"StepDown",			VAL.toSystemValue(ui.faceStepDownE, 'length')])		
+			p.append([L,	"StepDown",			VAL.toSystemValue(ui.faceStepDownE, 'length')])	
+			if ui.faceConventionalRB.isChecked() == True: method = "Conventional"
+			elif ui.faceClimbRB.isChecked() == True: method = "Climb"
+			else: method = "Either"
+			p.append([S,	"MillingMethod",	method])
 		return p
 	
 	def getCutProperties(self,props):
@@ -379,7 +391,7 @@ class CutGui():
 				if p[1] == "DrillDepth":	ui.registrationDrillDepthE.setText(VAL.fromSystemValue('length',p[2]))
 				elif p[1] == "PeckDepth":		ui.registrationPeckDepthE.setText(VAL.fromSystemValue('length',p[2]))
 				elif p[1] == "RegistrationAxis":
-					if p[1] == "X Axis":	ui.registrationXAxisRB.setChecked(True)
+					if p[2] == "X Axis":	ui.registrationXAxisRB.setChecked(True)
 					else: ui.registrationYAxisRB.setChecked(True)
 				elif p[1] == "FirstX":	ui.registrationFirstXE.setText(VAL.fromSystemValue('length',p[2]))
 				elif p[1] == "SecondX":	ui.registrationSecondXE.setText(VAL.fromSystemValue('length',p[2]))
@@ -405,6 +417,11 @@ class CutGui():
 				if p[1] == "StartHeight":	ui.faceStartHeightE.setText(VAL.fromSystemValue('length',p[2]))
 				if p[1] == "StepOver":		ui.faceStepOverE.setText(VAL.fromSystemValue('length',p[2]))
 				if p[1] == "StepDown":		ui.faceStepDownE.setText(VAL.fromSystemValue('length',p[2]))
+				if p[1] == "MillingMethod":
+					if p[2] == "Conventional": ui.faceConventionalRB.setChecked(True)
+					elif p[2] == "Climb":   ui.faceClimbRB.setChecked(True)
+					else: ui.faceEitherRB.setChecked(True)
+					
 
 	def accept(self):
 		ui = self.createCutUi

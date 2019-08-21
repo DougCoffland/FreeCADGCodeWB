@@ -110,9 +110,7 @@ class DrillCut(Cut):
 			newprop = obj.addProperty(prop[0],prop[1])
 			setattr(newprop,prop[1],prop[2])
 		obj.Label = obj.CutName
-		
-		if obj.CutType == "Drill": ViewDrillCut(obj.ViewObject)
-
+		ViewDrillCut(obj.ViewObject)
 		for prop in obj.PropertiesList:
 			obj.setEditorMode(prop,("ReadOnly",))
 		FreeCAD.ActiveDocument.recompute()
@@ -132,24 +130,22 @@ class DrillCut(Cut):
 		self.ui = ui
 		out = self.writeGCodeLine
 		self.outputUnits = outputUnits
-		safeHeight = self.toOutputUnits(obj.SafeHeight,'length')
+		safeHeight = obj.SafeHeight.Value
 		tool = str(obj.ToolNumber)
 		rapid = self.rapid
 		out("(Starting " + obj.CutName + ')')
 		self.setUserUnits()
-		self.resetOffset()
+		self.setOffset(0,0,0)
 		out('F' + str(self.toOutputUnits(obj.PlungeRate,'velocity')))
-		rapid(z=obj.ZToolChangeLocation)
-		rapid(obj.XToolChangeLocation,obj.YToolChangeLocation)
+		rapid(z=obj.ZToolChangeLocation.Value)
+		rapid(obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)
 		out('T' + tool + 'M6')
 		for point in obj.DrillPointList:
-			if outputUnits == 'IMPERIAL': mult = 1/25.4
-			else: mult = 1
-			x = point[0] * mult
-			y = point[1] * mult
-			z = point[2] * mult
-			s = obj.SafeHeight.Value * mult
-			p = obj.PeckDepth.Value * mult
+			x = point[0]
+			y = point[1]
+			z = point[2]
+			s = obj.SafeHeight.Value
+			p = obj.PeckDepth.Value
 			self.drill(x,y,z,s,p)
 		rapid(z=safeHeight)
 		
