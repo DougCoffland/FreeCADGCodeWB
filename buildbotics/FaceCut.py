@@ -253,36 +253,6 @@ class FaceCut(Cut):
 			
 		self.rapid(z = self.safeHeight)
 	
-	def runCircularOld(self,obj):
-		offset = -self.bitWidth/2
-		self.updateActionLabel("Getting Boundaries at offset: " + str(offset))
-		polys = self.getBoundaries(obj.CutArea, self.getOrigin(obj),obj.Depth.Value)
-		offsetPolys = self.getOffset(polys, offset)
-		polyList = offsetPolys
-		while len(offsetPolys) > 0:
-			self.updateActionLabel("Writing G-Code Cuts for offset: " + str(offset))
-			for poly in offsetPolys:
-				self.rapid(z=self.safeHeight)
-				if obj.MillingMethod == "Climb":
-					i = len(poly) - 1
-					self.rapid(poly[i][0],poly[i][1])
-					self.cut(z=-obj.Depth.Value)
-					i = i-1
-					while (i >= 0):
-						self.cut(poly[i][0],poly[i][1])
-						i = i - 1
-				else:
-					self.rapid(poly[0][0],poly[0][1])
-					self.cut(z=-obj.Depth.Value)
-					i = 1
-					while i < len(poly):
-						self.cut(poly[i][0],poly[i][1])
-						i = i + 1
-			self.rapid(z = self.safeHeight)
-			offset = offset - self.bitWidth/2
-			offsetPolys = self.getOffset(polys, offset)
-			polyList = polyList + offsetPolys
-		print str(len(polyList)) + " polys"
 		
 	def run(self, ui, obj, outputUnits, fp):		
 		self.parent = obj.getParentGroup()

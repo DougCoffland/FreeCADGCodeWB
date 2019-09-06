@@ -200,6 +200,7 @@ class GCodeProject():
 		ui.deleteB.clicked.connect(self.deleteCut)
 		ui.upB.clicked.connect(self.moveUp)
 		ui.downB.clicked.connect(self.moveDown)
+		ui.skipB.clicked.connect(self.toggleSkip)
 		ui.metricRB.clicked.connect(self.validateAllFields)
 		ui.imperialRB.clicked.connect(self.validateAllFields)
 		ui.outFileB.clicked.connect(self.setOutputFile)
@@ -295,7 +296,22 @@ class GCodeProject():
 		table.item(row+1,0).setSelected(True)
 		cut = self.cutList.pop(row)
 		self.cutList.insert(row+1,cut)
-
+		
+	def selectedRows(self):
+		ui = self.defineJobUi
+		rows = []
+		for i in ui.tableWidget.selectedItems():
+			if i.row() not in rows: rows.append(i.row())
+		return rows
+		
+	def toggleSkip(self):
+		ui = self.defineJobUi
+		row = self.selectedRows()[0]
+		item = ui.tableWidget.item(row,0)
+		if item.foreground() == QtCore.Qt.gray: color = QtCore.Qt.black
+		else: color = QtCore.Qt.gray
+		for col in range(3): ui.tableWidget.item(row,col).setForeground(color)
+		
 	def setOutputFile(self):
 		ui = self.defineJobUi
 		filename = QtGui.QFileDialog.getSaveFileName(caption='Select output file')[0]
@@ -333,7 +349,8 @@ class GCodeProject():
 		else:
 			outputUnits = 'IMPERIAL'
 			self.writeGCodeLine("G20")
-		for i in range(len(self.cutList)):			
+		for i in range(len(self.cutList)):
+			if ui.tableWidget.item(i,0).foreground() == QtCore.Qt.gray: continue			
 			for prop in self.cutList[i]:
 				if prop[1] == 'CutName': name = prop[2]
 			cut = FreeCAD.ActiveDocument.getObjectsByLabel(name)[0]
@@ -425,10 +442,11 @@ class GCodeProject():
 			ui.buttonBox.button(QtGui.QDialogButtonBox.Apply).setEnabled(False)				
 		if ui.toolTableCB.currentIndex() == 0: ui.addB.setEnabled(False)
 		else: ui.addB.setEnabled(True)		
-		if len(table.selectedItems()) == 1:
+		if len(self.selectedRows()) == 1:
 			ui.editB.setEnabled(True)
 			ui.deleteB.setEnabled(True)
-			row = table.row(table.selectedItems()[0])
+			ui.skipB.setEnabled(True)
+			row = self.selectedRows()[0]
 			if row == 0: ui.upB.setEnabled(False)
 			else: ui.upB.setEnabled(True)
 			if row == (table.rowCount() - 1): ui.downB.setEnabled(False)
@@ -438,6 +456,7 @@ class GCodeProject():
 			ui.deleteB.setEnabled(False)
 			ui.upB.setEnabled(False)
 			ui.downB.setEnabled(False)
+			ui.skipB.setEnabled(False)
 		if ui.outFileL.text() == 'No File Selected...':
 			ui.runB.setEnabled(False)
 			ui.pauseB.setEnabled(False)
@@ -545,6 +564,7 @@ class GCodeProject():
 		if hasattr(cut, "Depth"):		p.append([L,		"Depth",		cut.Depth])
 		if hasattr(cut, "StepOver"):	p.append([L,		"StepOver",		cut.StepOver])
 		if hasattr(cut, "StepDown"):	p.append([L,		"StepDown",		cut.StepDown])
+		if hasattr(cut, "MillingMethod"): p.append([S,		"MillingMethod", cut.MillingMethod])
 		return p
 
 	def Activated(self):
