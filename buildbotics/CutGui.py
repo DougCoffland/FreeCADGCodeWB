@@ -70,7 +70,7 @@ class CutGui():
 			ui.cutTypeCB.addItem(cut)
 		
 		ui.logoL.setPixmap(QtGui.QPixmap(os.path.dirname(__file__) + "/resources/ui/logo side by side.png"))			
-		ui.cutTypeCB.currentIndexChanged.connect(self.onToolTypeChanged)
+		ui.cutTypeCB.currentIndexChanged.connect(self.onCutTypeChanged)
 		ui.toolCB.currentIndexChanged.connect(self.validateAllFields)
 		ui.nameLE.textChanged.connect(self.validateAllFields)
 		ui.safeHeightLE.textChanged.connect(self.validateAllFields)
@@ -453,7 +453,7 @@ class CutGui():
 		setGUIMode('None')
 		setStatus('hidden')
 
-	def onToolTypeChanged(self):
+	def onCutTypeChanged(self):
 		ui = self.createCutUi
 		ui.stackedWidget.setCurrentIndex(ui.cutTypeCB.currentIndex())
 		self.validateAllFields()

@@ -212,7 +212,27 @@ class Cut():
 				x = vertex.Point[0]
 				y = vertex.Point[1]
 				poly.append([x,y])
-			polys.append(poly)
+
+			lastx,lasty = poly.pop(0)
+			shortPoly = [[lastx,lasty]]
+			while len(poly) > 0:
+				nextx,nexty = poly.pop(0)
+				if nextx == lastx:
+					while nextx == lastx and len(poly) > 0:
+						lasty = nexty
+						nextx,nexty = poly.pop(0)
+					shortPoly.append([lastx, lasty])
+					lastx, lasty = nextx, nexty
+				elif nexty == lasty:
+					while nexty == lasty and len(poly) > 0:
+						lastx = nextx
+						nextx,nexty = poly.pop(0)
+					shortPoly.append([lastx,lasty])
+					lastx,lasty = nextx,nexty
+				else:
+					shortPoly.append([nextx,nexty])
+					lastx,lasty = nextx, nexty
+			polys.append(shortPoly)
 		return polys
 		
 	def scalePolyToClipper(self,poly,sf):
