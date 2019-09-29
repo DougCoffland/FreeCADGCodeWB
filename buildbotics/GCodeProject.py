@@ -29,6 +29,7 @@ from Cut import Cut
 from RegistrationCut import RegistrationCut
 from DrillCut import DrillCut
 from FaceCut import FaceCut
+from PerimeterCut import PerimeterCut
 import os
 import validator as VAL
 
@@ -565,6 +566,12 @@ class GCodeProject():
 		if hasattr(cut, "StepOver"):	p.append([L,		"StepOver",		cut.StepOver])
 		if hasattr(cut, "StepDown"):	p.append([L,		"StepDown",		cut.StepDown])
 		if hasattr(cut, "MillingMethod"): p.append([S,		"MillingMethod", cut.MillingMethod])
+		if hasattr(cut, "DepthOfCut"):	p.append([L,		"DepthOfCut",	cut.DepthOfCut])
+		if hasattr(cut, "WidthOfCut"):	p.append([L,		"WidthOfCut",	cut.WidthOfCut])
+		if hasattr(cut, "Offset"):		p.append([L,		"Offset",		cut.Offset])
+		if hasattr(cut, "Side"):		p.append([S,		"Side",			cut.Side])
+		if hasattr(cut,	"ObjectToCut"): p.append([S,		"ObjectToCut",	cut.ObjectToCut])
+		
 		return p
 
 	def Activated(self):
@@ -666,6 +673,7 @@ class GCodeProject():
 					if prop[2] == "Registration": cut = RegistrationCut(obj)
 					elif prop[2] == "Drill": cut = DrillCut(obj)
 					elif prop[2] == "Facing": cut = FaceCut(obj)
+					elif prop[2] == "Perimeter": cut = PerimeterCut(obj)
 					else: cut = Cut(obj)
 			cut.getObject().Label = ui.nameLE.text()
 			cut.setProperties(line,cut.getObject())

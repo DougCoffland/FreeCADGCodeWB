@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>706</width>
-    <height>731</height>
+    <width>682</width>
+    <height>676</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -175,7 +175,11 @@ selection-background-color: lightblue;
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="nameLE"/>
+             <widget class="QLineEdit" name="nameLE">
+              <property name="toolTip">
+               <string>Enter a descriptive name for this cut.</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -261,7 +265,11 @@ selection-background-color: lightblue;
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLineEdit" name="safeHeightLE"/>
+            <widget class="QLineEdit" name="safeHeightLE">
+             <property name="toolTip">
+              <string>Height above origin for rapid moves</string>
+             </property>
+            </widget>
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="spindleSpeedL">
@@ -271,7 +279,11 @@ selection-background-color: lightblue;
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="spindleSpeedE"/>
+            <widget class="QLineEdit" name="spindleSpeedE">
+             <property name="toolTip">
+              <string>Spindle speed in RPM</string>
+             </property>
+            </widget>
            </item>
            <item row="2" column="0">
             <widget class="QLabel" name="feedRateL">
@@ -281,7 +293,11 @@ selection-background-color: lightblue;
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QLineEdit" name="feedRateE"/>
+            <widget class="QLineEdit" name="feedRateE">
+             <property name="toolTip">
+              <string>Rate at which the tool will move through the workpiece</string>
+             </property>
+            </widget>
            </item>
            <item row="3" column="0">
             <widget class="QLabel" name="plungeRateL">
@@ -291,7 +307,11 @@ selection-background-color: lightblue;
             </widget>
            </item>
            <item row="3" column="1">
-            <widget class="QLineEdit" name="plungeRateE"/>
+            <widget class="QLineEdit" name="plungeRateE">
+             <property name="toolTip">
+              <string>Rate at which the tool will move down into the workpiece.</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -317,6 +337,12 @@ selection-background-color: lightblue;
             <enum>QFrame::Raised</enum>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_4">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
             <item>
              <widget class="QLabel" name="tclL">
               <property name="text">
@@ -350,10 +376,18 @@ selection-background-color: lightblue;
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QLineEdit" name="tclXLE"/>
+               <widget class="QLineEdit" name="tclXLE">
+                <property name="toolTip">
+                 <string>X offset for tool changes</string>
+                </property>
+               </widget>
               </item>
               <item row="2" column="1">
-               <widget class="QLineEdit" name="tclYLE"/>
+               <widget class="QLineEdit" name="tclYLE">
+                <property name="toolTip">
+                 <string>Y offset from origin for tool changes</string>
+                </property>
+               </widget>
               </item>
               <item row="1" column="0">
                <widget class="QLabel" name="tclXL">
@@ -366,7 +400,11 @@ selection-background-color: lightblue;
                </widget>
               </item>
               <item row="4" column="1">
-               <widget class="QLineEdit" name="tclZLE"/>
+               <widget class="QLineEdit" name="tclZLE">
+                <property name="toolTip">
+                 <string>Z offset from origin for tool changes</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
@@ -382,7 +420,7 @@ selection-background-color: lightblue;
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>3</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="page">
       <widget class="QLabel" name="label_6">
@@ -1003,7 +1041,7 @@ selection-background-color: lightblue;
                <item>
                 <widget class="QRadioButton" name="faceClimbRB">
                  <property name="text">
-                  <string>Climb</string>
+                  <string>C&amp;limb</string>
                  </property>
                 </widget>
                </item>
@@ -1051,146 +1089,242 @@ selection-background-color: lightblue;
       </layout>
      </widget>
      <widget class="QWidget" name="page_4">
-      <widget class="QWidget" name="gridLayoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>100</x>
-         <y>10</y>
-         <width>311</width>
-         <height>294</height>
-        </rect>
-       </property>
-       <layout class="QGridLayout" name="gridLayout">
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_11">
-          <property name="text">
-           <string>Depth Of Cut</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QLineEdit" name="lineEdit_6"/>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_10">
-          <property name="text">
-           <string>Step Down</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <layout class="QVBoxLayout" name="verticalLayout">
-          <item>
-           <widget class="QRadioButton" name="radioButton">
-            <property name="font">
-             <font>
-              <family>Cantarell</family>
-              <pointsize>11</pointsize>
-              <weight>50</weight>
-              <italic>false</italic>
-              <bold>false</bold>
-             </font>
+      <layout class="QHBoxLayout" name="horizontalLayout_15">
+       <item>
+        <layout class="QFormLayout" name="formLayout_3">
+         <item row="3" column="0">
+          <widget class="QLabel" name="perimeterDepthOfCutL">
+           <property name="text">
+            <string>Depth Of Cut</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="perimeterStepDownL">
+           <property name="text">
+            <string>Step Down</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="perimeterWidthOfCutL">
+           <property name="text">
+            <string>Width of Cut</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="perimeterStepOverL">
+           <property name="text">
+            <string>Step Over</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="perimeterSideL">
+           <property name="text">
+            <string>Side</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="QFrame" name="frame_20">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_12">
+            <property name="leftMargin">
+             <number>0</number>
             </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QRadioButton" name="perimeterInsideRB">
+              <property name="toolTip">
+               <string>The cut will be inside the perimeter.</string>
+              </property>
+              <property name="text">
+               <string>Inside</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="perimeterOutsideRB">
+              <property name="toolTip">
+               <string>The cut will be outside the perimeter</string>
+              </property>
+              <property name="text">
+               <string>O&amp;utside</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="perimeterDepthOfCutE">
+           <property name="toolTip">
+            <string>Distance below the z-axis origin for the final cut.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="perimeterStepDownE">
+           <property name="toolTip">
+            <string>The distance that the z-axis will move down with each pass</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="perimeterWidthOfCutE">
+           <property name="toolTip">
+            <string>The width of the perimeter cut. This width cannot be less that the width of the selected tool.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QLineEdit" name="perimeterStepOverE">
+           <property name="toolTip">
+            <string>The distance to step over for each pass when the width of cut is greater than the width of the tool</string>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="0">
+          <widget class="QLabel" name="perimeterMillingMethodL">
+           <property name="text">
+            <string>Milling Method</string>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="1">
+          <widget class="QFrame" name="frame_22">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Sunken</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_14">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QRadioButton" name="perimeterConventionalRB">
+              <property name="toolTip">
+               <string>Cutting edge turns in to material behind the tool</string>
+              </property>
+              <property name="text">
+               <string>Conventional</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="perimeterClimbRB">
+              <property name="toolTip">
+               <string>Cutting edge of the tool cuts into the material ahead of the tool.</string>
+              </property>
+              <property name="text">
+               <string>C&amp;limb</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="perimeterEitherRB">
+              <property name="toolTip">
+               <string>System decides the milling method for you.</string>
+              </property>
+              <property name="text">
+               <string>Ei&amp;ther</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="perimeterOffsetL">
+           <property name="text">
+            <string>Offset from Perimeter</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QLineEdit" name="perimeterOffsetE">
+           <property name="toolTip">
+            <string>The distance that the edge of the cut will be from the perimeter. A value of zero means that the center of the bit will be on the perimeter.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="perimeterObjectToCutL">
+           <property name="text">
+            <string>Object to Cut Out</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="perimeterDepthL">
+           <property name="text">
+            <string>Depth of Perimeter</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="perimeterDepthE"/>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="perimeterObjectToCutCB">
+           <item>
             <property name="text">
-             <string>From &amp;Tool</string>
+             <string>None Selected...</string>
             </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="radioButton_2">
-            <property name="text">
-             <string>Overri&amp;de</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="1" column="2">
-         <widget class="QLineEdit" name="lineEdit_3"/>
-        </item>
-        <item row="2" column="1">
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QRadioButton" name="radioButton_4">
-            <property name="text">
-             <string>Fro&amp;m Tool</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="radioButton_5">
-            <property name="text">
-             <string>Overr&amp;ide</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="1" column="1">
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <widget class="QRadioButton" name="radioButton_3">
-            <property name="text">
-             <string>From Too&amp;l</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="radioButton_6">
-            <property name="text">
-             <string>Overr&amp;ide</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>Spindle Speed</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QLineEdit" name="lineEdit_5"/>
-        </item>
-        <item row="0" column="2">
-         <widget class="QLineEdit" name="lineEdit_2"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string>Feed Rate</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>Offset</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QLineEdit" name="lineEdit_4"/>
-        </item>
-       </layout>
-      </widget>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>193</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="page_5">
       <widget class="QLabel" name="label_20">
@@ -1326,17 +1460,19 @@ selection-background-color: lightblue;
   <tabstop>faceDepthE</tabstop>
   <tabstop>faceStepOverE</tabstop>
   <tabstop>faceStepDownE</tabstop>
-  <tabstop>radioButton</tabstop>
-  <tabstop>radioButton_2</tabstop>
-  <tabstop>radioButton_3</tabstop>
-  <tabstop>radioButton_6</tabstop>
-  <tabstop>radioButton_4</tabstop>
-  <tabstop>radioButton_5</tabstop>
-  <tabstop>lineEdit_6</tabstop>
-  <tabstop>lineEdit_4</tabstop>
-  <tabstop>lineEdit_2</tabstop>
-  <tabstop>lineEdit_3</tabstop>
-  <tabstop>lineEdit_5</tabstop>
+  <tabstop>faceConventionalRB</tabstop>
+  <tabstop>faceClimbRB</tabstop>
+  <tabstop>faceEitherRB</tabstop>
+  <tabstop>perimeterDepthOfCutE</tabstop>
+  <tabstop>perimeterStepDownE</tabstop>
+  <tabstop>perimeterWidthOfCutE</tabstop>
+  <tabstop>perimeterStepOverE</tabstop>
+  <tabstop>perimeterOffsetE</tabstop>
+  <tabstop>perimeterInsideRB</tabstop>
+  <tabstop>perimeterOutsideRB</tabstop>
+  <tabstop>perimeterConventionalRB</tabstop>
+  <tabstop>perimeterClimbRB</tabstop>
+  <tabstop>perimeterEitherRB</tabstop>
  </tabstops>
  <resources/>
  <connections/>
