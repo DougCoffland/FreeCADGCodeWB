@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>682</width>
-    <height>676</height>
+    <height>688</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1034,7 +1034,7 @@ selection-background-color: lightblue;
                <item>
                 <widget class="QRadioButton" name="faceConventionalRB">
                  <property name="text">
-                  <string>Conventional</string>
+                  <string>Co&amp;nventional</string>
                  </property>
                 </widget>
                </item>
@@ -1102,7 +1102,7 @@ selection-background-color: lightblue;
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
+         <item row="5" column="0">
           <widget class="QLabel" name="perimeterStepDownL">
            <property name="text">
             <string>Step Down</string>
@@ -1112,28 +1112,28 @@ selection-background-color: lightblue;
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
+         <item row="6" column="0">
           <widget class="QLabel" name="perimeterWidthOfCutL">
            <property name="text">
             <string>Width of Cut</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="0">
+         <item row="7" column="0">
           <widget class="QLabel" name="perimeterStepOverL">
            <property name="text">
             <string>Step Over</string>
            </property>
           </widget>
          </item>
-         <item row="8" column="0">
+         <item row="9" column="0">
           <widget class="QLabel" name="perimeterSideL">
            <property name="text">
             <string>Side</string>
            </property>
           </widget>
          </item>
-         <item row="8" column="1">
+         <item row="9" column="1">
           <widget class="QFrame" name="frame_20">
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
@@ -1160,7 +1160,7 @@ selection-background-color: lightblue;
                <string>The cut will be inside the perimeter.</string>
               </property>
               <property name="text">
-               <string>Inside</string>
+               <string>&amp;Inside</string>
               </property>
              </widget>
             </item>
@@ -1184,35 +1184,35 @@ selection-background-color: lightblue;
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item row="5" column="1">
           <widget class="QLineEdit" name="perimeterStepDownE">
            <property name="toolTip">
             <string>The distance that the z-axis will move down with each pass</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
+         <item row="6" column="1">
           <widget class="QLineEdit" name="perimeterWidthOfCutE">
            <property name="toolTip">
             <string>The width of the perimeter cut. This width cannot be less that the width of the selected tool.</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="1">
+         <item row="7" column="1">
           <widget class="QLineEdit" name="perimeterStepOverE">
            <property name="toolTip">
             <string>The distance to step over for each pass when the width of cut is greater than the width of the tool</string>
            </property>
           </widget>
          </item>
-         <item row="10" column="0">
+         <item row="11" column="0">
           <widget class="QLabel" name="perimeterMillingMethodL">
            <property name="text">
             <string>Milling Method</string>
            </property>
           </widget>
          </item>
-         <item row="10" column="1">
+         <item row="11" column="1">
           <widget class="QFrame" name="frame_22">
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
@@ -1242,7 +1242,7 @@ selection-background-color: lightblue;
                <string>Cutting edge turns in to material behind the tool</string>
               </property>
               <property name="text">
-               <string>Conventional</string>
+               <string>Co&amp;nventional</string>
               </property>
              </widget>
             </item>
@@ -1269,14 +1269,14 @@ selection-background-color: lightblue;
            </layout>
           </widget>
          </item>
-         <item row="7" column="0">
+         <item row="8" column="0">
           <widget class="QLabel" name="perimeterOffsetL">
            <property name="text">
             <string>Offset from Perimeter</string>
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
+         <item row="8" column="1">
           <widget class="QLineEdit" name="perimeterOffsetE">
            <property name="toolTip">
             <string>The distance that the edge of the cut will be from the perimeter. A value of zero means that the center of the bit will be on the perimeter.</string>
@@ -1308,6 +1308,26 @@ selection-background-color: lightblue;
             </property>
            </item>
           </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="perimeterStartHeightE"/>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="perimeterStartHeightL">
+           <property name="text">
+            <string>Start Height</string>
+           </property>
+          </widget>
+         </item>
+         <item row="12" column="0">
+          <widget class="QLabel" name="perimeterErrorL">
+           <property name="text">
+            <string>Maximum Error</string>
+           </property>
+          </widget>
+         </item>
+         <item row="12" column="1">
+          <widget class="QLineEdit" name="perimeterErrorE"/>
          </item>
         </layout>
        </item>

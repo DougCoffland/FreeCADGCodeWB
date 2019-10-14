@@ -68,6 +68,7 @@ class Cut():
 		self.outputUnits = ""
 		self.currentCut = None
 		self.ui = None
+		self.cuttingDirection = None
 		
 	def getObject(self):
 		return self.obj
@@ -84,11 +85,22 @@ class Cut():
 		print "overide run program in derived cut type"
 		
 	def cut(self,x=None,y=None,z=None):
+		obj = self.obj
 		line = 'G1'
 		if x != None: line = line + 'X' + str(round(self.toOutputUnits(x - self.xOff,'length'),4))
 		if y != None: line = line + 'Y' + str(round(self.toOutputUnits(y - self.yOff,'length'),4))
 		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z + self.zOff,'length'),4))
-		self.writeGCodeLine(line)
+		if x != None or y != None:
+			if self.cuttingDirection != "cutting":
+				feedString = 'F' + str(self.toOutputUnits(obj.FeedRate,'velocity'))
+				self.cuttingDirection = "cutting"
+			else: feedString = ""
+		else:
+			if self.cuttingDirection != "plunging":
+				feedString = 'F' + str(self.toOutputUnits(obj.PlungeRate,'velocity'))
+				self.cuttingDirection = "plunging"
+			else: feedString = ""
+		self.writeGCodeLine(line + ' ' + feedString)
 
 	def rapid(self,x=None,y=None,z=None):
 		line = 'G0'
@@ -285,13 +297,23 @@ class Cut():
 		
 	def shortestPoly(self,polys):
 		shortest = polys[0]
-		shortestLength = self.lengthOfPoly(polys[0])
+		shortestLength = self.lengthOfPoly(shortest)
 		for poly in polys:
 			l = self.lengthOfPoly(poly)
 			if l < shortestLength:
 				shortestLength = l
 				shortest = poly
 		return shortest
+		
+	def longestPoly(self,polys):
+		longest = polys[0]
+		longestLength = self.lengthOfPoly(longest)
+		for poly in polys:
+			l = self.lengthOfPoly(poly)
+			if l > longestLength:
+				longestLength = l
+				longest = poly
+		return longest
 		
 	def nextPoly(self,x,y,polys,delta):
 		nearestPoly = None
@@ -319,11 +341,17 @@ class Cut():
 			i = i - 1
 		
 	def cutPolyOutsideClimb(self,poly):
-		pass
+		i = len(poly) - 1
+		while (i >= 0):
+			self.cut(poly[i][0],poly[i][1])
+			i = i - 1
 		
 	def cutPolyOutsideConventional(self,poly):
-		pass
-		
+		i = 1
+		while i < len(poly):
+			self.cut(poly[i][0],poly[i],[1])
+			i = i + 1
+	
 	def getOffset(self, polys, offset):
 		pco = pyclipper.PyclipperOffset()
 		for poly in polys:
@@ -332,9 +360,50 @@ class Cut():
 		offsetPolys = self.scaleFromClipper(pco.Execute(offset * 1000000),1/1000000.)
 		for poly in offsetPolys:
 			poly.append(poly[0])
-		return offsetPolys		
+		return offsetPolys
+		
+	def getSegDir(self,seg):
+		x1 = seg[0][0]
+		x2 = seg[1][0]
+		y1 = seg[0][1]
+		y2 = seg[1][1]
+		length = math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1))
+		return math.acos((x2-x1)/length)
+		
+	def line(self, p1,p2):
+		""" returns line defined by p1 and p2 in A,B,C form """
+		if p1 == p2: return 0,0,0
+		(x1,y1),(x2,y2) = p1,p2
+		""" first solve for x and b in y=mx+b"""
+		if x2 == x1:
+			A = 1
+			B = 0
+			C = -x1
+		else:
+			A = (y2 - y1)/(x2 - x1)
+			B = -1
+			C = y1 - A * x1
+		return A,B,C
+		
+	def ptl(self,A,B,C,p):
+		""" returns distance from line in ABC form to point p"""
+		if A==0 and B==0 and C==0: return 0
+		return abs(A * p[0] + B * p[1] + C)/math.sqrt(A*A + B*B)
+		
+	def smoothePoly(self,poly,error):
+		i = 0
+		reducedPoly = [poly[0]]
+		while i < len(poly) - 1:
+			startPoint = poly[i]
+			A,B,C = self.line(startPoint,poly[i + 1])
+			while error > self.ptl(A,B,C,poly[i+1]):
+				i = i + 1
+				if i < len(poly) - 1: continue
+				else: break
+			reducedPoly.append(poly[i])
+		return reducedPoly		
 							
-	def getBoundaries(self, shapeName, origin, height):
+	def getBoundaries(self, shapeName, origin, height, error = .25):
 		fc = FreeCAD.ActiveDocument
 		mesh = fc.addObject("Mesh::Feature","Mesh")
 		part = fc.getObjectsByLabel(shapeName)[0]
@@ -342,7 +411,7 @@ class Cut():
 		s = self.getLabel(part.Name + '_mesh_')
 		newshape = fc.addObject("Part::Feature",s)
 		shape = Part.Shape()
-		shape.makeShapeFromMesh(mesh.Mesh.Topology,0.1)
+		shape.makeShapeFromMesh(mesh.Mesh.Topology,error)
 		wires = list()
 		for i in shape.slice(Base.Vector(0,0,1),8):
 			wires.append(i)

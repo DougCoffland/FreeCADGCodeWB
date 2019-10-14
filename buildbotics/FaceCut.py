@@ -579,7 +579,8 @@ class FaceCut(Cut):
 			
 		self.rapid(z = self.safeHeight)
 
-	def run(self, ui, obj, outputUnits, fp):		
+	def run(self, ui, obj, outputUnits, fp):
+		self.obj = obj		
 		self.parent = obj.getParentGroup()
 		self.fp = fp
 		self.ui = ui
@@ -594,7 +595,7 @@ class FaceCut(Cut):
 		self.setUserUnits()
 		self.setOffset(self.parent.XOriginValue.Value, self.parent.YOriginValue.Value, self.parent.ZOriginValue.Value)
 		self.updateActionLabel("Setting feeds and speeds")
-		out('F' + str(self.toOutputUnits(obj.FeedRate,'velocity')))
+
 		rapid(z=obj.ZToolChangeLocation.Value)
 		rapid(obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)
 		out('T' + tool + 'M6')

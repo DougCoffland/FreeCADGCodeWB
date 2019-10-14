@@ -561,7 +561,7 @@ class GCodeProject():
 		if hasattr(cut, "DrillPointList"): p.append([VL,	"DrillPointList", cut.DrillPointList])
 		if hasattr(cut, "FacingPattern"): p.append([S,		"FacingPattern", cut.FacingPattern])
 		if hasattr(cut,	"CutArea"):		p.append([S,		"CutArea",		cut.CutArea])
-		if hasattr(cut, "StartHeight"):  p.append([L,		"StartHeight",	cut.SafeHeight])
+		if hasattr(cut, "StartHeight"):  p.append([L,		"StartHeight",	cut.StartHeight])
 		if hasattr(cut, "Depth"):		p.append([L,		"Depth",		cut.Depth])
 		if hasattr(cut, "StepOver"):	p.append([L,		"StepOver",		cut.StepOver])
 		if hasattr(cut, "StepDown"):	p.append([L,		"StepDown",		cut.StepDown])
@@ -571,6 +571,7 @@ class GCodeProject():
 		if hasattr(cut, "Offset"):		p.append([L,		"Offset",		cut.Offset])
 		if hasattr(cut, "Side"):		p.append([S,		"Side",			cut.Side])
 		if hasattr(cut,	"ObjectToCut"): p.append([S,		"ObjectToCut",	cut.ObjectToCut])
+		if hasattr(cut, "MaximumError"): p.append([L,		"MaximumError", cut.MaximumError])
 		
 		return p
 

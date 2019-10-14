@@ -105,6 +105,7 @@ class RegistrationCut(Cut):
 		self.cut(z=-drillDepth)
 				
 	def run(self, ui, obj, outputUnits, fp):
+		self.obj = obj
 		self.fp = fp
 		self.ui = ui
 		out = self.writeGCodeLine
@@ -115,7 +116,7 @@ class RegistrationCut(Cut):
 		out("(Starting " + obj.CutName + ')')
 		self.setUserUnits()
 		self.setOffset(0,0,0)
-		out('F' + str(self.toOutputUnits(obj.PlungeRate,'velocity')))
+
 		rapid(z=obj.ZToolChangeLocation.Value)
 		rapid(obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)
 		out('T' + tool + 'M6')

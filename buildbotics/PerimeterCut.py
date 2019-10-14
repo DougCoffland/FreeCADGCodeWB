@@ -124,9 +124,6 @@ class PerimeterCut(Cut):
 			for prop in obj.PropertiesList:
 				obj.removeProperty(prop)
 		for prop in p:
-			print prop[1]
-			print prop[2]
-			print '\n'
 			newprop = obj.addProperty(prop[0],prop[1])
 			setattr(newprop,prop[1],prop[2])
 		obj.Label = obj.CutName
@@ -136,11 +133,89 @@ class PerimeterCut(Cut):
 		FreeCAD.ActiveDocument.recompute()
 		
 	def run(self, ui, obj, outputUnits,fp):
+		self.obj = obj
 		self.parent = obj.getParentGroup()
 		self.fp = fp
 		self.ui = ui
 		self.outputUnits = outputUnits
 		out = self.writeGCodeLine
+		self.updateActionLabel("Running " + obj.CutName)
+		self.safeHeight = obj.SafeHeight.Value
+		tool = str(obj.ToolNumber)
+		rapid = self.rapid
 		cut = self.cut
-		self.updateActionLabel("Running Perimeter Cut")
-		print "running perimeter cut"
+		self.setBitWidth(obj)
+		out("(Starting " + obj.CutName + ')')
+		self.setUserUnits()
+		self.setOffset(self.parent.XOriginValue.Value, self.parent.YOriginValue.Value, self.parent.ZOriginValue.Value)
+		self.updateActionLabel("Setting feeds and speeds for " + obj.CutName)
+
+		rapid(z=obj.ZToolChangeLocation.Value)
+		rapid(obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)
+		out('T' + tool + 'M6')
+		out('S' + str(obj.SpindleSpeed).split()[0])
+		
+		self.updateActionLabel("Getting Boundaries for " + obj.CutName)
+		polys = self.getBoundaries(obj.ObjectToCut, self.getOrigin(obj),obj.Depth.Value)
+		polyList =[]
+		offset = 0
+		self.updateActionLabel("Getting offset polygons for " + obj.CutName)
+		while offset < obj.WidthOfCut:
+			offset = offset + obj.StepOver.Value
+			if  offset >= obj.WidthOfCut.Value: offset = obj.WidthOfCut.Value
+			offsetPolys = self.getOffset(polys,offset)
+			for poly in offsetPolys: polyList.append(poly)
+		self.updateActionLabel("Generating cuts for " + obj.CutName)
+		currentDepth = obj.StartHeight.Value
+		while currentDepth >= -obj.Depth.Value:
+			currentList = polyList[:]
+			while len(currentList) > 0:
+				self.rapid(z=self.safeHeight)
+				if obj.Side == "Inside":
+					poly = self.shortestPoly(currentList)
+					self.rapid(poly[0][0],poly[0][1])
+					self.cut(z=currentDepth)
+					area = self.areaOfPoly(poly)
+					reducedPoly = self.smoothePoly(poly,obj.MaximumError)
+					if obj.MillingMethod == "Climb": self.cutPolyInsideClimb(reducedPoly)
+					else: self.cutPolyInsideConventional(reducedPoly)
+					currentList.remove(poly)
+					poly = self.nextPoly(poly[0][0],poly[0][1],currentList,self.bitWidth)
+					while poly != None:
+						length = self.lengthOfPoly(poly)
+						lengthTimesWidth = length * obj.StepOver.Value
+						if self.areaOfPoly(poly) - lengthTimesWidth > area: break
+						reducedPoly = self.smoothePoly(poly,obj.MaximumError)
+						if obj.MillingMethod == "Climb": self.cutPolyInsideClimb(reducedPoly)
+						else: self.cutPolyInsideConventional(reducedPoly)
+						area = self.areaOfPoly(poly)
+						currentList.remove(poly)
+						poly = self.nextPoly(poly[0][0],poly[0][1],currentList,self.bitWidth)
+				else:
+					poly = self.longestPoly(currentList)
+					self.rapid(poly[0][0],poly[0][1])
+					self.cut(z=currentDepth)
+					area = self.areaOfPoly(poly)
+					length = self.lengthOfPoly(poly)
+					lengthTimesWidth = length * obj.StepOver.Value
+					
+					reducedPoly = self.smoothePoly(poly,obj.MaximumError)
+					
+					if obj.MillingMethod == "Climb": self.cutPolyOutsideClimb(reducedPoly)
+					else: self.cutPolyOutsideConventional(reducedPoly)
+					currentList.remove(poly)
+					poly = self.nextPoly(poly[0][0],poly[0][1],currentList,self.bitWidth)
+					while poly != None:
+						if area - lengthTimesWidth > self.areaOfPoly(poly): break
+						reducedPoly = self.smoothePoly(poly,obj.MaximumError)
+						if obj.MillingMethod == "Climb": self.cutPolyOutsideClimb(reducedPoly)
+						else: self.cutPolyOutsideConventional(reducedPoly)
+						area = self.areaOfPoly(poly)
+						currentList.remove(poly)
+						poly = self.nextPoly(poly[0][0],poly[0][1],currentList,self.bitWidth)
+					
+			if currentDepth == -obj.DepthOfCut.Value: break
+			if currentDepth - obj.StepDown.Value <= -obj.DepthOfCut.Value: currentDepth = -obj.DepthOfCut.Value
+			else: currentDepth = currentDepth - obj.StepDown.Value
+		self.rapid(z = self.safeHeight)
+			

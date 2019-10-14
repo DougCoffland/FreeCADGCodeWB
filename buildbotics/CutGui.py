@@ -113,6 +113,7 @@ class CutGui():
 		ui.perimeterObjectToCutCB.currentIndexChanged.connect(self.validateAllFields)
 		ui.perimeterDepthE.textChanged.connect(self.validateAllFields)
 		ui.perimeterDepthOfCutE.textChanged.connect(self.validateAllFields)
+		ui.perimeterStartHeightE.textChanged.connect(self.validateAllFields)
 		ui.perimeterStepDownE.textChanged.connect(self.validateAllFields)
 		ui.perimeterWidthOfCutE.textChanged.connect(self.validateAllFields)
 		ui.perimeterStepOverE.textChanged.connect(self.validateAllFields)
@@ -122,6 +123,7 @@ class CutGui():
 		ui.perimeterEitherRB.clicked.connect(self.validateAllFields)
 		ui.perimeterInsideRB.clicked.connect(self.validateAllFields)
 		ui.perimeterOutsideRB.clicked.connect(self.validateAllFields)
+		ui.perimeterErrorE.textChanged.connect(self.validateAllFields)
 		
 		ui.buttonBox.accepted.connect(self.accept)
 		ui.buttonBox.rejected.connect(self.reject)
@@ -335,6 +337,7 @@ class CutGui():
 			else: VAL.setLabel(ui.perimeterObjectToCutL,'VALID')
 			valid = VAL.validate(ui.perimeterDepthE, ui.perimeterDepthL,True,valid,VAL.LENGTH)	
 			valid = VAL.validate(ui.perimeterDepthOfCutE, ui.perimeterDepthOfCutL,True,valid,VAL.LENGTH)	
+			valid = VAL.validate(ui.perimeterStartHeightE, ui.perimeterStartHeightL,True,valid,VAL.LENGTH)	
 			valid = VAL.validate(ui.perimeterStepDownE, ui.perimeterStepDownL,True,valid,VAL.LENGTH)	
 			if VAL.validate(ui.perimeterWidthOfCutE, ui.perimeterWidthOfCutL,True,valid,VAL.LENGTH) == True:
 				if VAL.toSystemValue(ui.perimeterWidthOfCutE,'length') < self.getToolWidth():
@@ -353,6 +356,7 @@ class CutGui():
 			else:
 				VAL.setLabel(ui.perimeterMillingMethodL,'INVALID')
 				valid = False
+			valid = VAL.validate(ui.perimeterErrorE, ui.perimeterErrorL, True, valid, VAL.LENGTH)
 		ui.buttonBox.buttons()[0].setEnabled(valid)
 		FreeCAD.ActiveDocument.recompute()	
 		return valid
@@ -418,6 +422,7 @@ class CutGui():
 			p.append([S,	"ObjectToCut",		ui.perimeterObjectToCutCB.currentText()])
 			p.append([L,	"Depth",			VAL.toSystemValue(ui.perimeterDepthE,'length')])
 			p.append([L,	"DepthOfCut",		VAL.toSystemValue(ui.perimeterDepthOfCutE,'length')])
+			p.append([L,	"StartHeight",		VAL.toSystemValue(ui.perimeterStartHeightE,'length')])
 			p.append([L,	"StepDown",			VAL.toSystemValue(ui.perimeterStepDownE,'length')])
 			p.append([L,	"WidthOfCut",		VAL.toSystemValue(ui.perimeterWidthOfCutE,'length')])
 			p.append([L,	"StepOver",			VAL.toSystemValue(ui.perimeterStepOverE,'length')])
@@ -429,6 +434,7 @@ class CutGui():
 			if ui.perimeterInsideRB.isChecked() == True: side = "Inside"
 			else: side = "Outside"
 			p.append([S,	"Side",				side])
+			p.append([L,	"MaximumError",		VAL.toSystemValue(ui.perimeterErrorE,'length')])
 		return p
 	
 	def getCutProperties(self,props):
@@ -488,6 +494,7 @@ class CutGui():
 				if p[1] == "ObjectToCut": 	ui.perimeterObjectToCutCB.setCurrentIndex(ui.perimeterObjectToCutCB.findText(p[2]))
 				if p[1] == "Depth":			ui.perimeterDepthE.setText(VAL.fromSystemValue('length',p[2]))
 				if p[1] == "DepthOfCut": 	ui.perimeterDepthOfCutE.setText(VAL.fromSystemValue('length',p[2]))
+				if p[1] == "StartHeight": 	ui.perimeterStartHeightE.setText(VAL.fromSystemValue('length',p[2]))
 				if p[1] == "StepDown":   	ui.perimeterStepDownE.setText(VAL.fromSystemValue('length',p[2]))
 				if p[1] == "WidthOfCut": 	ui.perimeterWidthOfCutE.setText(VAL.fromSystemValue('length',p[2]))
 				if p[1] == "StepOver":   	ui.perimeterStepOverE.setText(VAL.fromSystemValue('length',p[2]))
@@ -499,16 +506,17 @@ class CutGui():
 				if p[1] == "Side":
 					if p[2] == "Inside": ui.perimeterInsideRB.setChecked(True)
 					else: ui.perimeterOutsideRB.setChecked(True)
+				if p[1] == "MaximumError":	ui.perimeterErrorE.setText(VAL.fromSystemValue('length',p[2]))
 					
 	def accept(self):
-		print 'accepted'
 		ui = self.createCutUi
 		ui.hide()
+		setStatus('hidden')
 		p = self.setCutProperties()
 		mode = getGUIMode()
-		print mode
 		if mode in ["AddingCutFromGUI", "EditingCutFromGUI"]:
 			setGUIProperties(p)
+			return True
 		elif mode == "AddingCutFromIcon":
 			for prop in p:
 				if prop[1] == "CutType":
@@ -518,24 +526,26 @@ class CutGui():
 					elif prop[2] == "Perimeter": self.cut = PerimeterCut(self.selectedObject)
 					else: self.cut = Cut(self.selectedObject)
 			self.cut.getObject().Label = ui.nameLE.text()
-			print "calling setProperties"
 			self.cut.setProperties(p,self.cut.getObject())
-			setGUIMode("None")				
+			setGUIMode("None")
+			return True				
 		elif mode == "EditingCutFromIcon":
 			self.cut = self.selectedObject.Proxy
 			self.cut.Label = ui.nameLE.text()
 			self.cut.setProperties(p,self.selectedObject)
-		setStatus('hidden')
-		FreeCAD.ActiveDocument.recompute()
-		return True
+			setGUIMode("None")
+			return True
+		else:
+			print "unexpected mode (" + mode + ")"
+
+		return False
 				
 	def reject(self):
 		ui = self.createCutUi
 		ui.hide()
 		setGUIMode('None')
 		setStatus('hidden')
-		FreeCAD.ActiveDocument.recompute()
-		print "rejected"
+		return False
 
 	def onCutTypeChanged(self):
 		ui = self.createCutUi
@@ -579,10 +589,12 @@ class CutGui():
 		ui.perimeterObjectToCutCB.setCurrentIndex(0)
 		ui.perimeterDepthE.clear()
 		ui.perimeterDepthOfCutE.clear()
+		ui.perimeterStartHeightE.clear()
 		ui.perimeterStepDownE.clear()
 		ui.perimeterWidthOfCutE.clear()
 		ui.perimeterStepOverE.clear()
 		ui.perimeterOffsetE.clear()
+		ui.perimeterErrorE.clear()
 
 	def setMode(self):
 		if self.selectedObject == None: mode = getGUIMode()
@@ -594,7 +606,6 @@ class CutGui():
 		return mode
 
 	def getPropertiesFromExistingCut(self,obj):
-		print "getPropertiesFromExistingCut"
 		ui = self.createCutUi
 		fc = FreeCAD.ActiveDocument
 		ui.cutTypeCB.setCurrentIndex(ui.cutTypeCB.findText(obj.CutType))
@@ -645,6 +656,7 @@ class CutGui():
 			ui.perimeterObjectToCutCB.setCurrentIndex(ui.perimeterObjectToCutCB.findText(obj.ObjectToCut))
 			ui.perimeterDepthE.setText(VAL.fromSystemValue('length',obj.Depth))
 			ui.perimeterDepthOfCutE.setText(VAL.fromSystemValue('length',obj.DepthOfCut))
+			ui.perimeterStartHeightE.setText(VAL.fromSystemValue('length',obj.StartHeight))
 			ui.perimeterStepDownE.setText(VAL.fromSystemValue('length',obj.StepDown))
 			ui.perimeterWidthOfCutE.setText(VAL.fromSystemValue('length',obj.WidthOfCut))
 			ui.perimeterStepOverE.setText(VAL.fromSystemValue('length',obj.StepOver))
@@ -654,20 +666,18 @@ class CutGui():
 			else: ui.perimeterEitherRB.setChecked(True)
 			if obj.Side == "Inside": ui.perimeterInsideRB.setChecked(True)
 			else: ui.perimeterOutsideRB.setChecked(True)
+			ui.perimeterErrorE.setText(VAL.fromSystemValue('length',obj.MaximumError))
 		
 	def Activated(self):
-		print "Activated"
 		ui = self.createCutUi
 		self.reset()
-		
 		if hasattr(FreeCAD.ActiveDocument,"Objects"):
 			while ui.faceCutAreaCB.count() > 1: ui.faceCutAreaCB.removeItem(1)
-			while ui.perimeterObjectToCutCB.count() > 1: ui.faceCutAreaCB.removeItem(1)
+			while ui.perimeterObjectToCutCB.count() > 1: ui.perimeterObjectToCutCB.removeItem(1)
 			for obj in FreeCAD.ActiveDocument.Objects:
 				if hasattr(obj,"Shape"):
 					ui.faceCutAreaCB.addItem(obj.Label)
-					ui.perimeterObjectToCutCB.addItem(obj.Label)
-		
+					ui.perimeterObjectToCutCB.addItem(obj.Label)		
 		mode = self.setMode()
 		if mode == "AddingCutFromIcon":
 			self.originalCutName = ''
@@ -684,7 +694,6 @@ class CutGui():
 			group = FreeCAD.ActiveDocument.getObjectsByLabel(parent.ToolTable)[0].Group
 			for tool in group:
 				ui.toolCB.addItem(str(tool.Number) + " " + tool.Label)
-			print "calling getPropertiesFromExistingCut"
 			self.getPropertiesFromExistingCut(self.selectedObject)
 		elif mode == "AddingCutFromGUI":
 			self.originalCutName = ""
@@ -711,27 +720,19 @@ class CutGui():
 		self.validateAllFields()
 		
 	def IsActive(self):
-		print "1",
 		if getGUIMode() in ["EditingCutFromGUI", "AddingCutFromGUI"]:
 			return True
-		print "2",
 		mw = FreeCADGui.getMainWindow()
-		print "3",
 		tree = mw.findChildren(QtGui.QTreeWidget)[0]
-		print "4",
 		if len(tree.selectedItems()) != 1:
 			self.selectedObject = None
 			return False
-		print "5",
 		item = tree.selectedItems()[0]
-		print "6",
 		obj = FreeCAD.ActiveDocument.getObjectsByLabel(item.text(0))[0]
-		print "7",
 		if hasattr(obj,"ObjectType"):
 			if obj.ObjectType in ["GCodeJob"] + self.objectTypes:
 				self.selectedObject = obj
 				return True
-		print "8",
 		self.selectedObject = None
 		return False
 		
