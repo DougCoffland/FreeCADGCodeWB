@@ -202,6 +202,9 @@ selection-background-color: lightblue;
             </item>
             <item>
              <widget class="QComboBox" name="cutTypeCB">
+              <property name="toolTip">
+               <string>Select the type of cut here.</string>
+              </property>
               <property name="sizeAdjustPolicy">
                <enum>QComboBox::AdjustToContents</enum>
               </property>
@@ -233,6 +236,11 @@ selection-background-color: lightblue;
             </item>
             <item>
              <widget class="QComboBox" name="toolCB">
+              <property name="toolTip">
+               <string>Select the tool here. The tools in the tool table
+selected in the project page will
+be available.</string>
+              </property>
               <item>
                <property name="text">
                 <string>None Selected...</string>
@@ -378,14 +386,18 @@ selection-background-color: lightblue;
               <item row="1" column="1">
                <widget class="QLineEdit" name="tclXLE">
                 <property name="toolTip">
-                 <string>X offset for tool changes</string>
+                 <string>X offset from origin for tool changes.
+The location of the origin is defined on
+the project page.</string>
                 </property>
                </widget>
               </item>
               <item row="2" column="1">
                <widget class="QLineEdit" name="tclYLE">
                 <property name="toolTip">
-                 <string>Y offset from origin for tool changes</string>
+                 <string>Y offset from origin for tool changes.
+The location of the origin is defined on
+the project page.</string>
                 </property>
                </widget>
               </item>
@@ -402,7 +414,9 @@ selection-background-color: lightblue;
               <item row="4" column="1">
                <widget class="QLineEdit" name="tclZLE">
                 <property name="toolTip">
-                 <string>Z offset from origin for tool changes</string>
+                 <string>Z offset from origin for tool changes.
+The location of the origin is defined on
+the project page.</string>
                 </property>
                </widget>
               </item>
@@ -466,6 +480,15 @@ selection-background-color: lightblue;
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="toolTip">
+             <string>Defines how far the machine will plunge
+into the material on each peck. For each
+peck, the spindle raises to the Safe Height and then
+drills to the Peck Depth plus the depth
+on the previous peck. The last
+peck drills to the depth defined in the
+'Z' coordinate for the point being drilled.</string>
+            </property>
            </widget>
           </item>
           <item>
@@ -522,6 +545,9 @@ selection-background-color: lightblue;
               <layout class="QVBoxLayout" name="verticalLayout_5">
                <item>
                 <widget class="QPushButton" name="drillAddB">
+                 <property name="toolTip">
+                  <string>Add a new drill point</string>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -533,6 +559,11 @@ selection-background-color: lightblue;
                </item>
                <item>
                 <widget class="QPushButton" name="drillRemoveB">
+                 <property name="toolTip">
+                  <string>Delete the selected drill point.
+If multiple drill points are selected,
+only the first point is deleted.</string>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -544,6 +575,9 @@ selection-background-color: lightblue;
                </item>
                <item>
                 <widget class="QPushButton" name="drillUpB">
+                 <property name="toolTip">
+                  <string>Move the selected drill point up by one place.</string>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -555,6 +589,9 @@ selection-background-color: lightblue;
                </item>
                <item>
                 <widget class="QPushButton" name="drillDownB">
+                 <property name="toolTip">
+                  <string>Move the selected drill point down by one point.</string>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -566,6 +603,10 @@ selection-background-color: lightblue;
                </item>
                <item>
                 <widget class="QPushButton" name="drillSaveB">
+                 <property name="toolTip">
+                  <string>Saves the points shown in the
+Drill Point List to a file.</string>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -577,6 +618,11 @@ selection-background-color: lightblue;
                </item>
                <item>
                 <widget class="QPushButton" name="drillLoadB">
+                 <property name="toolTip">
+                  <string>Loads the drill points defined in a drill file.
+Any existing points are deleted and replaced
+by the contents of the drill file.</string>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -606,15 +652,32 @@ selection-background-color: lightblue;
                 <property name="text">
                  <string>X</string>
                 </property>
+                <property name="toolTip">
+                 <string>X Coordinate for the drill point.
+Value is relative to the origin
+defined on the project page.</string>
+                </property>
                </column>
                <column>
                 <property name="text">
                  <string>Y</string>
                 </property>
+                <property name="toolTip">
+                 <string>Y Coordinate for the drill point.
+Value is relative to the origin
+defined on the project page.</string>
+                </property>
                </column>
                <column>
                 <property name="text">
                  <string>Z</string>
+                </property>
+                <property name="toolTip">
+                 <string>Depth for the drill point.
+Value is relative to the origin
+defined on the project page.
+The actual depth will be the
+origin minus the value in this field.</string>
                 </property>
                </column>
               </widget>
@@ -657,7 +720,15 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="registrationDrillDepthE"/>
+                <widget class="QLineEdit" name="registrationDrillDepthE">
+                 <property name="toolTip">
+                  <string>Depth for the drill point.
+Value is relative to the origin
+defined on the project page.
+The actual depth will be the
+origin minus the value in this field.</string>
+                 </property>
+                </widget>
                </item>
                <item>
                 <widget class="QLabel" name="registrationPeckDepthL">
@@ -667,7 +738,17 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="registrationPeckDepthE"/>
+                <widget class="QLineEdit" name="registrationPeckDepthE">
+                 <property name="toolTip">
+                  <string>Defines how far the machine will plunge
+into the material on each peck. For each
+peck, the spindle raises to the Safe Height and then
+drills to the Peck Depth plus the depth
+on the previous peck. The last
+peck drills to the depth defined in the
+&quot;Drill Depth&quot; field.</string>
+                 </property>
+                </widget>
                </item>
                <item>
                 <spacer name="verticalSpacer_3">
@@ -704,6 +785,10 @@ selection-background-color: lightblue;
                  <layout class="QVBoxLayout" name="registrationAxisG">
                   <item>
                    <widget class="QRadioButton" name="registrationXAxisRB">
+                    <property name="toolTip">
+                     <string>If selected, the workpiece will be flipped
+around the x-axis to cut the opposite side.</string>
+                    </property>
                     <property name="text">
                      <string>&amp;X-Axis</string>
                     </property>
@@ -711,6 +796,10 @@ selection-background-color: lightblue;
                   </item>
                   <item>
                    <widget class="QRadioButton" name="registrationYAxisRB">
+                    <property name="toolTip">
+                     <string>If selected, the workpiece will be flipped
+around the y-axis to cut the opposite side.</string>
+                    </property>
                     <property name="text">
                      <string>&amp;Y-Axis</string>
                     </property>
@@ -779,7 +868,11 @@ selection-background-color: lightblue;
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLineEdit" name="registrationFirstXE"/>
+                    <widget class="QLineEdit" name="registrationFirstXE">
+                     <property name="toolTip">
+                      <string>X coordinate (relative to origin) of the first point.</string>
+                     </property>
+                    </widget>
                    </item>
                    <item>
                     <widget class="QLabel" name="registrationFirstYL">
@@ -789,7 +882,11 @@ selection-background-color: lightblue;
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLineEdit" name="registrationFirstYE"/>
+                    <widget class="QLineEdit" name="registrationFirstYE">
+                     <property name="toolTip">
+                      <string>Y coordinate (relative to origin) of the first point.</string>
+                     </property>
+                    </widget>
                    </item>
                   </layout>
                  </widget>
@@ -830,7 +927,11 @@ selection-background-color: lightblue;
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLineEdit" name="registrationSecondXE"/>
+                    <widget class="QLineEdit" name="registrationSecondXE">
+                     <property name="toolTip">
+                      <string>X coordinate (relative to origin) of the second point.</string>
+                     </property>
+                    </widget>
                    </item>
                    <item>
                     <widget class="QLabel" name="registrationSecondYL">
@@ -840,7 +941,11 @@ selection-background-color: lightblue;
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLineEdit" name="registrationSecondYE"/>
+                    <widget class="QLineEdit" name="registrationSecondYE">
+                     <property name="toolTip">
+                      <string>Y coordinate (relative to origin) of the second point.</string>
+                     </property>
+                    </widget>
                    </item>
                   </layout>
                  </widget>
@@ -910,6 +1015,9 @@ selection-background-color: lightblue;
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="toolTip">
+               <string>Select the pattern for this facing operation.</string>
+              </property>
               <item>
                <property name="text">
                 <string>None Selected...</string>
@@ -961,6 +1069,13 @@ selection-background-color: lightblue;
             </item>
             <item row="1" column="1">
              <widget class="QComboBox" name="faceCutAreaCB">
+              <property name="toolTip">
+               <string>Select the object that will define
+the area to be faced. The horizontal slice
+at the value in the &quot;Depth&quot; field
+from the object selected defines
+the shape of the facing operation.</string>
+              </property>
               <item>
                <property name="text">
                 <string>None Selected...</string>
@@ -983,6 +1098,10 @@ selection-background-color: lightblue;
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="toolTip">
+               <string>Depth below the origin to where
+the facing operation will cut.</string>
+              </property>
              </widget>
             </item>
             <item row="4" column="0">
@@ -993,7 +1112,12 @@ selection-background-color: lightblue;
              </widget>
             </item>
             <item row="4" column="1">
-             <widget class="QLineEdit" name="faceStepOverE"/>
+             <widget class="QLineEdit" name="faceStepOverE">
+              <property name="toolTip">
+               <string>The distance that the spindle will step
+horizontally as it clears the cutting area. </string>
+              </property>
+             </widget>
             </item>
             <item row="5" column="0">
              <widget class="QLabel" name="faceStepDownL">
@@ -1003,7 +1127,13 @@ selection-background-color: lightblue;
              </widget>
             </item>
             <item row="5" column="1">
-             <widget class="QLineEdit" name="faceStepDownE"/>
+             <widget class="QLineEdit" name="faceStepDownE">
+              <property name="toolTip">
+               <string>The distance that the spindle will
+step down. The final step down will
+be at the value defined in &quot;Depth&quot;.</string>
+              </property>
+             </widget>
             </item>
             <item row="2" column="0">
              <widget class="QLabel" name="faceStartHeightL">
@@ -1013,7 +1143,12 @@ selection-background-color: lightblue;
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="QLineEdit" name="faceStartHeightE"/>
+             <widget class="QLineEdit" name="faceStartHeightE">
+              <property name="toolTip">
+               <string>Height above the origin where
+the facing operation will begin.</string>
+              </property>
+             </widget>
             </item>
             <item row="6" column="0">
              <widget class="QLabel" name="faceMillingMethodL">
@@ -1033,6 +1168,11 @@ selection-background-color: lightblue;
               <layout class="QHBoxLayout" name="horizontalLayout_13">
                <item>
                 <widget class="QRadioButton" name="faceConventionalRB">
+                 <property name="toolTip">
+                  <string>Conventional means that the front cutting edge
+of the bit turns away from the edge being
+cut.</string>
+                 </property>
                  <property name="text">
                   <string>Co&amp;nventional</string>
                  </property>
@@ -1040,6 +1180,11 @@ selection-background-color: lightblue;
                </item>
                <item>
                 <widget class="QRadioButton" name="faceClimbRB">
+                 <property name="toolTip">
+                  <string>Climb means that the front cutting edge
+of the bit turns into the edge being
+cut.</string>
+                 </property>
                  <property name="text">
                   <string>C&amp;limb</string>
                  </property>
@@ -1047,6 +1192,9 @@ selection-background-color: lightblue;
                </item>
                <item>
                 <widget class="QRadioButton" name="faceEitherRB">
+                 <property name="toolTip">
+                  <string>The milling method is chosen by the system.</string>
+                 </property>
                  <property name="text">
                   <string>Ei&amp;ther</string>
                  </property>
@@ -1194,14 +1342,19 @@ selection-background-color: lightblue;
          <item row="6" column="1">
           <widget class="QLineEdit" name="perimeterWidthOfCutE">
            <property name="toolTip">
-            <string>The width of the perimeter cut. This width cannot be less that the width of the selected tool.</string>
+            <string>The width of the perimeter cut. This width 
+cannot be less that the width of the selectedtool.
+Defining the width to be greater than
+the width of the tool allows for
+ chip removal on deep cuts.</string>
            </property>
           </widget>
          </item>
          <item row="7" column="1">
           <widget class="QLineEdit" name="perimeterStepOverE">
            <property name="toolTip">
-            <string>The distance to step over for each pass when the width of cut is greater than the width of the tool</string>
+            <string>The distance to step over for each pass when
+the width of cut is greater than the width of the tool</string>
            </property>
           </widget>
          </item>
@@ -1239,7 +1392,7 @@ selection-background-color: lightblue;
             <item>
              <widget class="QRadioButton" name="perimeterConventionalRB">
               <property name="toolTip">
-               <string>Cutting edge turns in to material behind the tool</string>
+               <string>Cutting front edge turns away from the material.</string>
               </property>
               <property name="text">
                <string>Co&amp;nventional</string>
@@ -1249,7 +1402,7 @@ selection-background-color: lightblue;
             <item>
              <widget class="QRadioButton" name="perimeterClimbRB">
               <property name="toolTip">
-               <string>Cutting edge of the tool cuts into the material ahead of the tool.</string>
+               <string>Cutting front edge of the tool cuts into the material.</string>
               </property>
               <property name="text">
                <string>C&amp;limb</string>
@@ -1279,7 +1432,9 @@ selection-background-color: lightblue;
          <item row="8" column="1">
           <widget class="QLineEdit" name="perimeterOffsetE">
            <property name="toolTip">
-            <string>The distance that the edge of the cut will be from the perimeter. A value of zero means that the center of the bit will be on the perimeter.</string>
+            <string>The distance that the edge of the cut
+will be from the perimeter. A value of zero
+means that the center of the bit will be on the perimeter.</string>
            </property>
           </widget>
          </item>
@@ -1298,10 +1453,23 @@ selection-background-color: lightblue;
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QLineEdit" name="perimeterDepthE"/>
+          <widget class="QLineEdit" name="perimeterDepthE">
+           <property name="toolTip">
+            <string>Defines the depth at which the horizontal
+slice will be taken to define the perimeter
+to be cut.</string>
+           </property>
+          </widget>
          </item>
          <item row="1" column="1">
           <widget class="QComboBox" name="perimeterObjectToCutCB">
+           <property name="toolTip">
+            <string>Select the object that will define
+the perimeter. The horizontal slice
+at the value in the &quot;Depth of Perimeter&quot; field
+from the object selected defines
+the shape of the perimeter.</string>
+           </property>
            <item>
             <property name="text">
              <string>None Selected...</string>
@@ -1310,7 +1478,12 @@ selection-background-color: lightblue;
           </widget>
          </item>
          <item row="4" column="1">
-          <widget class="QLineEdit" name="perimeterStartHeightE"/>
+          <widget class="QLineEdit" name="perimeterStartHeightE">
+           <property name="toolTip">
+            <string>Height above the origin where
+the perimeter cutting operation will begin.</string>
+           </property>
+          </widget>
          </item>
          <item row="4" column="0">
           <widget class="QLabel" name="perimeterStartHeightL">
@@ -1327,7 +1500,13 @@ selection-background-color: lightblue;
           </widget>
          </item>
          <item row="12" column="1">
-          <widget class="QLineEdit" name="perimeterErrorE"/>
+          <widget class="QLineEdit" name="perimeterErrorE">
+           <property name="toolTip">
+            <string>The distance that bit can deviate from the exact path.
+Higher values greatly reduce the size of the
+resulting GCode file and reduce cutting time.</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -1440,6 +1619,15 @@ selection-background-color: lightblue;
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="toolTip">
+      <string notr="true">&quot;Cancel&quot; ignores the changes and exits the
+ tool change dialog.
+&quot;OK&quot; saves the changes and exits the
+tool change dialog. The &quot;OK&quot; button
+is only active if all other
+fields ae valid. Invalid fields
+are displayed with a red background. </string>
+     </property>
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>

@@ -512,6 +512,9 @@ selection-background-color: lightblue;
              </disabled>
             </palette>
            </property>
+           <property name="toolTip">
+            <string>Provide a descriptive name for this cutting job.</string>
+           </property>
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -553,6 +556,9 @@ selection-background-color: lightblue;
          </item>
          <item>
           <widget class="QComboBox" name="toolTableCB">
+           <property name="toolTip">
+            <string>Select the tool table to be used for this cutting job.</string>
+           </property>
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -602,6 +608,11 @@ selection-background-color: lightblue;
          </item>
          <item>
           <widget class="QComboBox" name="workpieceCB">
+           <property name="toolTip">
+            <string>Select the workpiece that will be used for this job.
+The workpiece can be any defined
+object in the FreeCAD project.</string>
+           </property>
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -775,6 +786,15 @@ selection-background-color: lightblue;
                       <height>0</height>
                      </size>
                     </property>
+                    <property name="toolTip">
+                     <string>Select the position on the workpiece
+for the x-axis origin. &quot;Left&quot; means the left end
+of the workpiece bounding box,
+&quot;Right&quot; means the right edge,
+&quot;Middle&quot; means half way between the left
+and right. &quot;Custom&quot; lets you define the
+distance from the left edge.</string>
+                    </property>
                     <property name="styleSheet">
                      <string notr="true"/>
                     </property>
@@ -821,6 +841,12 @@ selection-background-color: lightblue;
                       <width>100</width>
                       <height>0</height>
                      </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Displays the actual postion relative to the
+left edge of the workpiece bounding box.
+This value is set automatically if &quot;Left&quot;, &quot;Right&quot;, or &quot;Middle&quot; is selceted.
+If &quot;Custom&quot; is selected, the field can be set by the user.</string>
                     </property>
                     <property name="styleSheet">
                      <string notr="true"/>
@@ -905,6 +931,15 @@ selection-background-color: lightblue;
                       <height>0</height>
                      </size>
                     </property>
+                    <property name="toolTip">
+                     <string>Select the position on the workpiece
+for the y-axis origin. &quot;Front&quot; means the front edge
+of the workpiece bounding box,
+&quot;Back&quot; means the back edge,
+&quot;Middle&quot; means half way between the front
+and back. &quot;Custom&quot; lets you define the
+distance from the front edge.</string>
+                    </property>
                     <property name="styleSheet">
                      <string notr="true"/>
                     </property>
@@ -945,6 +980,12 @@ selection-background-color: lightblue;
                       <width>100</width>
                       <height>0</height>
                      </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Displays the actual postion relative to the
+front edge of the workpiece bounding box.
+This value is set automatically if &quot;Front&quot;, &quot;Back&quot;, or &quot;Middle&quot; is selceted.
+If &quot;Custom&quot; is selected, the field can be set by the user.</string>
                     </property>
                     <property name="styleSheet">
                      <string notr="true"/>
@@ -1029,6 +1070,15 @@ selection-background-color: lightblue;
                       <height>0</height>
                      </size>
                     </property>
+                    <property name="toolTip">
+                     <string>Select the position on the workpiece
+for the z-axis origin. &quot;Top&quot; means the top edge
+of the workpiece bounding box,
+&quot;Bottom&quot; means the bottom edge,
+&quot;Middle&quot; means half way between the top
+and bottom. &quot;Custom&quot; lets you define the
+distance from the bottom edge.</string>
+                    </property>
                     <property name="styleSheet">
                      <string notr="true"/>
                     </property>
@@ -1069,6 +1119,12 @@ selection-background-color: lightblue;
                       <width>100</width>
                       <height>0</height>
                      </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Displays the actual postion relative to the
+bottom edge of the workpiece bounding box.
+This value is set automatically if &quot;Top&quot;, &quot;Bottom&quot;, or &quot;Middle&quot; is selceted.
+If &quot;Custom&quot; is selected, the field can be set by the user.</string>
                     </property>
                     <property name="styleSheet">
                      <string notr="true"/>
@@ -1147,6 +1203,9 @@ selection-background-color: lightblue;
            <property name="enabled">
             <bool>true</bool>
            </property>
+           <property name="toolTip">
+            <string>Add a new cut to this GCode Job.</string>
+           </property>
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -1170,6 +1229,9 @@ selection-background-color: lightblue;
          </item>
          <item>
           <widget class="QPushButton" name="deleteB">
+           <property name="toolTip">
+            <string>Delete the selected cut from this GCode Job</string>
+           </property>
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -1184,6 +1246,9 @@ selection-background-color: lightblue;
          </item>
          <item>
           <widget class="QPushButton" name="editB">
+           <property name="toolTip">
+            <string>Edit the selected cut.</string>
+           </property>
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -1198,6 +1263,11 @@ selection-background-color: lightblue;
          </item>
          <item>
           <widget class="QPushButton" name="upB">
+           <property name="toolTip">
+            <string>Move the selected cut ahead by one position.
+The cuts will be executed in the order that they are listed
+in the cut table</string>
+           </property>
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -1212,6 +1282,11 @@ selection-background-color: lightblue;
          </item>
          <item>
           <widget class="QPushButton" name="downB">
+           <property name="toolTip">
+            <string>Move the selected cut back by one position.
+The cuts will be executed in the order that they are listed
+in the cut table</string>
+           </property>
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -1226,6 +1301,11 @@ selection-background-color: lightblue;
          </item>
          <item>
           <widget class="QPushButton" name="skipB">
+           <property name="toolTip">
+            <string>Toggle whether the selected cut will be executed
+ when this GCode job is executed. Cuts that are
+toggled off will be &quot;dimmed&quot; in the cut table.</string>
+           </property>
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -1300,6 +1380,10 @@ selection-background-color: lightblue;
       </item>
       <item>
        <widget class="QRadioButton" name="metricRB">
+        <property name="toolTip">
+         <string>The GCode output will be produced in metric units.
+(mm, mm/minute, revolutions per minute(RPM))</string>
+        </property>
         <property name="text">
          <string>&amp;Metric</string>
         </property>
@@ -1307,6 +1391,10 @@ selection-background-color: lightblue;
       </item>
       <item>
        <widget class="QRadioButton" name="imperialRB">
+        <property name="toolTip">
+         <string>The GCode output will be produced in Imperial units.
+(inches, inches/minute, revolutions per minute(RPM))</string>
+        </property>
         <property name="text">
          <string>&amp;Imperial</string>
         </property>
@@ -1351,6 +1439,9 @@ selection-background-color: lightblue;
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="toolTip">
+         <string>Click here to specify the pathname for the resulting GCode file.</string>
+        </property>
         <property name="styleSheet">
          <string notr="true"/>
         </property>
@@ -1365,6 +1456,13 @@ selection-background-color: lightblue;
       </item>
       <item>
        <widget class="QPushButton" name="runB">
+        <property name="toolTip">
+         <string>Causes the GCode program to be executed.
+This button is only active if all fields are valid
+and any changes have been &quot;Applied&quot;.
+If everything seems right, and the button is &quot;dimmed&quot;,
+try clicking &quot;Apply&quot;. </string>
+        </property>
         <property name="styleSheet">
          <string notr="true"/>
         </property>
@@ -1379,6 +1477,9 @@ selection-background-color: lightblue;
       </item>
       <item>
        <widget class="QPushButton" name="pauseB">
+        <property name="toolTip">
+         <string>Pause button is not yet implemented.</string>
+        </property>
         <property name="styleSheet">
          <string notr="true"/>
         </property>
@@ -1393,6 +1494,9 @@ selection-background-color: lightblue;
       </item>
       <item>
        <widget class="QPushButton" name="stopB">
+        <property name="toolTip">
+         <string>Stop button is not yet implemented.</string>
+        </property>
         <property name="styleSheet">
          <string notr="true"/>
         </property>
@@ -1435,6 +1539,10 @@ selection-background-color: lightblue;
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="toolTip">
+         <string>Displays the pathname for the file
+where the resulting GCode will be saved.</string>
+        </property>
         <property name="styleSheet">
          <string notr="true"/>
         </property>
@@ -1453,6 +1561,10 @@ selection-background-color: lightblue;
     <layout class="QFormLayout" name="formLayout">
      <item row="0" column="0">
       <widget class="QLabel" name="label_3">
+       <property name="toolTip">
+        <string>Displays the name of the cut that is currently
+being processed.</string>
+       </property>
        <property name="styleSheet">
         <string notr="true"/>
        </property>
@@ -1463,6 +1575,10 @@ selection-background-color: lightblue;
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_10">
+       <property name="toolTip">
+        <string>Displays the number of lines of GCode that have
+been written to the output file.</string>
+       </property>
        <property name="styleSheet">
         <string notr="true"/>
        </property>
@@ -1483,6 +1599,10 @@ selection-background-color: lightblue;
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_12">
+       <property name="toolTip">
+        <string>Describes the action currently being taken
+during GCode generation.</string>
+       </property>
        <property name="styleSheet">
         <string notr="true"/>
        </property>
@@ -1522,6 +1642,11 @@ selection-background-color: lightblue;
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="toolTip">
+      <string>&quot;Apply&quot; saves changes but does not close the dialog.
+&quot;Cancel&quot; discards changes and closes the dialog.
+&quot;OK&quot; saves the changes and closes the GCode job dialog.</string>
+     </property>
      <property name="styleSheet">
       <string notr="true"/>
      </property>

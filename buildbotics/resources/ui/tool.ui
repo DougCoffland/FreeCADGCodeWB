@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>861</width>
+    <width>709</width>
     <height>750</height>
    </rect>
   </property>
@@ -189,6 +189,9 @@ selection-background-color: lightblue;
          </item>
          <item>
           <widget class="QComboBox" name="toolTypeCB">
+           <property name="toolTip">
+            <string>Select the type of tool to be defined.</string>
+           </property>
            <item>
             <property name="text">
              <string>None Selected...</string>
@@ -247,7 +250,14 @@ selection-background-color: lightblue;
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="numberEdit"/>
+          <widget class="QLineEdit" name="numberEdit">
+           <property name="toolTip">
+            <string>Assign a number to this tool.
+Only positive integers can be entered.
+The tool number must be unique within the
+tool table.</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -275,7 +285,11 @@ selection-background-color: lightblue;
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="nameEdit"/>
+          <widget class="QLineEdit" name="nameEdit">
+           <property name="toolTip">
+            <string>Provide a descriptive name for this tool.</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -316,7 +330,7 @@ selection-background-color: lightblue;
             </sizepolicy>
            </property>
            <property name="currentIndex">
-            <number>2</number>
+            <number>5</number>
            </property>
            <widget class="QWidget" name="blankPage">
             <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -353,7 +367,11 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="0" column="1">
-                <widget class="QLineEdit" name="straightDiameterEdit"/>
+                <widget class="QLineEdit" name="straightDiameterEdit">
+                 <property name="toolTip">
+                  <string>Enter the diameter of the straight tool.</string>
+                 </property>
+                </widget>
                </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="straightCutLenL">
@@ -366,7 +384,11 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="1" column="1">
-                <widget class="QLineEdit" name="straightCutLengthEdit"/>
+                <widget class="QLineEdit" name="straightCutLengthEdit">
+                 <property name="toolTip">
+                  <string>Enter the length of the cutting edge of the straight tool.</string>
+                 </property>
+                </widget>
                </item>
                <item row="2" column="0">
                 <widget class="QLabel" name="straightToolLenL">
@@ -379,7 +401,11 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QLineEdit" name="straightToolLengthEdit"/>
+                <widget class="QLineEdit" name="straightToolLengthEdit">
+                 <property name="toolTip">
+                  <string>Enter the overall length of the tool.</string>
+                 </property>
+                </widget>
                </item>
                <item row="3" column="0">
                 <widget class="QLabel" name="staightShaftDiameterL">
@@ -392,7 +418,11 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QLineEdit" name="straightShaftDiameterEdit"/>
+                <widget class="QLineEdit" name="straightShaftDiameterEdit">
+                 <property name="toolTip">
+                  <string>Enter the diameter of the tool shaft.</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -416,7 +446,12 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="0" column="1">
-                <widget class="QLineEdit" name="taperedTopDiameterEdit"/>
+                <widget class="QLineEdit" name="taperedTopDiameterEdit">
+                 <property name="toolTip">
+                  <string>Enter the diameter at the top of the tapered
+part of the tapered tool.</string>
+                 </property>
+                </widget>
                </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="taperedBottomDiameterL">
@@ -426,7 +461,12 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="1" column="1">
-                <widget class="QLineEdit" name="taperedBottomDiameterEdit"/>
+                <widget class="QLineEdit" name="taperedBottomDiameterEdit">
+                 <property name="toolTip">
+                  <string>Enter the diameter at the bottom of the tapered
+part of the tapered tool.</string>
+                 </property>
+                </widget>
                </item>
                <item row="2" column="0">
                 <widget class="QLabel" name="taperedCutLengthL">
@@ -436,7 +476,13 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QLineEdit" name="taperedCutLengthEdit"/>
+                <widget class="QLineEdit" name="taperedCutLengthEdit">
+                 <property name="toolTip">
+                  <string>Enter the distance from the top
+of the tapered portion of the tool
+to the bottom.</string>
+                 </property>
+                </widget>
                </item>
                <item row="3" column="0">
                 <widget class="QLabel" name="taperedToolLengthL">
@@ -446,7 +492,11 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QLineEdit" name="taperedToolLengthEdit"/>
+                <widget class="QLineEdit" name="taperedToolLengthEdit">
+                 <property name="toolTip">
+                  <string>Enter the overall tool length.</string>
+                 </property>
+                </widget>
                </item>
                <item row="4" column="0">
                 <widget class="QLabel" name="taperedShaftDiameterL">
@@ -456,7 +506,11 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="4" column="1">
-                <widget class="QLineEdit" name="taperedShaftDiameterEdit"/>
+                <widget class="QLineEdit" name="taperedShaftDiameterEdit">
+                 <property name="toolTip">
+                  <string>Enter the diameter of the tapered tool shaft.</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -480,7 +534,12 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="0" column="1">
-                <widget class="QLineEdit" name="conicalTopDiameterEdit"/>
+                <widget class="QLineEdit" name="conicalTopDiameterEdit">
+                 <property name="toolTip">
+                  <string>Enter the diameter of the top of the
+cutting part of the conical tool.</string>
+                 </property>
+                </widget>
                </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="conicalCutAngleL">
@@ -490,7 +549,12 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="1" column="1">
-                <widget class="QLineEdit" name="conicalCutAngleEdit"/>
+                <widget class="QLineEdit" name="conicalCutAngleEdit">
+                 <property name="toolTip">
+                  <string>Enterthe angle of the tip of the
+conical tool.</string>
+                 </property>
+                </widget>
                </item>
                <item row="2" column="0">
                 <widget class="QLabel" name="conicalToolLengthL">
@@ -500,7 +564,11 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QLineEdit" name="conicalToolLengthEdit"/>
+                <widget class="QLineEdit" name="conicalToolLengthEdit">
+                 <property name="toolTip">
+                  <string>Enter the overall length of the conical tool.</string>
+                 </property>
+                </widget>
                </item>
                <item row="3" column="0">
                 <widget class="QLabel" name="conicalShaftDiameterL">
@@ -510,7 +578,11 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QLineEdit" name="conicalShaftDiameterEdit"/>
+                <widget class="QLineEdit" name="conicalShaftDiameterEdit">
+                 <property name="toolTip">
+                  <string>Enter the diameter of the cutting tool shaft.</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -527,7 +599,12 @@ selection-background-color: lightblue;
                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                </property>
                <item row="0" column="1">
-                <widget class="QLineEdit" name="ballDiameterEdit"/>
+                <widget class="QLineEdit" name="ballDiameterEdit">
+                 <property name="toolTip">
+                  <string>Enter the diameter of the ball tool
+cutting area.</string>
+                 </property>
+                </widget>
                </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="ballToolLengthL">
@@ -537,7 +614,11 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="1" column="1">
-                <widget class="QLineEdit" name="ballToolLengthEdit"/>
+                <widget class="QLineEdit" name="ballToolLengthEdit">
+                 <property name="toolTip">
+                  <string>Enterthe overall tool length.</string>
+                 </property>
+                </widget>
                </item>
                <item row="0" column="0">
                 <widget class="QLabel" name="ballDiameterL">
@@ -554,7 +635,11 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QLineEdit" name="ballShaftDiameterEdit"/>
+                <widget class="QLineEdit" name="ballShaftDiameterEdit">
+                 <property name="toolTip">
+                  <string>Enterthe diameter of the ball tool shaft.</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -578,7 +663,12 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="0" column="1">
-                <widget class="QLineEdit" name="taperedBallTopDiameterEdit"/>
+                <widget class="QLineEdit" name="taperedBallTopDiameterEdit">
+                 <property name="toolTip">
+                  <string>Enter the diameter at the top of the
+cutting area for the tapered ball tool.</string>
+                 </property>
+                </widget>
                </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="taperedBallBallDiameterL">
@@ -588,7 +678,12 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="1" column="1">
-                <widget class="QLineEdit" name="taperedBallDiameterEdit"/>
+                <widget class="QLineEdit" name="taperedBallDiameterEdit">
+                 <property name="toolTip">
+                  <string>Enter the diameter of the rounded tip
+of the tapered ball tool.</string>
+                 </property>
+                </widget>
                </item>
                <item row="2" column="0">
                 <widget class="QLabel" name="taperedBallCutLengthL">
@@ -598,7 +693,12 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QLineEdit" name="taperedBallCutLengthEdit"/>
+                <widget class="QLineEdit" name="taperedBallCutLengthEdit">
+                 <property name="toolTip">
+                  <string>Enter the distance from the top to the bottom
+of the cutting area for the tapered ball tool.</string>
+                 </property>
+                </widget>
                </item>
                <item row="3" column="0">
                 <widget class="QLabel" name="taperedBallToolLengthL">
@@ -608,7 +708,11 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QLineEdit" name="taperedBallToolLengthEdit"/>
+                <widget class="QLineEdit" name="taperedBallToolLengthEdit">
+                 <property name="toolTip">
+                  <string>Enter the overall length of the tapered ball tool.</string>
+                 </property>
+                </widget>
                </item>
                <item row="4" column="0">
                 <widget class="QLabel" name="taperedBallShaftDiameterL">
@@ -618,7 +722,11 @@ selection-background-color: lightblue;
                 </widget>
                </item>
                <item row="4" column="1">
-                <widget class="QLineEdit" name="taperedBallShaftDiameterEdit"/>
+                <widget class="QLineEdit" name="taperedBallShaftDiameterEdit">
+                 <property name="toolTip">
+                  <string>Enter the diameter of the shaft of the tapered ball tool.</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -700,7 +808,11 @@ selection-background-color: lightblue;
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QLineEdit" name="makeEdit"/>
+         <widget class="QLineEdit" name="makeEdit">
+          <property name="toolTip">
+           <string>Enter the name of the tool vendor.</string>
+          </property>
+         </widget>
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_32">
@@ -713,7 +825,11 @@ selection-background-color: lightblue;
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QLineEdit" name="modelEdit"/>
+         <widget class="QLineEdit" name="modelEdit">
+          <property name="toolTip">
+           <string>Enter the model of the tool.</string>
+          </property>
+         </widget>
         </item>
         <item row="4" column="0">
          <widget class="QLabel" name="stepOverL">
@@ -726,7 +842,12 @@ selection-background-color: lightblue;
          </widget>
         </item>
         <item row="4" column="1">
-         <widget class="QLineEdit" name="stepOverEdit"/>
+         <widget class="QLineEdit" name="stepOverEdit">
+          <property name="toolTip">
+           <string>Enter the recommended maximum
+step over distance for this tool.</string>
+          </property>
+         </widget>
         </item>
         <item row="3" column="0">
          <widget class="QLabel" name="docL">
@@ -739,7 +860,12 @@ selection-background-color: lightblue;
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QLineEdit" name="depthOfCutEdit"/>
+         <widget class="QLineEdit" name="depthOfCutEdit">
+          <property name="toolTip">
+           <string>Enter the recommended
+maximum cutting depth for this tool.</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -759,7 +885,12 @@ selection-background-color: lightblue;
          </widget>
         </item>
         <item row="4" column="1">
-         <widget class="QLineEdit" name="plungeRateEdit"/>
+         <widget class="QLineEdit" name="plungeRateEdit">
+          <property name="toolTip">
+           <string>Enter the recommended plunge rate
+for this tool and this material.</string>
+          </property>
+         </widget>
         </item>
         <item row="5" column="0">
          <widget class="QLabel" name="spindleSpeedLabel">
@@ -772,7 +903,12 @@ selection-background-color: lightblue;
          </widget>
         </item>
         <item row="5" column="1">
-         <widget class="QLineEdit" name="spindleSpeedEdit"/>
+         <widget class="QLineEdit" name="spindleSpeedEdit">
+          <property name="toolTip">
+           <string>Enter the recommended spindle speed
+for this tool and this mateial.</string>
+          </property>
+         </widget>
         </item>
         <item row="3" column="0">
          <widget class="QLabel" name="feedRateL">
@@ -785,7 +921,12 @@ selection-background-color: lightblue;
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QLineEdit" name="feedRateEdit"/>
+         <widget class="QLineEdit" name="feedRateEdit">
+          <property name="toolTip">
+           <string>Enter the recommended feed rate for
+this tool and this material.</string>
+          </property>
+         </widget>
         </item>
         <item row="2" column="0">
          <widget class="QLabel" name="label_33">
@@ -798,7 +939,12 @@ selection-background-color: lightblue;
          </widget>
         </item>
         <item row="2" column="1">
-         <widget class="QLineEdit" name="materialEdit"/>
+         <widget class="QLineEdit" name="materialEdit">
+          <property name="toolTip">
+           <string>Enter the stock material for which
+these ratings are defined.</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -823,6 +969,10 @@ selection-background-color: lightblue;
       </item>
       <item>
        <widget class="QDialogButtonBox" name="buttonBox">
+        <property name="toolTip">
+         <string>&quot;Cancel&quot; discards all changes and closes the dialog.
+&quot;Save&quot; saves the changes and closes the dialog.</string>
+        </property>
         <property name="standardButtons">
          <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
         </property>
