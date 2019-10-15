@@ -137,6 +137,15 @@ class CutGui():
                 'MenuText': "New Cut",
                 'ToolTip' : "Sets up a new cut that can be added to a g-code job"}
 	
+	def setUnits(self):
+		ui = self.createCutUi
+		if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units").GetInt("UserSchema") in [0, 1, 4, 6]:
+			self.units = 'mm'
+			ui.unitsLabel.setText("Default units are mm, mm/min, and rpm")
+		else:
+			ui.unitsLabel.setText("Default units are in, in/min, and rpm")
+			self.units = 'in'
+	
 	def addDrillPoint(self):
 		tw = self.createCutUi.drillTW
 		row = tw.rowCount()
@@ -669,6 +678,7 @@ class CutGui():
 			ui.perimeterErrorE.setText(VAL.fromSystemValue('length',obj.MaximumError))
 		
 	def Activated(self):
+		self.setUnits
 		ui = self.createCutUi
 		self.reset()
 		if hasattr(FreeCAD.ActiveDocument,"Objects"):

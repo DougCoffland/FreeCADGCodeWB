@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>682</width>
-    <height>688</height>
+    <height>718</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1618,19 +1618,38 @@ resulting GCode file and reduce cutting time.</string>
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="toolTip">
-      <string notr="true">&quot;Cancel&quot; ignores the changes and exits the
+    <widget class="QFrame" name="frame_24">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_16">
+      <item>
+       <widget class="QLabel" name="unitsLabel">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDialogButtonBox" name="buttonBox">
+        <property name="toolTip">
+         <string notr="true">&quot;Cancel&quot; ignores the changes and exits the
  tool change dialog.
 &quot;OK&quot; saves the changes and exits the
 tool change dialog. The &quot;OK&quot; button
 is only active if all other
 fields ae valid. Invalid fields
 are displayed with a red background. </string>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
+        </property>
+        <property name="standardButtons">
+         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

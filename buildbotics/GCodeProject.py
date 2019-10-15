@@ -220,6 +220,15 @@ class GCodeProject():
                 'MenuText': "New GCode Project",
                 'ToolTip' : "Sets up a new project for creating G-Code paths from FreeCAD Shapes"}
 
+	def setUnits(self):
+		ui = self.defineJobUi
+		if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units").GetInt("UserSchema") in [0, 1, 4, 6]:
+			self.units = 'mm'
+			ui.unitsLabel.setText("Default units are mm, mm/min, and rpm")
+		else:
+			ui.unitsLabel.setText("Default units are in, in/min, and rpm")
+			self.units = 'in'
+		
 	def reset(self):
 		ui = self.defineJobUi
 		ui.nameLE.setText("")
@@ -576,6 +585,7 @@ class GCodeProject():
 		return p
 
 	def Activated(self):
+		self.setUnits()
 		ui = self.defineJobUi
 		self.reset()
 		ui.toolTableCB.clear()

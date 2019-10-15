@@ -1631,28 +1631,49 @@ during GCode generation.</string>
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="label_9">
-     <property name="styleSheet">
-      <string notr="true"/>
+    <widget class="QFrame" name="frame_20">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
      </property>
-     <property name="text">
-      <string>...</string>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="toolTip">
-      <string>&quot;Apply&quot; saves changes but does not close the dialog.
+     <layout class="QHBoxLayout" name="horizontalLayout_12">
+      <item>
+       <widget class="QLabel" name="unitsLabel">
+        <property name="font">
+         <font>
+          <family>MathJax_SansSerif</family>
+          <pointsize>16</pointsize>
+          <weight>9</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDialogButtonBox" name="buttonBox">
+        <property name="toolTip">
+         <string>&quot;Apply&quot; saves changes but does not close the dialog.
 &quot;Cancel&quot; discards changes and closes the dialog.
 &quot;OK&quot; saves the changes and closes the GCode job dialog.</string>
-     </property>
-     <property name="styleSheet">
-      <string notr="true"/>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="standardButtons">
+         <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>
