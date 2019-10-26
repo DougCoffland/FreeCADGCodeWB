@@ -157,6 +157,7 @@ class PerimeterCut(Cut):
 		
 		self.updateActionLabel("Getting Boundaries for " + obj.CutName)
 		polys = self.getBoundaries(obj.ObjectToCut, self.parent.ZOriginValue.Value - obj.Depth.Value)
+		polys = self.moveOrigin2D(polys)
 		polyList =[]
 		offset = 0
 		self.updateActionLabel("Getting offset polygons for " + obj.CutName)
