@@ -138,6 +138,7 @@ class PerimeterCut(Cut):
 		self.fp = fp
 		self.ui = ui
 		self.outputUnits = outputUnits
+		self.error = obj.MaximumError.Value
 		out = self.writeGCodeLine
 		self.updateActionLabel("Running " + obj.CutName)
 		self.safeHeight = obj.SafeHeight.Value
@@ -177,7 +178,7 @@ class PerimeterCut(Cut):
 					self.rapid(poly[0][0],poly[0][1])
 					self.cut(z=currentDepth)
 					area = self.areaOfPoly(poly)
-					reducedPoly = self.smoothePoly(poly,obj.MaximumError)
+					reducedPoly = self.smoothePoly(poly)
 					if obj.MillingMethod == "Climb": self.cutPolyInsideClimb(reducedPoly)
 					else: self.cutPolyInsideConventional(reducedPoly)
 					currentList.remove(poly)
@@ -186,7 +187,7 @@ class PerimeterCut(Cut):
 						length = self.lengthOfPoly(poly)
 						lengthTimesWidth = length * obj.StepOver.Value
 						if self.areaOfPoly(poly) - lengthTimesWidth > area: break
-						reducedPoly = self.smoothePoly(poly,obj.MaximumError)
+						reducedPoly = self.smoothePoly(poly)
 						if obj.MillingMethod == "Climb": self.cutPolyInsideClimb(reducedPoly)
 						else: self.cutPolyInsideConventional(reducedPoly)
 						area = self.areaOfPoly(poly)
@@ -200,7 +201,7 @@ class PerimeterCut(Cut):
 					length = self.lengthOfPoly(poly)
 					lengthTimesWidth = length * obj.StepOver.Value
 					
-					reducedPoly = self.smoothePoly(poly,obj.MaximumError)
+					reducedPoly = self.smoothePoly(poly)
 					
 					if obj.MillingMethod == "Climb": self.cutPolyOutsideClimb(reducedPoly)
 					else: self.cutPolyOutsideConventional(reducedPoly)
@@ -208,7 +209,7 @@ class PerimeterCut(Cut):
 					poly = self.nextPoly(poly[0][0],poly[0][1],currentList,self.bitWidth)
 					while poly != None:
 						if area - lengthTimesWidth > self.areaOfPoly(poly): break
-						reducedPoly = self.smoothePoly(poly,obj.MaximumError)
+						reducedPoly = self.smoothePoly(poly)
 						if obj.MillingMethod == "Climb": self.cutPolyOutsideClimb(reducedPoly)
 						else: self.cutPolyOutsideConventional(reducedPoly)
 						area = self.areaOfPoly(poly)

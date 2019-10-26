@@ -69,6 +69,7 @@ class Cut():
 		self.currentCut = None
 		self.ui = None
 		self.cuttingDirection = None
+		self.error = 0.25
 		
 	def getObject(self):
 		return self.obj
@@ -83,33 +84,6 @@ class Cut():
 		
 	def run(self):
 		print "overide run program in derived cut type"
-		
-	"""
-	def cut(self,x=None,y=None,z=None):
-		obj = self.obj
-		line = 'G1'
-		if x != None: line = line + 'X' + str(round(self.toOutputUnits(x - self.xOff,'length'),4))
-		if y != None: line = line + 'Y' + str(round(self.toOutputUnits(y - self.yOff,'length'),4))
-		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z - self.zOff,'length'),4))
-		if x != None or y != None:
-			if self.cuttingDirection != "cutting":
-				feedString = 'F' + str(self.toOutputUnits(obj.FeedRate,'velocity'))
-				self.cuttingDirection = "cutting"
-			else: feedString = ""
-		else:
-			if self.cuttingDirection != "plunging":
-				feedString = 'F' + str(self.toOutputUnits(obj.PlungeRate,'velocity'))
-				self.cuttingDirection = "plunging"
-			else: feedString = ""
-		self.writeGCodeLine(line + ' ' + feedString)
-
-	def rapid(self,x=None,y=None,z=None):
-		line = 'G0'
-		if x != None: line = line + 'X' + str(round(self.toOutputUnits(x - self.xOff,'length'),4))
-		if y != None: line = line + 'Y' + str(round(self.toOutputUnits(y - self.yOff,'length'),4))
-		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z - self.zOff,'length'),4))
-		self.writeGCodeLine(line)
-	"""
 
 	def cut(self,x=None,y=None,z=None):
 		obj = self.obj
@@ -417,7 +391,8 @@ class Cut():
 		if A==0 and B==0 and C==0: return 0
 		return abs(A * p[0] + B * p[1] + C)/math.sqrt(A*A + B*B)
 		
-	def smoothePoly(self,poly,error):
+	def smoothePoly(self,poly):
+		error = self.error / 3
 		i = 0
 		reducedPoly = [poly[0]]
 		while i < len(poly) - 1:
@@ -440,15 +415,15 @@ class Cut():
 				point[1] = point[1] - yOff
 		return polys
 							
-	def getBoundaries(self, shapeName, height, error = .25):
+	def getBoundaries(self, shapeName, height):
 		fc = FreeCAD.ActiveDocument
 		mesh = fc.addObject("Mesh::Feature","Mesh")
 		part = fc.getObjectsByLabel(shapeName)[0]
-		mesh.Mesh = MeshPart.meshFromShape(Shape = part.Shape, MaxLength = 6.35)		
+		mesh.Mesh = MeshPart.meshFromShape(Shape = part.Shape, LinearDeflection = self.error/3,AngularDeflection = math.pi / 6, Relative = False)		
 		s = self.getLabel(part.Name + '_mesh_')
 		newshape = fc.addObject("Part::Feature",s)
 		shape = Part.Shape()
-		shape.makeShapeFromMesh(mesh.Mesh.Topology,error)
+		shape.makeShapeFromMesh(mesh.Mesh.Topology,self.error/3)
 		wires = list()
 		for i in shape.slice(Base.Vector(0,0,1),height):
 			wires.append(i)
