@@ -480,7 +480,8 @@ class ToolGui():
 		return False
 
 	def IsActive(self):
-		if getGUIMode() in ["EditingToolFromGUI", "AddingToolFromGUI"]:
+		mode = getGUIMode()
+		if mode in ["EditingToolFromGUI", "AddingToolFromGUI"]:
 			return True
 		mw = FreeCADGui.getMainWindow()
 		tree = mw.findChildren(QtGui.QTreeWidget)[0]

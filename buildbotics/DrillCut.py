@@ -127,6 +127,7 @@ class DrillCut(Cut):
 		
 	def run(self, ui, obj, outputUnits,fp):
 		self.obj = obj
+		self.parent = obj.getParentGroup()
 		self.fp = fp
 		self.ui = ui
 		out = self.writeGCodeLine
@@ -136,7 +137,6 @@ class DrillCut(Cut):
 		rapid = self.rapid
 		out("(Starting " + obj.CutName + ')')
 		self.setUserUnits()
-		self.setOffset(0,0,0)
 
 		rapid(z=obj.ZToolChangeLocation.Value)
 		rapid(obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)

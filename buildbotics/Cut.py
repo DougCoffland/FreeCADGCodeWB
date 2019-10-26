@@ -84,12 +84,13 @@ class Cut():
 	def run(self):
 		print "overide run program in derived cut type"
 		
+	"""
 	def cut(self,x=None,y=None,z=None):
 		obj = self.obj
 		line = 'G1'
 		if x != None: line = line + 'X' + str(round(self.toOutputUnits(x - self.xOff,'length'),4))
 		if y != None: line = line + 'Y' + str(round(self.toOutputUnits(y - self.yOff,'length'),4))
-		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z + self.zOff,'length'),4))
+		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z - self.zOff,'length'),4))
 		if x != None or y != None:
 			if self.cuttingDirection != "cutting":
 				feedString = 'F' + str(self.toOutputUnits(obj.FeedRate,'velocity'))
@@ -106,7 +107,33 @@ class Cut():
 		line = 'G0'
 		if x != None: line = line + 'X' + str(round(self.toOutputUnits(x - self.xOff,'length'),4))
 		if y != None: line = line + 'Y' + str(round(self.toOutputUnits(y - self.yOff,'length'),4))
-		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z + self.zOff,'length'),4))
+		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z - self.zOff,'length'),4))
+		self.writeGCodeLine(line)
+	"""
+
+	def cut(self,x=None,y=None,z=None):
+		obj = self.obj
+		line = 'G1'
+		if x != None: line = line + 'X' + str(round(self.toOutputUnits(x,'length'),4))
+		if y != None: line = line + 'Y' + str(round(self.toOutputUnits(y,'length'),4))
+		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z,'length'),4))
+		if x != None or y != None:
+			if self.cuttingDirection != "cutting":
+				feedString = 'F' + str(self.toOutputUnits(obj.FeedRate,'velocity'))
+				self.cuttingDirection = "cutting"
+			else: feedString = ""
+		else:
+			if self.cuttingDirection != "plunging":
+				feedString = 'F' + str(self.toOutputUnits(obj.PlungeRate,'velocity'))
+				self.cuttingDirection = "plunging"
+			else: feedString = ""
+		self.writeGCodeLine(line + ' ' + feedString)
+
+	def rapid(self,x=None,y=None,z=None):
+		line = 'G0'
+		if x != None: line = line + 'X' + str(round(self.toOutputUnits(x,'length'),4))
+		if y != None: line = line + 'Y' + str(round(self.toOutputUnits(y,'length'),4))
+		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z,'length'),4))
 		self.writeGCodeLine(line)
 		
 	def setProperties(self,p,obj):
@@ -401,9 +428,19 @@ class Cut():
 				if i < len(poly) - 1: continue
 				else: break
 			reducedPoly.append(poly[i])
-		return reducedPoly		
+		return reducedPoly
+		
+	def moveOrigin2D(self,polys):
+		xOff = self.parent.XOriginValue.Value
+		yOff = self.parent.YOriginValue.Value
+		zOff = self.parent.ZOriginValue.Value
+		for poly in polys:
+			for point in poly:
+				point[0] = point[0] - xOff
+				point[1] = point[1] - yOff
+		return polys
 							
-	def getBoundaries(self, shapeName, origin, height, error = .25):
+	def getBoundaries(self, shapeName, height, error = .25):
 		fc = FreeCAD.ActiveDocument
 		mesh = fc.addObject("Mesh::Feature","Mesh")
 		part = fc.getObjectsByLabel(shapeName)[0]
@@ -413,7 +450,7 @@ class Cut():
 		shape = Part.Shape()
 		shape.makeShapeFromMesh(mesh.Mesh.Topology,error)
 		wires = list()
-		for i in shape.slice(Base.Vector(0,0,1),8):
+		for i in shape.slice(Base.Vector(0,0,1),height):
 			wires.append(i)
 		fc.removeObject(mesh.Name)
 		fc.removeObject(newshape.Name)
