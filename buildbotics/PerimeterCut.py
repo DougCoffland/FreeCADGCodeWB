@@ -162,7 +162,7 @@ class PerimeterCut(Cut):
 		polyList =[]
 		offset = 0
 		self.updateActionLabel("Getting offset polygons for " + obj.CutName)
-		while offset < obj.WidthOfCut:
+		while offset < obj.WidthOfCut.Value:
 			offset = offset + obj.StepOver.Value
 			if  offset >= obj.WidthOfCut.Value: offset = obj.WidthOfCut.Value
 			offsetPolys = self.getOffset(polys,offset)

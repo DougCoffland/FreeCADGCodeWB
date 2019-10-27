@@ -125,6 +125,18 @@ class CutGui():
 		ui.perimeterOutsideRB.clicked.connect(self.validateAllFields)
 		ui.perimeterErrorE.textChanged.connect(self.validateAllFields)
 		
+		ui.pocket2DObjectCB.currentIndexChanged.connect(self.validateAllFields)
+		ui.pocket2DPerimeterDepthE.textChanged.connect(self.validateAllFields)
+		ui.pocket2DDepthOfCutE.textChanged.connect(self.validateAllFields)
+		ui.pocket2DStartHeightE.textChanged.connect(self.validateAllFields)
+		ui.pocket2DStepDownE.textChanged.connect(self.validateAllFields)
+		ui.pocket2DStepOverE.textChanged.connect(self.validateAllFields)
+		ui.pocket2DOffsetFromPerimeterE.textChanged.connect(self.validateAllFields)
+		ui.pocket2DMaximumErrorE.textChanged.connect(self.validateAllFields)
+		ui.pocket2DConventionalRB.clicked.connect(self.validateAllFields)
+		ui.pocket2DClimbRB.clicked.connect(self.validateAllFields)
+		ui.pocket2DEitherRB.clicked.connect(self.validateAllFields)
+		
 		ui.buttonBox.accepted.connect(self.accept)
 		ui.buttonBox.rejected.connect(self.reject)
 		
@@ -366,6 +378,23 @@ class CutGui():
 				VAL.setLabel(ui.perimeterMillingMethodL,'INVALID')
 				valid = False
 			valid = VAL.validate(ui.perimeterErrorE, ui.perimeterErrorL, True, valid, VAL.LENGTH)
+		elif cutType == "Pocket2D":
+			if ui.pocket2DObjectCB.currentIndex() == 0:
+				VAL.setLabel(ui.pocket2DObjectL,'INVALID')
+				valid = False
+			else: VAL.setLabel(ui.pocket2DObjectL,'VALID')
+			valid = VAL.validate(ui.pocket2DPerimeterDepthE, ui.pocket2DPerimeterDepthL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.pocket2DDepthOfCutE, ui.pocket2DDepthOfCutL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.pocket2DStartHeightE, ui.pocket2DStartHeightL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.pocket2DStepDownE, ui.pocket2DStepDownL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.pocket2DStepOverE, ui.pocket2DStepOverL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.pocket2DOffsetFromPerimeterE, ui.pocket2DOffsetFromPerimeterL,True,valid,VAL.LENGTH)
+			if ui.pocket2DConventionalRB.isChecked() == True or ui.pocket2DClimbRB.isChecked() == True or ui.pocket2DEitherRB.isChecked() == True:
+				VAL.setLabel(ui.perimeterMillingMethodL,'VALID')
+			else:
+				VAL.setLabel(ui.perimeterMillingMethodL,'INVALID')
+				valid = False			
+			valid = VAL.validate(ui.pocket2DMaximumErrorE, ui.pocket2DMaximumErrorL,True,valid,VAL.LENGTH)
 		ui.buttonBox.buttons()[0].setEnabled(valid)
 		FreeCAD.ActiveDocument.recompute()	
 		return valid
@@ -444,6 +473,19 @@ class CutGui():
 			else: side = "Outside"
 			p.append([S,	"Side",				side])
 			p.append([L,	"MaximumError",		VAL.toSystemValue(ui.perimeterErrorE,'length')])
+		elif cuttype == "Pocket2D":
+			p.append([S,	"ObjectToCut",		ui.pocket2DObjectCB.currentText()])
+			p.append([L,	"PerimeterDepth",	VAL.toSystemValue(ui.pocket2DPerimeterDepthE,'length')])
+			p.append([L,	"DepthOfCut",		VAL.toSystemValue(ui.pocket2DDepthOfCutE,'length')])
+			p.append([L,	"StartHeight",		VAL.toSystemValue(ui.pocket2DStartHeightE,'length')])
+			p.append([L,	"StepDown",			VAL.toSystemValue(ui.pocket2DStepDownE,'length')])
+			p.append([L,	"StepOver",			VAL.toSystemValue(ui.pocket2DStepOverE,'length')])
+			p.append([L,	"OffsetFromPerimeter",	VAL.toSystemValue(ui.pocket2DOffsetFromPerimeterE,'length')])
+			if ui.pocket2DConventionalRB.isChecked() == True: method = "Conventional"
+			elif ui.pocket2DClimbRB.isChecked() == True: method = "Climb"
+			else: method = "Either"
+			p.append([S,	"MillingMethod",	method])
+			p.append([L,	"MaximumError",		VAL.toSystemValue(ui.pocket2DMaximumErrorE,'length')])
 		return p
 	
 	def getCutProperties(self,props):
@@ -516,6 +558,20 @@ class CutGui():
 					if p[2] == "Inside": ui.perimeterInsideRB.setChecked(True)
 					else: ui.perimeterOutsideRB.setChecked(True)
 				if p[1] == "MaximumError":	ui.perimeterErrorE.setText(VAL.fromSystemValue('length',p[2]))
+		elif cutType == "Pocket2D":
+			for p in props:
+				if p[1] == "ObjectToCut":	ui.pocket2DObjectCB.setCurrentIndex(ui.pocket2DObjectCB.findText(p[2]))
+				if p[1] == "PerimeterDepth": ui.pocket2DPerimeterDepthE.setText(VAL.fromSystemValue('length',p[2]))
+				if p[1] == "DepthOfCut":	ui.pocket2DDepthOfCutE.setText(VAL.fromSystemValue('length',p[2]))
+				if p[1] == "StartHeight":	ui.pocket2DStartHeightE.setText(VAL.fromSystemValue('length',p[2]))
+				if p[1] == "StepDown":		ui.pocket2DStepDownE.setText(VAL.fromSystemValue('length',p[2]))
+				if p[1] == "StepOver":		ui.pocket2DStepOverE.setText(VAL.fromSystemValue('length',p[2]))
+				if p[1] == "OffsetFromPerimeter":	ui.pocket2DOffsetFromPerimeterE.setText(VAL.fromSystemValue('length',p[2]))
+				if p[1] == "MillingMethod":
+					if p[2] == "Conventional": ui.pocket2DConventionalRB.setChecked(True)
+					elif p[2] == "Climb":   ui.pocket2DClimbRB.setChecked(True)
+					else: ui.pocket2DEitherRB.setChecked(True)
+				if p[1] == "MaximumError":	ui.pocket2DMaximumErrorE.setText(VAL.fromSystemValue('length',p[2]))
 					
 	def accept(self):
 		ui = self.createCutUi
@@ -533,6 +589,7 @@ class CutGui():
 					elif prop[2] == "Drill": self.cut = DrillCut(self.selectedObject)
 					elif prop[2] == "Facing": self.cut = FaceCut(self.selectedObject)
 					elif prop[2] == "Perimeter": self.cut = PerimeterCut(self.selectedObject)
+					elif prop[2] == "Pocket2D": self.cut = Pocket2DCut(self.selectedObject)
 					else: self.cut = Cut(self.selectedObject)
 			self.cut.getObject().Label = ui.nameLE.text()
 			self.cut.setProperties(p,self.cut.getObject())
@@ -603,7 +660,24 @@ class CutGui():
 		ui.perimeterWidthOfCutE.clear()
 		ui.perimeterStepOverE.clear()
 		ui.perimeterOffsetE.clear()
+		ui.perimeterInsideRB.setChecked(False)
+		ui.perimeterOutsideRB.setChecked(False)
+		ui.perimeterConventionalRB.setChecked(False)
+		ui.perimeterClimbRB.setChecked(False)
+		ui.perimeterEitherRB.setChecked(False)
 		ui.perimeterErrorE.clear()
+		
+		ui.pocket2DObjectCB.setCurrentIndex(0)
+		ui.pocket2DPerimeterDepthE.clear()
+		ui.pocket2DDepthOfCutE.clear()
+		ui.pocket2DStartHeightE.clear()
+		ui.pocket2DStepDownE.clear()
+		ui.pocket2DStepOverE.clear()
+		ui.pocket2DOffsetFromPerimeterE.clear()
+		ui.pocket2DConventionalRB.setChecked(False)
+		ui.pocket2DClimbRB.setChecked(False)
+		ui.pocket2DEitherRB.setChecked(False)
+		ui.pocket2DMaximumErrorE.clear()
 
 	def setMode(self):
 		if self.selectedObject == None: mode = getGUIMode()
@@ -676,6 +750,19 @@ class CutGui():
 			if obj.Side == "Inside": ui.perimeterInsideRB.setChecked(True)
 			else: ui.perimeterOutsideRB.setChecked(True)
 			ui.perimeterErrorE.setText(VAL.fromSystemValue('length',obj.MaximumError))
+		elif obj.CutType == "Pocket2D":
+			ui.pocket2DObjectCB.setCurrentIndex(ui.pocket2DObjectCB.findText(obj.ObjectToCut))
+			ui.pocket2DPerimeterDepthE.setText(VAL.fromSystemValue('length',obj.PerimeterDepth))
+			ui.pocket2DDepthOfCutE.setText(VAL.fromSystemValue('length',obj.DepthOfCut))
+			ui.pocket2DStartHeightE.setText(VAL.fromSystemValue('length',obj.StartHeight))
+			ui.pocket2DStepDownE.setText(VAL.fromSystemValue('length',obj.StepDown))
+			ui.pocket2DStepOverE.setText(VAL.fromSystemValue('length',obj.StepOver))
+			ui.pocket2DPerimeterDepthE.setText(VAL.fromSystemValue('length',obj.PerimeterDepth))
+			ui.pocket2DOffsetFromPerimeterE.setText(VAL.fromSystemValue('length',obj.OffsetFromPerimeter))
+			if obj.MillingMethod == "Conventional": ui.pocket2DConventionalRB.setChecked(True)
+			elif obj.MillingMethod == "Climb": ui.pocket2DClimbRB.setChecked(True)
+			else: ui.pocket2DEitherRB.setChecked(True)
+			ui.pocket2DMaximumErrorE.setText(VAL.fromSystemValue('length',obj.MaximumError))
 		
 	def Activated(self):
 		self.setUnits
@@ -684,10 +771,12 @@ class CutGui():
 		if hasattr(FreeCAD.ActiveDocument,"Objects"):
 			while ui.faceCutAreaCB.count() > 1: ui.faceCutAreaCB.removeItem(1)
 			while ui.perimeterObjectToCutCB.count() > 1: ui.perimeterObjectToCutCB.removeItem(1)
+			while ui.pocket2DObjectCB.count() > 1: ui.pocket2DObjectCB.removeItem(1)
 			for obj in FreeCAD.ActiveDocument.Objects:
 				if hasattr(obj,"Shape"):
 					ui.faceCutAreaCB.addItem(obj.Label)
-					ui.perimeterObjectToCutCB.addItem(obj.Label)		
+					ui.perimeterObjectToCutCB.addItem(obj.Label)
+					ui.pocket2DObjectCB.addItem(obj.Label)		
 		mode = self.setMode()
 		if mode == "AddingCutFromIcon":
 			self.originalCutName = ''
