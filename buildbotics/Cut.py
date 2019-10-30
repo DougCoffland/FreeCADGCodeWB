@@ -330,7 +330,7 @@ class Cut():
 			print 'length = ' + str(self.lengthOfPoly(poly)) + ' mm, area = ' + str(self.areaOfPoly(poly))
 		
 	def cutPolyInsideClimb(self,poly):
-		i = 1
+		i = 0
 		while i < len(poly):
 			self.cut(poly[i][0],poly[i][1])
 			i = i + 1
@@ -348,10 +348,18 @@ class Cut():
 			i = i - 1
 		
 	def cutPolyOutsideConventional(self,poly):
-		i = 1
+		i = 0
 		while i < len(poly):
 			self.cut(poly[i][0],poly[i],[1])
 			i = i + 1
+	
+	def getClipSolutions(self,clip,subj):
+		pc = pyclipper.Pyclipper()
+		pc.AddPath(pyclipper.scale_to_clipper(clip), pyclipper.PT_CLIP, True)
+		pc.AddPaths(pyclipper.scale_to_clipper(subj), pyclipper.PT_SUBJECT, True)
+		solution = pyclipper.scale_from_clipper(pc.Execute(pyclipper.CT_XOR, pyclipper.PFT_EVENODD, pyclipper.PFT_EVENODD))
+		return solution			
+	
 	
 	def getOffset(self, polys, offset):
 		pco = pyclipper.PyclipperOffset()
@@ -398,11 +406,16 @@ class Cut():
 		while i < len(poly) - 1:
 			startPoint = poly[i]
 			A,B,C = self.line(startPoint,poly[i + 1])
+			if error < self.ptl(A,B,C,poly[i+1]):
+				reducedPoly.append(poly[i+1])
+				i = i + 1
+				continue
 			while error > self.ptl(A,B,C,poly[i+1]):
 				i = i + 1
 				if i < len(poly) - 1: continue
 				else: break
 			reducedPoly.append(poly[i])
+		if reducedPoly[0] != reducedPoly[len(reducedPoly) - 1]: reducedPoly.append(poly[0])
 		return reducedPoly
 		
 	def moveOrigin2D(self,polys):
@@ -411,8 +424,7 @@ class Cut():
 		zOff = self.parent.ZOriginValue.Value
 		for poly in polys:
 			for point in poly:
-				point[0] = point[0] - xOff
-				point[1] = point[1] - yOff
+				point = (point[0] - xOff,point[1] - yOff)
 		return polys
 							
 	def getBoundaries(self, shapeName, height):

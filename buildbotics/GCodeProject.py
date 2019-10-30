@@ -31,6 +31,7 @@ from DrillCut import DrillCut
 from FaceCut import FaceCut
 from PerimeterCut import PerimeterCut
 from Pocket2DCut import Pocket2DCut
+from Volume2DCut import Volume2DCut
 import os
 import validator as VAL
 
@@ -583,7 +584,7 @@ class GCodeProject():
 		if hasattr(cut,	"ObjectToCut"): p.append([S,		"ObjectToCut",	cut.ObjectToCut])
 		if hasattr(cut, "MaximumError"): p.append([L,		"MaximumError", cut.MaximumError])
 		if hasattr(cut, "PerimeterDepth"): p.append([L,		"PerimeterDepth", cut.PerimeterDepth])
-		if hasattr(cut, "OffsetFromPerimeter"): p.append([L,"OffsetFromPerimeter", cut.MaximumError])
+		if hasattr(cut, "OffsetFromPerimeter"): p.append([L,"OffsetFromPerimeter", cut.OffsetFromPerimeter])
 		
 		return p
 
@@ -689,6 +690,7 @@ class GCodeProject():
 					elif prop[2] == "Facing": cut = FaceCut(obj)
 					elif prop[2] == "Perimeter": cut = PerimeterCut(obj)
 					elif prop[2] == "Pocket2D": cut = Pocket2DCut(obj)
+					elif prop[2] == "Volume2D": cut = Volume2DCut(obj)
 					else: cut = Cut(obj)
 			cut.getObject().Label = ui.nameLE.text()
 			cut.setProperties(line,cut.getObject())
