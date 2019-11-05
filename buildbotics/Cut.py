@@ -59,7 +59,7 @@ class ViewCut:
 	def getIcon(self):
 		return ""
 					
-class Cut():
+class Cut:
 	def __init__(self,selectedObject):
 		obj = FreeCAD.ActiveDocument.addObject('App::FeaturePython', "Cut")
 		obj.Proxy = self
@@ -265,7 +265,7 @@ class Cut():
 				y = int(round(point[1] * sf))
 				scaledPoly.append((x,y))
 			scaledPolys.append(scaledPoly)
-			return scaledPolys
+		return scaledPolys
 			
 	def scaleFromClipper(self,polys,sf):
 		scaledPolys = []
@@ -358,19 +358,18 @@ class Cut():
 		pc.AddPath(pyclipper.scale_to_clipper(clip), pyclipper.PT_CLIP, True)
 		pc.AddPaths(pyclipper.scale_to_clipper(subj), pyclipper.PT_SUBJECT, True)
 		solution = pyclipper.scale_from_clipper(pc.Execute(pyclipper.CT_XOR, pyclipper.PFT_EVENODD, pyclipper.PFT_EVENODD))
-		return solution			
-	
-	
+		return solution
+
 	def getOffset(self, polys, offset):
 		pco = pyclipper.PyclipperOffset()
 		for poly in polys:
-			bigPoly = self.scalePolyToClipper(poly,1000000.0)
+			bigPoly = self.scalePolyToClipper(poly,100000.0)
 			pco.AddPath(bigPoly, pyclipper.JT_ROUND, pyclipper.ET_CLOSEDPOLYGON)
-		offsetPolys = self.scaleFromClipper(pco.Execute(offset * 1000000),1/1000000.)
+		offsetPolys = self.scaleFromClipper(pco.Execute(offset * 100000),1/100000.)
 		for poly in offsetPolys:
 			poly.append(poly[0])
 		return offsetPolys
-		
+
 	def getSegDir(self,seg):
 		x1 = seg[0][0]
 		x2 = seg[1][0]
@@ -444,6 +443,49 @@ class Cut():
 		del mesh, part
 		polys = self.wiresToPolys(wires)
 		return polys
+		
+	def intersectWorkpiece(self, shapeName):
+		fc = FreeCAD.ActiveDocument
+		fc.addObject("Part::MultiCommon",'Common')
+		workpiece = fc.getObjectsByLabel(self.parent.WorkPiece)[0]
+		objectToCut = fc.getObjectsByLabel(shapeName)[0]
+		fc.Common.Shapes = [workpiece,objectToCut]
+		fc.recompute()
+		return fc.Common
+		
+	def makeMeshedShape(self,shapeName):
+		fc = FreeCAD.ActiveDocument
+		mesh = fc.addObject("Mesh::Feature","Mesh")
+		part = fc.getObjectsByLabel(shapeName)[0]
+		mesh.Mesh = MeshPart.meshFromShape(Shape = part.Shape,LinearDeflection = self.error/3,AngularDeflection = math.pi / 6, Relative = False)		
+		s = self.getLabel(part.Name + '_mesh_')
+		fc.addObject("Part::Feature",s)
+		shape = Part.Shape()
+		shape.makeShapeFromMesh(mesh.Mesh.Topology,self.error/3)
+		fc.getObject(s).Shape = shape
+		fc.removeObject(mesh.Name)
+		del mesh, part, shape
+		return fc.getObject(s)
+		
+	def getSlice(self,shapeName,level):
+		fc = FreeCAD.ActiveDocument
+		shape = fc.getObjectsByLabel(shapeName)[0].Shape
+		wires = list()
+		for wire in shape.slice(FreeCAD.Base.Vector(0,0,1),level):
+			wires.append(wire)
+		return wires
+		"""
+		z = shape.BoundBox.ZMax
+		polysList = []
+		i = 0
+		while z <= shape.BoundBox.ZMin:
+			i += 1
+			self.updateActionLabel('getting slice ' + str(i) + ' of ' + str(round(shape.BoundBox.ZLength / self.obj.StepDown.Value)))
+			for j in shape.slice(FreeCAD.Base.Vector(0,0,1),z):
+				wires.append(j)
+			z = z - self.obj.StepDown.Value
+		return wires
+		"""
 	
 	def __getstate__(self):
 		state = {}
