@@ -33,6 +33,7 @@ from PerimeterCut import PerimeterCut
 from Pocket2DCut import Pocket2DCut
 from Volume2DCut import Volume2DCut
 from Pocket3DCut import Pocket3DCut
+from Volume3DCut import Volume3DCut
 import os
 import validator as VAL
 
@@ -546,7 +547,7 @@ class GCodeProject():
 		p = []
 		S = "App::PropertyString"
 		I = "App::PropertyInteger"
-		L = "App::PropertyLength"
+		L = "App::PropertyDistance"
 		A = "App::PropertyAngle"
 		V = "App::PropertySpeed"
 		Q = "App::PropertyQuantity"
@@ -671,15 +672,15 @@ class GCodeProject():
 		obj.WorkPiece = ui.workpieceCB.currentText()
 		if hasattr(obj, 'XOrigin') == False: obj.addProperty("App::PropertyString","XOrigin")
 		obj.XOrigin = ui.xaxisCB.currentText()
-		if hasattr(obj, 'XOriginValue') == False: obj.addProperty("App::PropertyLength","XOriginValue")
+		if hasattr(obj, 'XOriginValue') == False: obj.addProperty("App::PropertyDistance","XOriginValue")
 		obj.XOriginValue = VAL.toSystemValue(ui.xaxisLE,'length')
 		if hasattr(obj, 'YOrigin') == False: obj.addProperty("App::PropertyString","YOrigin")
 		obj.YOrigin = ui.yaxisCB.currentText()
-		if hasattr(obj, 'YOriginValue') == False: obj.addProperty("App::PropertyLength","YOriginValue")
+		if hasattr(obj, 'YOriginValue') == False: obj.addProperty("App::PropertyDistance","YOriginValue")
 		obj.YOriginValue = VAL.toSystemValue(ui.yaxisLE, 'length')
 		if hasattr(obj, 'ZOrigin') == False: obj.addProperty("App::PropertyString","ZOrigin")
 		obj.ZOrigin = ui.zaxisCB.currentText()
-		if hasattr(obj, 'ZOriginValue') == False: obj.addProperty("App::PropertyLength","ZOriginValue")
+		if hasattr(obj, 'ZOriginValue') == False: obj.addProperty("App::PropertyDistance","ZOriginValue")
 		obj.ZOriginValue = VAL.toSystemValue(ui.zaxisLE,'length')
 		for cut in obj.Group:
 			FreeCAD.ActiveDocument.removeObject(cut.Name)
@@ -693,6 +694,7 @@ class GCodeProject():
 					elif prop[2] == "Pocket2D": cut = Pocket2DCut(obj)
 					elif prop[2] == "Volume2D": cut = Volume2DCut(obj)
 					elif prop[2] == "Pocket3D": cut = Pocket3DCut(obj)
+					elif prop[2] == "Volume3D": cut = Volume3DCut(obj)
 					else: cut = Cut(obj)
 			cut.getObject().Label = ui.nameLE.text()
 			cut.setProperties(line,cut.getObject())

@@ -434,7 +434,7 @@ the project page.</string>
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>7</number>
+      <number>8</number>
      </property>
      <widget class="QWidget" name="page">
       <widget class="QLabel" name="label_6">
@@ -2122,19 +2122,193 @@ resulting GCode file and reduce cutting time.</string>
       </layout>
      </widget>
      <widget class="QWidget" name="page_8">
-      <widget class="QLabel" name="label_23">
-       <property name="geometry">
-        <rect>
-         <x>160</x>
-         <y>170</y>
-         <width>67</width>
-         <height>19</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Volume3D</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_24">
+       <item>
+        <layout class="QFormLayout" name="formLayout_7">
+         <item row="0" column="0">
+          <widget class="QLabel" name="volume3DObjectToCutL">
+           <property name="text">
+            <string>Protruding Object</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="volume3DObjectToCutCB">
+           <property name="toolTip">
+            <string>Select the object that defines the
+perimeter(s) of the objects(s)
+to be left uncut.</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>None Selected...</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="volume3DStartHeightL">
+           <property name="text">
+            <string>Start Height</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="volume3DStartHeightE">
+           <property name="toolTip">
+            <string>Specifies the height relative to the Z-axis
+origin were cutting starts.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="volume3DStepDownL">
+           <property name="text">
+            <string>Step Down</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="volume3DStepDownE">
+           <property name="toolTip">
+            <string>Enter the distance to step down
+with each pass.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="volume3DStepOverL">
+           <property name="text">
+            <string>Step Over</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="volume3DStepOverE">
+           <property name="toolTip">
+            <string>Enter the distance to step over
+with each pass.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="volume3DOffsetFromPerimeterL">
+           <property name="text">
+            <string>Offset from Perimeter</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="volume3DOffsetFromPerimeterE">
+           <property name="toolTip">
+            <string>The distance that the edge of the cut
+will be from the perimeter.
+A value of zero means that
+the center of the bit will be
+on the perimeter.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="volume3DMillingMethodL">
+           <property name="text">
+            <string>Milling Method</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QFrame" name="frame_28">
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_23">
+            <item>
+             <widget class="QRadioButton" name="volume3DConventionalRB">
+              <property name="toolTip">
+               <string>Cutting front edge turns away from the material.</string>
+              </property>
+              <property name="text">
+               <string>Co&amp;nventional</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="volume3DClimbRB">
+              <property name="toolTip">
+               <string>Cutting front edge turns towards the material.</string>
+              </property>
+              <property name="text">
+               <string>C&amp;limb</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="volume3DEitherRB">
+              <property name="toolTip">
+               <string>System chooses the milling method.</string>
+              </property>
+              <property name="text">
+               <string>E&amp;ither</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="volume3DMaximumErrorL">
+           <property name="text">
+            <string>Maximum Error</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QLineEdit" name="volume3DMaximumErrorE">
+           <property name="toolTip">
+            <string>The distance that bit can deviate from the exact path.
+Higher values greatly reduce the size of the
+resulting GCode file and reduce cutting time.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="volume3DCutAreaL">
+           <property name="text">
+            <string>Cut Area</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="volume3DCutAreaCB">
+           <property name="toolTip">
+            <string>Select the shape that will define the area to be cut.</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>None Selected...</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_9">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>163</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="page_9">
       <widget class="QLabel" name="label_24">

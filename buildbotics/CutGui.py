@@ -35,6 +35,7 @@ from PerimeterCut import PerimeterCut
 from Pocket2DCut import Pocket2DCut
 from Volume2DCut import Volume2DCut
 from Pocket3DCut import Pocket3DCut
+from Volume3DCut import Volume3DCut
 import validator as VAL
 
 GUI_STATUS = 'hidden'
@@ -162,6 +163,17 @@ class CutGui():
 		ui.pocket3DConventionalRB.clicked.connect(self.validateAllFields)
 		ui.pocket3DClimbRB.clicked.connect(self.validateAllFields)
 		ui.pocket3DEitherRB.clicked.connect(self.validateAllFields)
+		
+		ui.volume3DObjectToCutCB.currentIndexChanged.connect(self.validateAllFields)
+		ui.volume3DCutAreaCB.currentIndexChanged.connect(self.validateAllFields)
+		ui.volume3DStartHeightE.textChanged.connect(self.validateAllFields)
+		ui.volume3DStepDownE.textChanged.connect(self.validateAllFields)
+		ui.volume3DStepOverE.textChanged.connect(self.validateAllFields)
+		ui.volume3DOffsetFromPerimeterE.textChanged.connect(self.validateAllFields)
+		ui.volume3DMaximumErrorE.textChanged.connect(self.validateAllFields)
+		ui.volume3DConventionalRB.clicked.connect(self.validateAllFields)
+		ui.volume3DClimbRB.clicked.connect(self.validateAllFields)
+		ui.volume3DEitherRB.clicked.connect(self.validateAllFields)
 		
 		ui.buttonBox.accepted.connect(self.accept)
 		ui.buttonBox.rejected.connect(self.reject)
@@ -457,6 +469,25 @@ class CutGui():
 				VAL.setLabel(ui.pocket3DMillingMethodL,'INVALID')
 				valid = False			
 			valid = VAL.validate(ui.pocket3DMaximumErrorE, ui.pocket3DMaximumErrorL,True,valid,VAL.LENGTH)
+		elif cutType == "Volume3D":
+			if ui.volume3DObjectToCutCB.currentIndex() == 0:
+				VAL.setLabel(ui.volume3DObjectToCutL,'INVALID')
+				valid = False
+			else: VAL.setLabel(ui.volume3DObjectToCutL,'VALID')
+			if ui.volume3DCutAreaCB.currentIndex() == 0:
+				VAL.setLabel(ui.volume3DCutAreaL,'INVALID')
+				valid = False
+			else: VAL.setLabel(ui.volume3DCutAreaL,'VALID')
+			valid = VAL.validate(ui.volume3DStartHeightE, ui.volume3DStartHeightL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.volume3DStepDownE, ui.volume3DStepDownL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.volume3DStepOverE, ui.volume3DStepOverL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.volume3DOffsetFromPerimeterE, ui.volume3DOffsetFromPerimeterL,True,valid,VAL.LENGTH)
+			if ui.volume3DConventionalRB.isChecked() == True or ui.volume3DClimbRB.isChecked() == True or ui.volume3DEitherRB.isChecked() == True:
+				VAL.setLabel(ui.volume3DMillingMethodL,'VALID')
+			else:
+				VAL.setLabel(ui.volume3DMillingMethodL,'INVALID')
+				valid = False			
+			valid = VAL.validate(ui.volume3DMaximumErrorE, ui.volume3DMaximumErrorL,True,valid,VAL.LENGTH)
 		ui.buttonBox.buttons()[0].setEnabled(valid)
 		FreeCAD.ActiveDocument.recompute()	
 		return valid
@@ -467,7 +498,7 @@ class CutGui():
 		else: units = 25.4
 		S = "App::PropertyString"
 		I = "App::PropertyInteger"
-		L = "App::PropertyLength"
+		L = "App::PropertyDistance"
 		A = "App::PropertyAngle"
 		V = "App::PropertySpeed"
 		Q = "App::PropertyQuantity"
@@ -573,6 +604,18 @@ class CutGui():
 			else: method = "Either"
 			p.append([S,	"MillingMethod",	method])
 			p.append([L,	"MaximumError",		VAL.toSystemValue(ui.pocket3DMaximumErrorE,'length')])
+		elif cuttype == "Volume3D":
+			p.append([S,	"ObjectToCut",		ui.volume3DObjectToCutCB.currentText()])
+			p.append([S,	"CutArea",			ui.volume3DCutAreaCB.currentText()])
+			p.append([L,	"StartHeight",		VAL.toSystemValue(ui.volume3DStartHeightE,'length')])
+			p.append([L,	"StepDown",			VAL.toSystemValue(ui.volume3DStepDownE,'length')])
+			p.append([L,	"StepOver",			VAL.toSystemValue(ui.volume3DStepOverE,'length')])
+			p.append([L,	"OffsetFromPerimeter",	VAL.toSystemValue(ui.volume3DOffsetFromPerimeterE,'length')])
+			if ui.volume3DConventionalRB.isChecked() == True: method = "Conventional"
+			elif ui.volume3DClimbRB.isChecked() == True: method = "Climb"
+			else: method = "Either"
+			p.append([S,	"MillingMethod",	method])
+			p.append([L,	"MaximumError",		VAL.toSystemValue(ui.volume3DMaximumErrorE,'length')])
 		return p
 	
 	def getCutProperties(self,props):
@@ -686,6 +729,19 @@ class CutGui():
 					elif p[2] == "Climb":   ui.pocket3DClimbRB.setChecked(True)
 					else: ui.pocket3DEitherRB.setChecked(True)
 				if p[1] == "MaximumError":	ui.pocket3DMaximumErrorE.setText(VAL.fromSystemValue('length',p[2]))
+		elif cutType == "Volume3D":
+			for p in props:
+				if p[1] == "ObjectToCut":	ui.volume3DObjectToCutCB.setCurrentIndex(ui.volume3DObjectToCutCB.findText(p[2]))
+				if p[1] == "CutArea":		ui.volume3DCutAreaCB.setCurrentIndex(ui.volume3DCutAreaCB.findText(p[2]))
+				if p[1] == "StartHeight":	ui.volume3DStartHeightE.setText(VAL.fromSystemValue('length',p[2]))
+				if p[1] == "StepDown":		ui.volume3DStepDownE.setText(VAL.fromSystemValue('length',p[2]))
+				if p[1] == "StepOver":		ui.volume3DStepOverE.setText(VAL.fromSystemValue('length',p[2]))
+				if p[1] == "OffsetFromPerimeter":	ui.volume3DOffsetFromPerimeterE.setText(VAL.fromSystemValue('length',p[2]))
+				if p[1] == "MillingMethod":
+					if p[2] == "Conventional": ui.volume3DConventionalRB.setChecked(True)
+					elif p[2] == "Climb":   ui.volume3DClimbRB.setChecked(True)
+					else: ui.volume3DEitherRB.setChecked(True)
+				if p[1] == "MaximumError":	ui.volume3DMaximumErrorE.setText(VAL.fromSystemValue('length',p[2]))
 					
 	def accept(self):
 		ui = self.createCutUi
@@ -706,6 +762,7 @@ class CutGui():
 					elif prop[2] == "Pocket2D": self.cut = Pocket2DCut(self.selectedObject)
 					elif prop[2] == "Volume2D": self.cut = Volume2DCut(self.selectedObject)	
 					elif prop[2] == "Pocket3D": self.cut = Pocket3DCut(self.selectedObject)				
+					elif prop[2] == "Volume3D": self.cut = Volume3DCut(self.selectedObject)				
 					else: self.cut = Cut(self.selectedObject)
 			self.cut.getObject().Label = ui.nameLE.text()
 			self.cut.setProperties(p,self.cut.getObject())
@@ -714,6 +771,7 @@ class CutGui():
 		elif mode == "EditingCutFromIcon":
 			self.cut = self.selectedObject.Proxy
 			self.cut.Label = ui.nameLE.text()
+			print p
 			self.cut.setProperties(p,self.selectedObject)
 			setGUIMode("None")
 			return True
@@ -816,6 +874,17 @@ class CutGui():
 		ui.pocket3DClimbRB.setChecked(False)
 		ui.pocket3DEitherRB.setChecked(False)
 		ui.pocket3DMaximumErrorE.clear()
+
+		ui.volume3DObjectToCutCB.setCurrentIndex(0)
+		ui.volume3DCutAreaCB.setCurrentIndex(0)
+		ui.volume3DStartHeightE.clear()
+		ui.volume3DStepDownE.clear()
+		ui.volume3DStepOverE.clear()
+		ui.volume3DOffsetFromPerimeterE.clear()
+		ui.volume3DConventionalRB.setChecked(False)
+		ui.volume3DClimbRB.setChecked(False)
+		ui.volume3DEitherRB.setChecked(False)
+		ui.volume3DMaximumErrorE.clear()
 
 	def setMode(self):
 		if self.selectedObject == None: mode = getGUIMode()
@@ -925,6 +994,17 @@ class CutGui():
 			elif obj.MillingMethod == "Climb": ui.pocket3DClimbRB.setChecked(True)
 			else: ui.pocket3DEitherRB.setChecked(True)
 			ui.pocket3DMaximumErrorE.setText(VAL.fromSystemValue('length',obj.MaximumError))
+		elif obj.CutType == "Volume3D":
+			ui.volume3DObjectToCutCB.setCurrentIndex(ui.volume3DObjectToCutCB.findText(obj.ObjectToCut))
+			ui.volume3DCutAreaCB.setCurrentIndex(ui.volume3DCutAreaCB.findText(obj.CutArea))
+			ui.volume3DStartHeightE.setText(VAL.fromSystemValue('length',obj.StartHeight))
+			ui.volume3DStepDownE.setText(VAL.fromSystemValue('length',obj.StepDown))
+			ui.volume3DStepOverE.setText(VAL.fromSystemValue('length',obj.StepOver))
+			ui.volume3DOffsetFromPerimeterE.setText(VAL.fromSystemValue('length',obj.OffsetFromPerimeter))
+			if obj.MillingMethod == "Conventional": ui.volume3DConventionalRB.setChecked(True)
+			elif obj.MillingMethod == "Climb": ui.volume3DClimbRB.setChecked(True)
+			else: ui.volume3DEitherRB.setChecked(True)
+			ui.volume3DMaximumErrorE.setText(VAL.fromSystemValue('length',obj.MaximumError))
 		
 	def Activated(self):
 		self.setUnits()
@@ -937,6 +1017,8 @@ class CutGui():
 			while ui.volume2DObjectToCutCB.count() > 1: ui.volume2DObjectToCutCB.removeItem(1)
 			while ui.volume2DCutAreaCB.count() > 1: ui.volume2DCutAreaCB.removeItem(1)
 			while ui.pocket3DObjectToCutCB.count() > 1: ui.pocket3DObjectToCutCB.removeItem(1)
+			while ui.volume3DObjectToCutCB.count() > 1: ui.volume3DObjectToCutCB.removeItem(1)
+			while ui.volume3DCutAreaCB.count() > 1: ui.volume3DCutAreaCB.removeItem(1)
 			for obj in FreeCAD.ActiveDocument.Objects:
 				if hasattr(obj,"Shape"):
 					ui.faceCutAreaCB.addItem(obj.Label)
@@ -945,6 +1027,8 @@ class CutGui():
 					ui.volume2DObjectToCutCB.addItem(obj.Label)
 					ui.volume2DCutAreaCB.addItem(obj.Label)		
 					ui.pocket3DObjectToCutCB.addItem(obj.Label)
+					ui.volume3DObjectToCutCB.addItem(obj.Label)
+					ui.volume3DCutAreaCB.addItem(obj.Label)
 		mode = self.setMode()
 		if mode == "AddingCutFromIcon":
 			self.originalCutName = ''

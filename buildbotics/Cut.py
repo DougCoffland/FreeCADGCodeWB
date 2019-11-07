@@ -225,6 +225,7 @@ class Cut:
 				x = vertex.Point[0]
 				y = vertex.Point[1]
 				poly.append([x,y])
+			poly.append(poly[0])
 
 			lastx,lasty = poly.pop(0)
 			shortPoly = [[lastx,lasty]]
@@ -444,15 +445,6 @@ class Cut:
 		polys = self.wiresToPolys(wires)
 		return polys
 		
-	def intersectWorkpiece(self, shapeName):
-		fc = FreeCAD.ActiveDocument
-		fc.addObject("Part::MultiCommon",'Common')
-		workpiece = fc.getObjectsByLabel(self.parent.WorkPiece)[0]
-		objectToCut = fc.getObjectsByLabel(shapeName)[0]
-		fc.Common.Shapes = [workpiece,objectToCut]
-		fc.recompute()
-		return fc.Common
-		
 	def makeMeshedShape(self,shapeName):
 		fc = FreeCAD.ActiveDocument
 		mesh = fc.addObject("Mesh::Feature","Mesh")
@@ -465,6 +457,7 @@ class Cut:
 		fc.getObject(s).Shape = shape
 		fc.removeObject(mesh.Name)
 		del mesh, part, shape
+		fc.recompute()
 		return fc.getObject(s)
 		
 	def getSlice(self,shapeName,level):
@@ -474,18 +467,37 @@ class Cut:
 		for wire in shape.slice(FreeCAD.Base.Vector(0,0,1),level):
 			wires.append(wire)
 		return wires
-		"""
-		z = shape.BoundBox.ZMax
-		polysList = []
-		i = 0
-		while z <= shape.BoundBox.ZMin:
-			i += 1
-			self.updateActionLabel('getting slice ' + str(i) + ' of ' + str(round(shape.BoundBox.ZLength / self.obj.StepDown.Value)))
-			for j in shape.slice(FreeCAD.Base.Vector(0,0,1),z):
-				wires.append(j)
-			z = z - self.obj.StepDown.Value
-		return wires
-		"""
+		
+	def getUniqueName(self,base):
+		i = 1
+		name = base + str(i)
+		while hasattr(FreeCAD.ActiveDocument,name) == True:
+			i = i + 1
+			name = base + str(i)
+		return name
+		
+	def intersectShapes(self,name1, name2):
+		fc = FreeCAD.ActiveDocument
+		shape1 = fc.getObjectsByLabel(name1)[0]
+		shape2 = fc.getObjectsByLabel(name2)[0]
+		nameOfNewShape = self.getUniqueName("Common")
+		fc.addObject("Part::MultiCommon",nameOfNewShape)
+		newShape = fc.getObjectsByLabel(nameOfNewShape)[0]
+		newShape.Shapes = [shape1,shape2]
+		fc.recompute()
+		return newShape
+		
+	def differenceOfShapes(self,name1,name2):
+		fc = FreeCAD.ActiveDocument
+		base = fc.getObjectsByLabel(name1)[0]
+		cut = fc.getObjectsByLabel(name2)[0]
+		nameOfNewShape = self.getUniqueName("Cut")
+		fc.addObject("Part::Cut",nameOfNewShape)
+		mold = fc.getObjectsByLabel(nameOfNewShape)[0]
+		mold.Base = base
+		mold.Tool = cut
+		fc.recompute()
+		return mold
 	
 	def __getstate__(self):
 		state = {}

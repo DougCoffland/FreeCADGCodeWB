@@ -350,7 +350,7 @@ class Pocket3DCut(Cut):
 		
 		# Get intersection of workpiece and object to cut
 		self.updateActionLabel('making intersection between workpiece and ' + obj.ObjectToCut)
-		intersectingShape = self.intersectWorkpiece(obj.ObjectToCut)
+		intersectingShape = self.intersectShapes(self.parent.WorkPiece,obj.ObjectToCut)
 		
 		# Make a mesh from the object to cut
 		self.updateActionLabel('making meshed shape from ' + intersectingShape.Name)
