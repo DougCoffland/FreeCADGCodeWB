@@ -217,38 +217,6 @@ class Cut:
 		if i == 0: return s
 		return s + str(i)
 		
-	def wiresToPolys(self,wires):
-		polys = []
-		for wire in wires:
-			poly = []
-			for vertex in wire.Vertexes:
-				x = vertex.Point[0]
-				y = vertex.Point[1]
-				poly.append([x,y])
-			poly.append(poly[0])
-
-			lastx,lasty = poly.pop(0)
-			shortPoly = [[lastx,lasty]]
-			while len(poly) > 0:
-				nextx,nexty = poly.pop(0)
-				if nextx == lastx:
-					while nextx == lastx and len(poly) > 0:
-						lasty = nexty
-						nextx,nexty = poly.pop(0)
-					shortPoly.append([lastx, lasty])
-					lastx, lasty = nextx, nexty
-				elif nexty == lasty:
-					while nexty == lasty and len(poly) > 0:
-						lastx = nextx
-						nextx,nexty = poly.pop(0)
-					shortPoly.append([lastx,lasty])
-					lastx,lasty = nextx,nexty
-				else:
-					shortPoly.append([nextx,nexty])
-					lastx,lasty = nextx, nexty
-			polys.append(shortPoly)
-		return polys
-		
 	def scalePolyToClipper(self,poly,sf):
 		scaledPoly = []
 		for point in poly:
@@ -426,47 +394,7 @@ class Cut:
 			for point in poly:
 				point = (point[0] - xOff,point[1] - yOff)
 		return polys
-							
-	def getBoundaries(self, shapeName, height):
-		fc = FreeCAD.ActiveDocument
-		mesh = fc.addObject("Mesh::Feature","Mesh")
-		part = fc.getObjectsByLabel(shapeName)[0]
-		mesh.Mesh = MeshPart.meshFromShape(Shape = part.Shape, LinearDeflection = self.error/3,AngularDeflection = math.pi / 6, Relative = False)		
-		s = self.getLabel(part.Name + '_mesh_')
-		newshape = fc.addObject("Part::Feature",s)
-		shape = Part.Shape()
-		shape.makeShapeFromMesh(mesh.Mesh.Topology,self.error/3)
-		wires = list()
-		for i in shape.slice(Base.Vector(0,0,1),height):
-			wires.append(i)
-		fc.removeObject(mesh.Name)
-		fc.removeObject(newshape.Name)
-		del mesh, part
-		polys = self.wiresToPolys(wires)
-		return polys
-		
-	def makeMeshedShape(self,shapeName):
-		fc = FreeCAD.ActiveDocument
-		mesh = fc.addObject("Mesh::Feature","Mesh")
-		part = fc.getObjectsByLabel(shapeName)[0]
-		mesh.Mesh = MeshPart.meshFromShape(Shape = part.Shape,LinearDeflection = self.error/3,AngularDeflection = math.pi / 6, Relative = False)		
-		s = self.getLabel(part.Name + '_mesh_')
-		fc.addObject("Part::Feature",s)
-		shape = Part.Shape()
-		shape.makeShapeFromMesh(mesh.Mesh.Topology,self.error/3)
-		fc.getObject(s).Shape = shape
-		fc.removeObject(mesh.Name)
-		del mesh, part, shape
-		fc.recompute()
-		return fc.getObject(s)
-		
-	def makeMesh(self,shapeName):
-		fc = FreeCAD.ActiveDocument
-		meshName = self.getUniqueName("mesh")
-		mesh = fc.addObject("Mesh::Feature",meshName)
-		part = fc.getObjectsByLabel(shapeName)[0]
-		mesh.Mesh = MeshPart.meshFromShape(Shape = part.Shape,LinearDeflection = self.error/3,AngularDeflection = math.pi / 6, Relative = False)		
-		return mesh
+
 		
 	def getSlice(self,shapeName,level):
 		fc = FreeCAD.ActiveDocument
@@ -483,17 +411,6 @@ class Cut:
 			i = i + 1
 			name = base + str(i)
 		return name
-		
-	def intersectShapes(self,name1, name2):
-		fc = FreeCAD.ActiveDocument
-		shape1 = fc.getObjectsByLabel(name1)[0]
-		shape2 = fc.getObjectsByLabel(name2)[0]
-		nameOfNewShape = self.getUniqueName("Common")
-		fc.addObject("Part::MultiCommon",nameOfNewShape)
-		newShape = fc.getObjectsByLabel(nameOfNewShape)[0]
-		newShape.Shapes = [shape1,shape2]
-		fc.recompute()
-		return newShape
 		
 	def differenceOfShapes(self,name1,name2):
 		fc = FreeCAD.ActiveDocument
@@ -517,7 +434,9 @@ class Cut:
 		fc = FreeCAD.ActiveDocument
 		obj = fc.getObjectsByLabel(objectToCut)[0]
 		shape = obj.Shape
-		FreeCADGui.ActiveDocument.getObject(obj.Name).Deviation = self.obj.MaximumError.Value
+		if hasattr(obj,"MaximumError") == False: error = .1
+		else: error = self.obj.MaximumError.Value
+		FreeCADGui.ActiveDocument.getObject(obj.Name).Deviation = error
 		wires = list()
 		for i in shape.slice(Base.Vector(0,0,1),height):
 			wires.append(i)
@@ -547,57 +466,6 @@ class Cut:
 				poly.append([v[0],v[1]])
 			polys.append(poly)
 		return polys
-				
-				
-				
-	"""
-	def getPolysAtSlice(self,objectToCut,plane,offset):
-		fc = FreeCAD.ActiveDocument
-		shape = fc.getObjectsByLabel(objectToCut)[0]
-		FreeCADGui.ActiveDocument.getObject(shape.Name).Visibility = False
-		boxName = self.getUniqueName("Box")
-		box = fc.addObject("Part::Box",boxName)
-		#sbb = FreeCADGui.ActiveDocument.getObject(shape.Name).Shape.BoundBox
-		sbb = fc.getObject(shape.Name).Shape.BoundBox
-		box.Placement.Base = (sbb.XMin,sbb.YMin,sbb.ZMin + sbb.ZLength + offset)
-		box.Length = sbb.XLength
-		box.Width = sbb.YLength
-		box.Height = sbb.ZLength
-		cutName = self.getUniqueName('Cut')
-		fc.addObject('Part::Cut',cutName)
-		newCut = fc.getObjectsByLabel(cutName)[0]
-		newCut.Base = shape
-		newCut.Tool = box
-		fc.recompute()
-		wires = []
-		for wire in newCut.Shape.Wires:
-			if wire.BoundBox.ZMin == sbb.ZMax - offset:
-				segList = []
-				for edge in wire.Edges:
-					segList.append(edge.discretize(QuasiDeflection=1))
-				newWire = segList.pop()
-				while len(segList) > 0:
-					for seg in segList:
-						if self.dtp(seg[0],newWire[len(newWire)-1]) < 0.00001:
-							newWire = newWire + seg[1:]
-							segList.remove(seg)
-							break
-						elif self.dtp(seg[len(seg)-1],newWire[len(newWire)-1]) < 0.00001:
-							temp = []
-							i = len(seg) - 2
-							while i>=0:
-								temp.append(seg[i])
-								i = i-1
-							newWire = newWire + temp
-							segList.remove(seg)
-							break
-					
-				wires.append(newWire)
-		for wire in wires:
-			print wire
-
-		return
-	"""
 	
 	def __getstate__(self):
 		state = {}

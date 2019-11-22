@@ -402,6 +402,7 @@ class Volume2DCut(Cut):
 		self.ui = ui
 		self.outputUnits = outputUnits
 		self.error = obj.MaximumError.Value
+		self.cuttingDirection = None
 		out = self.writeGCodeLine
 		self.updateActionLabel("Running " + obj.CutName)
 		self.safeHeight = obj.SafeHeight.Value

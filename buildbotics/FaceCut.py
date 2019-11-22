@@ -589,6 +589,7 @@ class FaceCut(Cut):
 		self.outputUnits = outputUnits
 		out = self.writeGCodeLine
 		self.safeHeight = obj.SafeHeight.Value
+		self.cuttingDirection = None
 		tool = str(obj.ToolNumber)
 		rapid = self.rapid
 		cut = self.cut

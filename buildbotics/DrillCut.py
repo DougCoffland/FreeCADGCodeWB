@@ -133,6 +133,7 @@ class DrillCut(Cut):
 		out = self.writeGCodeLine
 		self.outputUnits = outputUnits
 		safeHeight = obj.SafeHeight.Value
+		self.cuttingDirection = None
 		tool = str(obj.ToolNumber)
 		rapid = self.rapid
 		out("(Starting " + obj.CutName + ')')
