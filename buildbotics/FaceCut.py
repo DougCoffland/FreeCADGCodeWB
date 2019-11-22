@@ -398,7 +398,7 @@ class FaceCut(Cut):
 		if direction == "DIAGONAL": self.updateActionLabel("Getting Boundaries for Zig Zag facing")
 		elif direction == "ALONGX": self.updateActionLabel("Getting Boundaries for Along X facing")
 		else: self.updateActionLabel("Getting Boundaries for Along Y facing")
-		polys = self.getBoundaries(obj.CutArea, self.parent.ZOriginValue.Value - obj.Depth.Value)
+		polys = self.getPolysAtSlice(obj.CutArea,"XY",self.parent.ZOriginValue.Value - obj.Depth.Value)
 		polys = self.moveOrigin2D(polys)
 		if len(polys) == 0: return
 		root2 = math.sqrt(2)
@@ -541,7 +541,7 @@ class FaceCut(Cut):
 	def runCircular(self,obj):
 		offset = -self.bitWidth/2
 		self.updateActionLabel("Getting Boundaries for circular facing")
-		polys = self.getBoundaries(obj.CutArea, self.parent.ZOriginValue.Value - obj.Depth.Value)
+		polys = self.getPolysAtSlice(obj.CutArea,"XY",self.parent.ZOriginValue.Value - obj.Depth.Value)
 		polys = self.moveOrigin2D(polys)
 		self.updateActionLabel("Getting Offsets")
 		offsetPolys = self.getOffset(polys, offset)

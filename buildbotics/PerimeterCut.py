@@ -157,7 +157,7 @@ class PerimeterCut(Cut):
 		out('S' + str(obj.SpindleSpeed).split()[0])
 		
 		self.updateActionLabel("Getting Boundaries for " + obj.CutName)
-		polys = self.getBoundaries(obj.ObjectToCut, self.parent.ZOriginValue.Value - obj.Depth.Value)
+		polys = self.getPolysAtSlice(obj.ObjectToCut,"XY",self.parent.ZOriginValue.Value - obj.Depth.Value)
 		polys = self.moveOrigin2D(polys)
 		polyList =[]
 		offset = 0

@@ -350,20 +350,11 @@ class Pocket3DCut(Cut):
 		
 		# Get intersection of workpiece and object to cut
 		self.updateActionLabel('making intersection between workpiece and ' + obj.ObjectToCut)
-		intersectingShape = self.intersectShapes(self.parent.WorkPiece,obj.ObjectToCut)
-		
-		# Make a mesh from the object to cut
-		self.updateActionLabel('making meshed shape from ' + intersectingShape.Name)
-		meshedShape = self.makeMeshedShape(intersectingShape.Name)
-		fc.removeObject(intersectingShape.Name)
-		
-		# Slice the mesh to make wires
-		self.updateActionLabel('getting boundaries from ' + meshedShape.Name)
-		level = meshedShape.Shape.BoundBox.ZMax
-		while level >= meshedShape.Shape.BoundBox.ZMin:
+		differenceShape = self.differenceOfShapes(self.parent.WorkPiece,obj.ObjectToCut)
+		level = differenceShape.Shape.BoundBox.ZMax
+		while level >= differenceShape.Shape.BoundBox.ZMin:
 			self.updateActionLabel('getting slice a z = ' + str(level - self.parent.ZOriginValue.Value))
-			wires = self.getSlice(meshedShape.Name,level)
-			polys = self.wiresToPolys(wires)
+			polys = self.getPolysAtSlice(differenceShape.Name,"XY",level)
 			polys = self.moveOrigin2D(polys)
 			polyList = []
 			self.updateActionLabel('Getting offset polygons for z = ' + str(level - self.parent.ZOriginValue.Value))
@@ -398,6 +389,7 @@ class Pocket3DCut(Cut):
 					poly = self.nextPoly(poly[0][0],poly[0][1],polyList,self.bitWidth)					
 			self.rapid(z = self.safeHeight)
 			level = level - obj.StepDown.Value
-		fc.removeObject(meshedShape.Name)
+		fc.removeObject(differenceShape.Name)
+		return
 
 			

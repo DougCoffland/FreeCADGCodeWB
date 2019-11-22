@@ -420,8 +420,8 @@ class Volume2DCut(Cut):
 		out('S' + str(obj.SpindleSpeed).split()[0])
 		
 		self.updateActionLabel("Getting Boundaries for " + obj.CutName)
-		polys = self.getBoundaries(obj.ObjectToCut, self.parent.ZOriginValue.Value - obj.PerimeterDepth.Value)
-		cutAreaPolys = self.getBoundaries(obj.CutArea, self.parent.ZOriginValue.Value - obj.PerimeterDepth.Value)
+		polys = self.getPolysAtSlice(obj.ObjectToCut,"XY",self.parent.ZOriginValue.Value - obj.PerimeterDepth.Value)
+		cutAreaPolys = self.getPolysAtSlice(obj.CutArea,"XY",self.parent.ZOriginValue.Value - obj.PerimeterDepth.Value)
 		polys = self.getClipSolutions(cutAreaPolys[0],polys)
 		polys = self.moveOrigin2D(polys)
 		polyList =[]

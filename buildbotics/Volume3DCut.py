@@ -316,20 +316,10 @@ class Volume3DCut(Cut):
 		self.updateActionLabel('making mold by removing ' + obj.ObjectToCut + ' from ' + obj.CutArea)
 		mold = self.differenceOfShapes(obj.CutArea, obj.ObjectToCut)
 		
-		# get meshed mold
-		self.updateActionLabel('making meshed shape from mold')
-		meshedMold = self.makeMeshedShape(mold.Name)
-		fc.removeObject(mold.Name)
-		
-		# Slice the mesh to make wires
-		self.updateActionLabel('getting slices from ' + meshedMold.Name)
-		#level = meshedMold.Shape.BoundBox.ZMax
 		level = obj.StartHeight.Value + self.parent.ZOriginValue.Value
-		while level >= meshedMold.Shape.BoundBox.ZMin:
+		while level >= mold.Shape.BoundBox.ZMin:
 			self.updateActionLabel('getting slice at z = ' + str(level - self.parent.ZOriginValue.Value))
-			wires = self.getSlice(meshedMold.Name,level)
-			polys = self.wiresToPolys(wires)
-			polys = self.moveOrigin2D(polys)
+			polys = self.getPolysAtSlice(mold.Name,"XY",level)
 			polyList = []
 			self.updateActionLabel('Getting offset polygons for z = ' + str(level - self.parent.ZOriginValue.Value))
 			offset = obj.OffsetFromPerimeter.Value
@@ -363,6 +353,6 @@ class Volume3DCut(Cut):
 					poly = self.nextPoly(poly[0][0],poly[0][1],polyList,self.bitWidth)					
 			self.rapid(z = self.safeHeight)
 			level = level - obj.StepDown.Value
-		fc.removeObject(meshedMold.Name)
-
+		fc.removeObject(mold.Name)
+		return
 			

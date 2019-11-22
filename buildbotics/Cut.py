@@ -460,6 +460,14 @@ class Cut:
 		fc.recompute()
 		return fc.getObject(s)
 		
+	def makeMesh(self,shapeName):
+		fc = FreeCAD.ActiveDocument
+		meshName = self.getUniqueName("mesh")
+		mesh = fc.addObject("Mesh::Feature",meshName)
+		part = fc.getObjectsByLabel(shapeName)[0]
+		mesh.Mesh = MeshPart.meshFromShape(Shape = part.Shape,LinearDeflection = self.error/3,AngularDeflection = math.pi / 6, Relative = False)		
+		return mesh
+		
 	def getSlice(self,shapeName,level):
 		fc = FreeCAD.ActiveDocument
 		shape = fc.getObjectsByLabel(shapeName)[0].Shape
@@ -498,6 +506,98 @@ class Cut:
 		mold.Tool = cut
 		fc.recompute()
 		return mold
+		
+	def dtp(self,v1,v2):
+		x = v1[0] - v2[0]
+		y = v1[1] - v2[1]
+		z = v1[2] - v2[2]
+		return math.sqrt(x*x + y*y + z*z)
+	
+	def getPolysAtSlice(self,objectToCut,plane,height):
+		fc = FreeCAD.ActiveDocument
+		obj = fc.getObjectsByLabel(objectToCut)[0]
+		shape = obj.Shape
+		FreeCADGui.ActiveDocument.getObject(obj.Name).Deviation = self.obj.MaximumError.Value
+		wires = list()
+		for i in shape.slice(Base.Vector(0,0,1),height):
+			wires.append(i)
+		polys = []
+		for wire in wires:
+			segList = []
+			for edge in wire.Edges:
+				segList.append(edge.discretize(QuasiDeflection=0.1))
+			newWire = segList.pop()
+			while len(segList) > 0:
+				for seg in segList:
+					if self.dtp(seg[0],newWire[len(newWire)-1]) < 0.00001:
+						newWire = newWire + seg[1:]
+						segList.remove(seg)
+						break
+					elif self.dtp(seg[len(seg)-1],newWire[len(newWire)-1]) < 0.00001:
+						temp = []
+						i = len(seg) - 2
+						while i>=0:
+							temp.append(seg[i])
+							i = i-1
+						newWire = newWire + temp
+						segList.remove(seg)
+						break
+			poly = []
+			for v in newWire:
+				poly.append([v[0],v[1]])
+			polys.append(poly)
+		return polys
+				
+				
+				
+	"""
+	def getPolysAtSlice(self,objectToCut,plane,offset):
+		fc = FreeCAD.ActiveDocument
+		shape = fc.getObjectsByLabel(objectToCut)[0]
+		FreeCADGui.ActiveDocument.getObject(shape.Name).Visibility = False
+		boxName = self.getUniqueName("Box")
+		box = fc.addObject("Part::Box",boxName)
+		#sbb = FreeCADGui.ActiveDocument.getObject(shape.Name).Shape.BoundBox
+		sbb = fc.getObject(shape.Name).Shape.BoundBox
+		box.Placement.Base = (sbb.XMin,sbb.YMin,sbb.ZMin + sbb.ZLength + offset)
+		box.Length = sbb.XLength
+		box.Width = sbb.YLength
+		box.Height = sbb.ZLength
+		cutName = self.getUniqueName('Cut')
+		fc.addObject('Part::Cut',cutName)
+		newCut = fc.getObjectsByLabel(cutName)[0]
+		newCut.Base = shape
+		newCut.Tool = box
+		fc.recompute()
+		wires = []
+		for wire in newCut.Shape.Wires:
+			if wire.BoundBox.ZMin == sbb.ZMax - offset:
+				segList = []
+				for edge in wire.Edges:
+					segList.append(edge.discretize(QuasiDeflection=1))
+				newWire = segList.pop()
+				while len(segList) > 0:
+					for seg in segList:
+						if self.dtp(seg[0],newWire[len(newWire)-1]) < 0.00001:
+							newWire = newWire + seg[1:]
+							segList.remove(seg)
+							break
+						elif self.dtp(seg[len(seg)-1],newWire[len(newWire)-1]) < 0.00001:
+							temp = []
+							i = len(seg) - 2
+							while i>=0:
+								temp.append(seg[i])
+								i = i-1
+							newWire = newWire + temp
+							segList.remove(seg)
+							break
+					
+				wires.append(newWire)
+		for wire in wires:
+			print wire
+
+		return
+	"""
 	
 	def __getstate__(self):
 		state = {}
