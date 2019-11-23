@@ -436,7 +436,7 @@ class Cut:
 		shape = obj.Shape
 		if hasattr(obj,"MaximumError") == False: error = .1
 		else: error = self.obj.MaximumError.Value
-		FreeCADGui.ActiveDocument.getObject(obj.Name).Deviation = error
+		FreeCADGui.ActiveDocument.getObject(obj.Name).Deviation = error / 3.
 		wires = list()
 		for i in shape.slice(Base.Vector(0,0,1),height):
 			wires.append(i)
@@ -444,7 +444,7 @@ class Cut:
 		for wire in wires:
 			segList = []
 			for edge in wire.Edges:
-				segList.append(edge.discretize(QuasiDeflection=0.1))
+				segList.append(edge.discretize(QuasiDeflection=error/3.))
 			newWire = segList.pop()
 			while len(segList) > 0:
 				for seg in segList:
