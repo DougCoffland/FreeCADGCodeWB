@@ -34,6 +34,7 @@ from Pocket2DCut import Pocket2DCut
 from Volume2DCut import Volume2DCut
 from Pocket3DCut import Pocket3DCut
 from Volume3DCut import Volume3DCut
+from Surface3DCut import Surface3DCut
 import os
 import validator as VAL
 
@@ -695,6 +696,7 @@ class GCodeProject():
 					elif prop[2] == "Volume2D": cut = Volume2DCut(obj)
 					elif prop[2] == "Pocket3D": cut = Pocket3DCut(obj)
 					elif prop[2] == "Volume3D": cut = Volume3DCut(obj)
+					elif prop[2] == "Surface3D": cut = Surface3DCut(obj)
 					else: cut = Cut(obj)
 			cut.getObject().Label = ui.nameLE.text()
 			cut.setProperties(line,cut.getObject())

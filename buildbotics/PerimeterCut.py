@@ -161,13 +161,16 @@ class PerimeterCut(Cut):
 		polys = self.getPolysAtSlice(obj.ObjectToCut,"XY",self.parent.ZOriginValue.Value - obj.Depth.Value)
 		polys = self.moveOrigin2D(polys)
 		polyList =[]
-		offset = 0
+		if obj.Side == 'Inside': offset = -obj.Offset.Value
+		else: offset = obj.Offset.Value
 		self.updateActionLabel("Getting offset polygons for " + obj.CutName)
-		while offset < obj.WidthOfCut.Value:
-			offset = offset + obj.StepOver.Value
+		while abs(offset) < obj.WidthOfCut.Value:
 			if  offset >= obj.WidthOfCut.Value: offset = obj.WidthOfCut.Value
-			offsetPolys = self.getOffset(polys,offset)
+			if offset != 0: offsetPolys = self.getOffset(polys,offset)
+			else: offsetPolys = polys[:]
 			for poly in offsetPolys: polyList.append(poly)
+			if obj.Side == 'Inside': offset = offset - obj.StepOver.Value
+			else: offset = offset + obj.StepOver.Value
 		self.updateActionLabel("Generating cuts for " + obj.CutName)
 		currentDepth = obj.StartHeight.Value
 		while currentDepth >= -obj.Depth.Value:

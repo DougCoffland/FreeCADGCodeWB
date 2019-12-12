@@ -36,6 +36,7 @@ from Pocket2DCut import Pocket2DCut
 from Volume2DCut import Volume2DCut
 from Pocket3DCut import Pocket3DCut
 from Volume3DCut import Volume3DCut
+from Surface3DCut import Surface3DCut
 import validator as VAL
 
 GUI_STATUS = 'hidden'
@@ -249,7 +250,8 @@ class CutGui():
 		ui.spindleSpeedL.setText('Spindle Speed')
 		ui.feedRateL.setText('Feed Rate')
 		ui.plungeRateL.setText('Plunge Rate')
-		toolLabel = toolLabel.lstrip('0123456789 ')
+		toolLabel = toolLabel.lstrip('0123456789')
+		toolLabel = toolLabel.lstrip(' ')
 		if toolLabel != "None Selected...":
 			obj = FreeCAD.ActiveDocument.getObjectsByLabel(toolLabel)[0]
 			if hasattr(obj,'SpindleSpeed'): ui.spindleSpeedL.setText('Spindle Speed (' + obj.SpindleSpeed + ')')
@@ -260,9 +262,12 @@ class CutGui():
 		ui = self.createCutUi
 		toolLabel = ui.toolCB.currentText()
 		if toolLabel == "None Selected...": return 0.0
-		toolLabel = toolLabel.lstrip('0123456789 ')
+		toolLabel = toolLabel.lstrip('0123456789')
+		toolLabel = toolLabel.lstrip(' ')
 		obj = FreeCAD.ActiveDocument.getObjectsByLabel(toolLabel)[0]
-		return obj.Diameter.Value		
+		if hasattr(obj,'Diameter'): return obj.Diameter.Value
+		if hasattr(obj, 'BallDiameter'): return obj.BallDiameter.Value
+		return obj.TopDiameter.Value		
 			
 	def saveDrillList(self):
 		filename = QtGui.QFileDialog.getSaveFileName(caption='Select output file')[0]
@@ -503,11 +508,13 @@ class CutGui():
 		V = "App::PropertySpeed"
 		Q = "App::PropertyQuantity"
 		VL = "App::PropertyVectorList"
+		toolLabel = ui.toolCB.currentText().lstrip('0123456789')
+		toolLabel = toolLabel.lstrip(' ')
 		cuttype = ui.cutTypeCB.currentText()
 		p = [[S,	"CutName",				ui.nameLE.text()],
 			 [S,	"ObjectType",		cuttype + "Cut"],	     
 		     [S,	"CutType",			cuttype],
-		     [S,	"Tool",				ui.toolCB.currentText().lstrip('0123456789 ')],
+		     [S,	"Tool",				toolLabel],
 		     [I,	"ToolNumber",		eval(ui.toolCB.currentText().split()[0])],
 		     [L,	"SafeHeight",		VAL.toSystemValue(ui.safeHeightLE,'length')],
 		     [S,	"SpindleSpeed",		VAL.toSystemValue(ui.spindleSpeedE, 'angularVelocity')],

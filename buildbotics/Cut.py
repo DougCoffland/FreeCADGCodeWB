@@ -207,7 +207,9 @@ class Cut:
 	
 	def setBitWidth(self,obj):
 		tool = FreeCAD.ActiveDocument.getObjectsByLabel(obj.Tool)[0]
-		self.bitWidth = tool.Diameter.Value
+		if hasattr(tool,'Diameter'): self.bitWidth = tool.Diameter.Value
+		else: self.bitWidth = 0.0	
+		return
 	
 	def getLabel(self,s):
 		i = 0
@@ -328,13 +330,16 @@ class Cut:
 		pc.AddPaths(pyclipper.scale_to_clipper(subj), pyclipper.PT_SUBJECT, True)
 		solution = pyclipper.scale_from_clipper(pc.Execute(pyclipper.CT_XOR, pyclipper.PFT_EVENODD, pyclipper.PFT_EVENODD))
 		return solution
+				
+	def ensurePolyOrientation(self,poly,polys,xMin,xMax):
+		pass
 
 	def getOffset(self, polys, offset):
 		pco = pyclipper.PyclipperOffset()
-		for poly in polys:
-			bigPoly = self.scalePolyToClipper(poly,100000.0)
-			pco.AddPath(bigPoly, pyclipper.JT_ROUND, pyclipper.ET_CLOSEDPOLYGON)
-		offsetPolys = self.scaleFromClipper(pco.Execute(offset * 100000),1/100000.)
+		bigPolys = self.scaleToClipper(polys,100000.)
+		solution = pyclipper.SimplifyPolygons(bigPolys)
+		pco.AddPaths(solution, pyclipper.JT_ROUND, pyclipper.ET_CLOSEDPOLYGON)
+		offsetPolys = self.scaleFromClipper(pco.Execute(offset * 100000.),1/100000.)
 		for poly in offsetPolys:
 			poly.append(poly[0])
 		return offsetPolys
@@ -429,6 +434,14 @@ class Cut:
 		y = v1[1] - v2[1]
 		z = v1[2] - v2[2]
 		return math.sqrt(x*x + y*y + z*z)
+		
+	def reversePath(self,p):
+		newP = []
+		i = len(p) - 1
+		while i >= 0:
+			newP.append(p[i])
+			i = i - 1
+		return newP
 	
 	def getPolysAtSlice(self,objectToCut,plane,height):
 		fc = FreeCAD.ActiveDocument
