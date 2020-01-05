@@ -588,6 +588,8 @@ class GCodeProject():
 		if hasattr(cut, "MaximumError"): p.append([L,		"MaximumError", cut.MaximumError])
 		if hasattr(cut, "PerimeterDepth"): p.append([L,		"PerimeterDepth", cut.PerimeterDepth])
 		if hasattr(cut, "OffsetFromPerimeter"): p.append([L,"OffsetFromPerimeter", cut.OffsetFromPerimeter])
+		if hasattr(cut, "MaximumDepth"): p.append([L, 		"MaximumDepth", cut.MaximumDepth])
+		if hasattr(cut, "Direction"): 	p.append([S,		"Direction", cut.Direction])
 		
 		return p
 

@@ -389,4 +389,75 @@ class Surface3DCut(Cut):
 		for prop in obj.PropertiesList:
 			obj.setEditorMode(prop,("ReadOnly",))
 		FreeCAD.ActiveDocument.recompute()
+		
+	def reverseWire(self,wire):
+		reversedWire = list()
+		while len(wire) > 0: reversedWire.append(wire.pop())
+		return reversedWire
+		
+	def run(self, ui, obj, outputUnits,fp):
+		self.obj = obj
+		self.parent = obj.getParentGroup()
+		self.fp = fp
+		self.ui = ui
+		self.outputUnits = outputUnits
+		self.cuttingDirection = None
+
+		out = self.writeGCodeLine
+		self.updateActionLabel("Running " + obj.CutName)
+		self.safeHeight = obj.SafeHeight.Value
+		tool = str(obj.ToolNumber)
+		rapid = self.rapid
+		cut = self.cut
+		self.setBitWidth(obj)
+		out("(Starting " + obj.CutName + ')')
+		self.setUserUnits()
+		self.setOffset(self.parent.XOriginValue.Value, self.parent.YOriginValue.Value, self.parent.ZOriginValue.Value)
+		self.updateActionLabel("Setting feeds and speeds for " + obj.CutName)
+		
+		rapid(z=obj.ZToolChangeLocation.Value)
+		rapid(obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)
+		out('T' + tool + 'M6')
+		out('S' + str(obj.SpindleSpeed).split()[0])
+		
+		fc = FreeCAD.ActiveDocument
+		offsetName = self.getUniqueName("Offset")
+		fc.addObject("Part::Offset",offsetName)
+		offsetObject = fc.getObjectsByLabel(offsetName)[0]
+		objectToScan = fc.getObjectsByLabel(obj.ObjectToCut)[0]
+		offsetObject.Source = objectToScan
+		offsetObject.Value = obj.Offset.Value
+		offsetObject.Mode = 0
+		offsetObject.Join = 0
+		offsetObject.Intersection = False
+		offsetObject.SelfIntersection = False
+		fc.recompute()
+		
+		self.updateActionLabel("getting slice wires")
+		
+		i = 0.
+		if obj.Direction == 'AlongX':
+			position = offsetObject.Shape.BoundBox.XMin
+			maxPosition = offsetObject.Shape.BoundBox.XMax
+		elif obj.Direction == 'AlongY':
+			position = offsetObject.Shape.BoundBox.YMin
+			maxPosition = offsetObject.Shape.BoundBox.YMax
+		wire = list()
+		while position <= maxPosition:
+			if i % 2 == 0:
+				temp = self.getWire(offsetObject,obj.Direction,self.parent.ZOriginValue.Value - obj.MaximumDepth.Value,position)
+				if temp != None: wire = wire + temp
+			else:
+				temp = self.getWire(offsetObject,obj.Direction,self.parent.ZOriginValue.Value - obj.MaximumDepth.Value,position)
+				if temp != None:
+					while len(temp) > 0:
+						wire.append(temp.pop())
+					
+			position = position + obj.StepOver.Value
+			i = i + 1
+			if len(wire) > 0: break
+
+		print wire
+		self.cutWire(wire)
+
 

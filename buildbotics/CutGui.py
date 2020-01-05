@@ -176,6 +176,15 @@ class CutGui():
 		ui.volume3DClimbRB.clicked.connect(self.validateAllFields)
 		ui.volume3DEitherRB.clicked.connect(self.validateAllFields)
 		
+		ui.surface3DObjectToCutCB.currentIndexChanged.connect(self.validateAllFields)
+		ui.surface3DStepOverE.textChanged.connect(self.validateAllFields)
+		ui.surface3DOffsetE.textChanged.connect(self.validateAllFields)
+		ui.surface3DDirectionXRB.clicked.connect(self.validateAllFields)
+		ui.surface3DDirectionYRB.clicked.connect(self.validateAllFields)
+		ui.surface3DDirectionDiagonalRB.clicked.connect(self.validateAllFields)
+		ui.surface3DMaximumDepthE.textChanged.connect(self.validateAllFields)
+		ui.surface3DMaximumErrorE.textChanged.connect(self.validateAllFields)
+		
 		ui.buttonBox.accepted.connect(self.accept)
 		ui.buttonBox.rejected.connect(self.reject)
 		
@@ -493,6 +502,20 @@ class CutGui():
 				VAL.setLabel(ui.volume3DMillingMethodL,'INVALID')
 				valid = False			
 			valid = VAL.validate(ui.volume3DMaximumErrorE, ui.volume3DMaximumErrorL,True,valid,VAL.LENGTH)
+		elif cutType == "Surface3D":
+			if ui.surface3DObjectToCutCB.currentIndex() == 0:
+				VAL.setLabel(ui.surface3DObjectToCutL,'INVALID')
+				valid = False
+			else: VAL.setLabel(ui.surface3DObjectToCutL,'VALID')
+			valid = VAL.validate(ui.surface3DStepOverE, ui.surface3DStepOverL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.surface3DOffsetE, ui.surface3DOffsetL,True,valid,VAL.LENGTH)
+			if ui.surface3DDirectionXRB.isChecked() == True or ui.surface3DDirectionYRB.isChecked() == True or ui.surface3DDirectionDiagonalRB.isChecked() == True:
+				VAL.setLabel(ui.surface3DDirectionL,'VALID')
+			else:
+				VAL.setLabel(ui.surface3DDirectionL,'INVALID')
+				valid = False
+			valid = VAL.validate(ui.surface3DMaximumDepthE, ui.surface3DMaximumDepthL,True,valid,VAL.LENGTH)
+			valid = VAL.validate(ui.surface3DMaximumErrorE, ui.surface3DMaximumErrorL,True,valid,VAL.LENGTH)			
 		ui.buttonBox.buttons()[0].setEnabled(valid)
 		FreeCAD.ActiveDocument.recompute()	
 		return valid
@@ -623,6 +646,16 @@ class CutGui():
 			else: method = "Either"
 			p.append([S,	"MillingMethod",	method])
 			p.append([L,	"MaximumError",		VAL.toSystemValue(ui.volume3DMaximumErrorE,'length')])
+		elif cuttype == "Surface3D":
+			p.append([S,	"ObjectToCut",		ui.surface3DObjectToCutCB.currentText()])
+			p.append([L,	"StepOver",			VAL.toSystemValue(ui.surface3DStepOverE,'length')])
+			p.append([L,	"Offset",			VAL.toSystemValue(ui.surface3DOffsetE,'length')])
+			if ui.surface3DDirectionXRB.isChecked() == True: direction = 'AlongX'
+			elif ui.surface3DDirectionYRB.isChecked() == True: direction = 'AlongY'
+			else: direction = 'Diagonal'
+			p.append([S,	"Direction",		direction])
+			p.append([L,	"MaximumDepth",		VAL.toSystemValue(ui.surface3DMaximumDepthE,'length')])
+			p.append([L,	"MaximumError",		VAL.toSystemValue(ui.surface3DMaximumErrorE,'length')])
 		return p
 	
 	def getCutProperties(self,props):
@@ -656,7 +689,7 @@ class CutGui():
 		elif cutType == "Drill":
 			for p in props:
 				if p[1] == "PeckDepth": ui.drillPeckDepthE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "DrillPointList":
+				elif p[1] == "DrillPointList":
 					tw = ui.drillTW
 					while tw.rowCount() > 0: tw.removeRow(0)
 					for point in p[2]:
@@ -668,87 +701,98 @@ class CutGui():
 		elif cutType == "Facing":
 			for p in props:
 				if p[1] == "FacingPattern": ui.facePatternCB.setCurrentIndex(ui.facePatternCB.findText(p[2]))
-				if p[1] == "CutArea":		ui.faceCutAreaCB.setCurrentIndex(ui.faceCutAreaCB.findText(p[2]))
-				if p[1] == "Depth":			ui.faceDepthE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "StartHeight":	ui.faceStartHeightE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "StepOver":		ui.faceStepOverE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "StepDown":		ui.faceStepDownE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "MillingMethod":
+				elif p[1] == "CutArea":		ui.faceCutAreaCB.setCurrentIndex(ui.faceCutAreaCB.findText(p[2]))
+				elif p[1] == "Depth":			ui.faceDepthE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "StartHeight":	ui.faceStartHeightE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "StepOver":		ui.faceStepOverE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "StepDown":		ui.faceStepDownE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "MillingMethod":
 					if p[2] == "Conventional": ui.faceConventionalRB.setChecked(True)
 					elif p[2] == "Climb":   ui.faceClimbRB.setChecked(True)
 					else: ui.faceEitherRB.setChecked(True)
 		elif cutType == "Perimeter":
 			for p in props:
 				if p[1] == "ObjectToCut": 	ui.perimeterObjectToCutCB.setCurrentIndex(ui.perimeterObjectToCutCB.findText(p[2]))
-				if p[1] == "Depth":			ui.perimeterDepthE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "DepthOfCut": 	ui.perimeterDepthOfCutE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "StartHeight": 	ui.perimeterStartHeightE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "StepDown":   	ui.perimeterStepDownE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "WidthOfCut": 	ui.perimeterWidthOfCutE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "StepOver":   	ui.perimeterStepOverE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "Offset":     	ui.perimeterOffsetE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "MillingMethod":
+				elif p[1] == "Depth":			ui.perimeterDepthE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "DepthOfCut": 	ui.perimeterDepthOfCutE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "StartHeight": 	ui.perimeterStartHeightE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "StepDown":   	ui.perimeterStepDownE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "WidthOfCut": 	ui.perimeterWidthOfCutE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "StepOver":   	ui.perimeterStepOverE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "Offset":     	ui.perimeterOffsetE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "MillingMethod":
 					if p[2] == "Conventional": ui.perimeterConventionalRB.setChecked(True)
 					elif p[2] == "Climb":   ui.perimeterClimbRB.setChecked(True)
 					else: ui.perimeterEitherRB.setChecked(True)
-				if p[1] == "Side":
+				elif p[1] == "Side":
 					if p[2] == "Inside": ui.perimeterInsideRB.setChecked(True)
 					else: ui.perimeterOutsideRB.setChecked(True)
-				if p[1] == "MaximumError":	ui.perimeterErrorE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "MaximumError":	ui.perimeterErrorE.setText(VAL.fromSystemValue('length',p[2]))
 		elif cutType == "Pocket2D":
 			for p in props:
 				if p[1] == "ObjectToCut":	ui.pocket2DObjectCB.setCurrentIndex(ui.pocket2DObjectCB.findText(p[2]))
-				if p[1] == "PerimeterDepth": ui.pocket2DPerimeterDepthE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "DepthOfCut":	ui.pocket2DDepthOfCutE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "StartHeight":	ui.pocket2DStartHeightE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "StepDown":		ui.pocket2DStepDownE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "StepOver":		ui.pocket2DStepOverE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "OffsetFromPerimeter":	ui.pocket2DOffsetFromPerimeterE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "MillingMethod":
+				elif p[1] == "PerimeterDepth": ui.pocket2DPerimeterDepthE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "DepthOfCut":	ui.pocket2DDepthOfCutE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "StartHeight":	ui.pocket2DStartHeightE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "StepDown":		ui.pocket2DStepDownE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "StepOver":		ui.pocket2DStepOverE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "OffsetFromPerimeter":	ui.pocket2DOffsetFromPerimeterE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "MillingMethod":
 					if p[2] == "Conventional": ui.pocket2DConventionalRB.setChecked(True)
 					elif p[2] == "Climb":   ui.pocket2DClimbRB.setChecked(True)
 					else: ui.pocket2DEitherRB.setChecked(True)
-				if p[1] == "MaximumError":	ui.pocket2DMaximumErrorE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "MaximumError":	ui.pocket2DMaximumErrorE.setText(VAL.fromSystemValue('length',p[2]))
 		elif cutType == "Volume2D":
 			for p in props:
 				if p[1] == "ObjectToCut":	ui.volume2DObjectToCutCB.setCurrentIndex(ui.volume2DObjectToCutCB.findText(p[2]))
-				if p[1] == "CutArea":		ui.volume2DCutAreaCB.setCurrentIndex(ui.volume2DCutAreaCB.findText(p[2]))
-				if p[1] == "PerimeterDepth": ui.volume2DPerimeterDepthE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "DepthOfCut":	ui.volume2DDepthOfCutE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "StartHeight":	ui.volume2DStartHeightE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "StepDown":		ui.volume2DStepDownE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "StepOver":		ui.volume2DStepOverE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "OffsetFromPerimeter":	ui.volume2DOffsetFromPerimeterE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "MillingMethod":
+				elif p[1] == "CutArea":		ui.volume2DCutAreaCB.setCurrentIndex(ui.volume2DCutAreaCB.findText(p[2]))
+				elif p[1] == "PerimeterDepth": ui.volume2DPerimeterDepthE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "DepthOfCut":	ui.volume2DDepthOfCutE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "StartHeight":	ui.volume2DStartHeightE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "StepDown":		ui.volume2DStepDownE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "StepOver":		ui.volume2DStepOverE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "OffsetFromPerimeter":	ui.volume2DOffsetFromPerimeterE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "MillingMethod":
 					if p[2] == "Conventional": ui.volume2DConventionalRB.setChecked(True)
 					elif p[2] == "Climb":   ui.volume2DClimbRB.setChecked(True)
 					else: ui.volume2DEitherRB.setChecked(True)
-				if p[1] == "MaximumError":	ui.volume2DMaximumErrorE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "MaximumError":	ui.volume2DMaximumErrorE.setText(VAL.fromSystemValue('length',p[2]))
 		elif cutType == "Pocket3D":
 			for p in props:
 				if p[1] == "ObjectToCut":	ui.pocket3DObjectToCutCB.setCurrentIndex(ui.pocket3DObjectToCutCB.findText(p[2]))
-				if p[1] == "StartHeight":	ui.pocket3DStartHeightE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "StepDown":		ui.pocket3DStepDownE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "StepOver":		ui.pocket3DStepOverE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "OffsetFromPerimeter":	ui.pocket3DOffsetFromPerimeterE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "MillingMethod":
+				elif p[1] == "StartHeight":	ui.pocket3DStartHeightE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "StepDown":		ui.pocket3DStepDownE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "StepOver":		ui.pocket3DStepOverE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "OffsetFromPerimeter":	ui.pocket3DOffsetFromPerimeterE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "MillingMethod":
 					if p[2] == "Conventional": ui.pocket3DConventionalRB.setChecked(True)
 					elif p[2] == "Climb":   ui.pocket3DClimbRB.setChecked(True)
 					else: ui.pocket3DEitherRB.setChecked(True)
-				if p[1] == "MaximumError":	ui.pocket3DMaximumErrorE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "MaximumError":	ui.pocket3DMaximumErrorE.setText(VAL.fromSystemValue('length',p[2]))
 		elif cutType == "Volume3D":
 			for p in props:
 				if p[1] == "ObjectToCut":	ui.volume3DObjectToCutCB.setCurrentIndex(ui.volume3DObjectToCutCB.findText(p[2]))
-				if p[1] == "CutArea":		ui.volume3DCutAreaCB.setCurrentIndex(ui.volume3DCutAreaCB.findText(p[2]))
-				if p[1] == "StartHeight":	ui.volume3DStartHeightE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "StepDown":		ui.volume3DStepDownE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "StepOver":		ui.volume3DStepOverE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "OffsetFromPerimeter":	ui.volume3DOffsetFromPerimeterE.setText(VAL.fromSystemValue('length',p[2]))
-				if p[1] == "MillingMethod":
+				elif p[1] == "CutArea":		ui.volume3DCutAreaCB.setCurrentIndex(ui.volume3DCutAreaCB.findText(p[2]))
+				elif p[1] == "StartHeight":	ui.volume3DStartHeightE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "StepDown":		ui.volume3DStepDownE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "StepOver":		ui.volume3DStepOverE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "OffsetFromPerimeter":	ui.volume3DOffsetFromPerimeterE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "MillingMethod":
 					if p[2] == "Conventional": ui.volume3DConventionalRB.setChecked(True)
 					elif p[2] == "Climb":   ui.volume3DClimbRB.setChecked(True)
 					else: ui.volume3DEitherRB.setChecked(True)
-				if p[1] == "MaximumError":	ui.volume3DMaximumErrorE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "MaximumError":	ui.volume3DMaximumErrorE.setText(VAL.fromSystemValue('length',p[2]))
+		elif cutType == "Surface3D":
+			for p in props:
+				if p[1] == "ObjectToCut":		ui.surface3DObjectToCutCB.setCurrentIndex(ui.surface3DObjectToCutCB.findText(p[2]))
+				elif p[1] == "StepOver":		ui.surface3DStepOverE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "Offset":			ui.surface3DOffsetE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "Direction":
+					if p[2] == "AlongX":		ui.surface3DDirectionXRB.setChecked(True)
+					elif p[2] == "AlongY":		ui.surface3DDirectionYRB.setChecked(True)
+					else:						ui.surface3DDirectionDiagonalRB.setChecked(True)
+				elif p[1] == "MaximumDepth":	ui.surface3DMaximumDepthE.setText(VAL.fromSystemValue('length',p[2]))
+				elif p[1] == "MaximumError":	ui.surface3DMaximumErrorE.setText(VAL.fromSystemValue('length',p[2]))
 					
 	def accept(self):
 		ui = self.createCutUi
@@ -769,7 +813,8 @@ class CutGui():
 					elif prop[2] == "Pocket2D": self.cut = Pocket2DCut(self.selectedObject)
 					elif prop[2] == "Volume2D": self.cut = Volume2DCut(self.selectedObject)	
 					elif prop[2] == "Pocket3D": self.cut = Pocket3DCut(self.selectedObject)				
-					elif prop[2] == "Volume3D": self.cut = Volume3DCut(self.selectedObject)				
+					elif prop[2] == "Volume3D": self.cut = Volume3DCut(self.selectedObject)
+					elif prop[2] == "Surface3D": self.cut = Surface3DCut(self.selectedObject)				
 					else: self.cut = Cut(self.selectedObject)
 			self.cut.getObject().Label = ui.nameLE.text()
 			self.cut.setProperties(p,self.cut.getObject())
@@ -778,7 +823,6 @@ class CutGui():
 		elif mode == "EditingCutFromIcon":
 			self.cut = self.selectedObject.Proxy
 			self.cut.Label = ui.nameLE.text()
-			print p
 			self.cut.setProperties(p,self.selectedObject)
 			setGUIMode("None")
 			return True
@@ -892,6 +936,15 @@ class CutGui():
 		ui.volume3DClimbRB.setChecked(False)
 		ui.volume3DEitherRB.setChecked(False)
 		ui.volume3DMaximumErrorE.clear()
+		
+		ui.surface3DObjectToCutCB.setCurrentIndex(0)
+		ui.surface3DStepOverE.clear()
+		ui.surface3DOffsetE.clear()
+		ui.surface3DDirectionXRB.setChecked(False)
+		ui.surface3DDirectionYRB.setChecked(False)
+		ui.surface3DDirectionDiagonalRB.setChecked(False)
+		ui.surface3DMaximumDepthE.clear()
+		ui.surface3DMaximumErrorE.clear()
 
 	def setMode(self):
 		if self.selectedObject == None: mode = getGUIMode()
@@ -1012,6 +1065,15 @@ class CutGui():
 			elif obj.MillingMethod == "Climb": ui.volume3DClimbRB.setChecked(True)
 			else: ui.volume3DEitherRB.setChecked(True)
 			ui.volume3DMaximumErrorE.setText(VAL.fromSystemValue('length',obj.MaximumError))
+		elif obj.CutType == "Surface3D":
+			ui.surface3DObjectToCutCB.setCurrentIndex(ui.surface3DObjectToCutCB.findText(obj.ObjectToCut))
+			ui.surface3DStepOverE.setText(VAL.fromSystemValue('length',obj.StepOver))
+			ui.surface3DOffsetE.setText(VAL.fromSystemValue('length',obj.Offset))
+			if obj.Direction == 'AlongX': ui.surface3DDirectionXRB.setChecked(True)
+			elif obj.Direction == 'AlongY': ui.surface3DDirectionYRB.setChecked(True)
+			else: ui.surface3DDirectionDiagonalRB.setChecked(True)
+			ui.surface3DMaximumDepthE.setText(VAL.fromSystemValue('length',obj.MaximumDepth))
+			ui.surface3DMaximumErrorE.setText(VAL.fromSystemValue('length',obj.MaximumError))
 		
 	def Activated(self):
 		self.setUnits()
@@ -1026,6 +1088,7 @@ class CutGui():
 			while ui.pocket3DObjectToCutCB.count() > 1: ui.pocket3DObjectToCutCB.removeItem(1)
 			while ui.volume3DObjectToCutCB.count() > 1: ui.volume3DObjectToCutCB.removeItem(1)
 			while ui.volume3DCutAreaCB.count() > 1: ui.volume3DCutAreaCB.removeItem(1)
+			while ui.surface3DObjectToCutCB.count() > 1: ui.surface3DObjectToCutCB.removeItem(1)
 			for obj in FreeCAD.ActiveDocument.Objects:
 				if hasattr(obj,"Shape"):
 					ui.faceCutAreaCB.addItem(obj.Label)
@@ -1036,6 +1099,7 @@ class CutGui():
 					ui.pocket3DObjectToCutCB.addItem(obj.Label)
 					ui.volume3DObjectToCutCB.addItem(obj.Label)
 					ui.volume3DCutAreaCB.addItem(obj.Label)
+					ui.surface3DObjectToCutCB.addItem(obj.Label)
 		mode = self.setMode()
 		if mode == "AddingCutFromIcon":
 			self.originalCutName = ''

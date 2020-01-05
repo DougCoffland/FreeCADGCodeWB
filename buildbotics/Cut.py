@@ -110,6 +110,17 @@ class Cut:
 		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z,'length'),4))
 		self.writeGCodeLine(line)
 		
+	def cutWire(self,wire):
+		self.rapid(z=self.safeHeight)
+		self.rapid(wire[0][0],wire[0][1])
+		self.cut(z = wire[0][2])
+		i = 1
+		while i < len(wire):
+			x,y,z = wire[i]
+			self.cut(x,y,z)
+			i = i + 1
+		self.rapid(z = self.safeHeight)
+		
 	def setProperties(self,p,obj):
 		if hasattr(obj,'PropertiesList'):
 			for prop in obj.PropertiesList:
@@ -337,8 +348,7 @@ class Cut:
 	def getOffset(self, polys, offset):
 		pco = pyclipper.PyclipperOffset()
 		bigPolys = self.scaleToClipper(polys,100000.)
-		solution = pyclipper.SimplifyPolygons(bigPolys)
-		pco.AddPaths(solution, pyclipper.JT_ROUND, pyclipper.ET_CLOSEDPOLYGON)
+		pco.AddPaths(bigPolys, pyclipper.JT_ROUND, pyclipper.ET_CLOSEDPOLYGON)
 		offsetPolys = self.scaleFromClipper(pco.Execute(offset * 100000.),1/100000.)
 		for poly in offsetPolys:
 			poly.append(poly[0])
@@ -390,24 +400,7 @@ class Cut:
 			reducedPoly.append(poly[i])
 		if reducedPoly[0] != reducedPoly[len(reducedPoly) - 1]: reducedPoly.append(poly[0])
 		return reducedPoly
-		
-	def moveOrigin2D(self,polys):
-		xOff = self.parent.XOriginValue.Value
-		yOff = self.parent.YOriginValue.Value
-		zOff = self.parent.ZOriginValue.Value
-		for poly in polys:
-			for point in poly:
-				point = (point[0] - xOff,point[1] - yOff)
-		return polys
 
-		
-	def getSlice(self,shapeName,level):
-		fc = FreeCAD.ActiveDocument
-		shape = fc.getObjectsByLabel(shapeName)[0].Shape
-		wires = list()
-		for wire in shape.slice(FreeCAD.Base.Vector(0,0,1),level):
-			wires.append(wire)
-		return wires
 		
 	def getUniqueName(self,base):
 		i = 1
@@ -442,12 +435,150 @@ class Cut:
 			newP.append(p[i])
 			i = i - 1
 		return newP
-	
+
+	def getWire(self,objectToSlice,direction,depth,position):
+		if hasattr(self.obj,"MaximumError") == False: error = .1
+		else: error = self.obj.MaximumError.Value
+		fv = FreeCAD.Base.Vector
+		if direction == 'AlongX': vec = fv(1,0,0)
+		elif direction == 'AlongY': vec = fv(0,1,0)
+		else: vec = fv(1,1,0)
+		wires = list()
+		wires = objectToSlice.Shape.slice(vec,position)
+		if len(wires) == 0: return None
+		else: wire = wires[0]
+
+		poly = list()
+		edges = wire.OrderedEdges
+		i = 0
+		while i < len(edges):
+			j = 0
+			segs = edges[i].discretize(QuasiDeflection = error/3.)
+			while j < len(segs):
+				segs[j] = fv(round(segs[j][0],5),round(segs[j][1],5),round(segs[j][2],5))
+				j = j + 1
+			print segs
+			if i > 0: 
+				if segs[0] == poly[len(poly)-1]: pass
+				elif segs[len(segs) - 1] == poly[len(poly)-1]:
+					print 'reversing segs'
+					segs.reverse()
+				elif segs[0] == poly[0]:
+					print 'reversing poly'
+					poly.reverse()
+				elif segs[len(segs)-1] == poly[0]:
+					print 'reversing both'
+					poly.reverse()
+					segs.reverse()
+				else: print 'Error: broken polygon'
+
+			if i == 0: poly = poly + segs
+			else: poly = poly + segs[1:]
+			i = i + 1
+		poly.pop()
+				
+		wireAboveDepth = list()
+		lastPoint = poly[len(poly) - 1]
+		while len(poly) > 0:
+			p = poly.pop(0)
+			if p[2] >= depth:
+				if lastPoint[2] < depth:
+					if direction == 'AlongX':
+						if lastPoint[1] == p[1]:
+							lastPoint = (lastPoint[0],lastPoint[1],depth)
+						else:
+							m = (lastPoint[2] - p[2])/(lastPoint[1] - p[1])
+							lastPoint = (lastPoint[0],round(lastPoint[1] + m * (p[1] - lastPoint[1]),5), depth)
+					elif direction == 'AlongY':
+						if lastPoint[0] == p[0]:
+							lastPoint = (lastPoint[0],lastPoint[1],depth)
+						else:
+							m = (lastPoint[2] - p[2])/(lastPoint[0] - p[0])
+							lastPoint = (round(lastPoint[0] + m * (p[0] - lastPoint[0]),5), lastPoint[1], depth)
+						
+					wireAboveDepth.append(lastPoint)
+				wireAboveDepth.append(p)
+			else:
+				if lastPoint[2] >= depth:
+					if direction == 'AlongX':
+						if lastPoint[1] == p[1]:
+							lastPoint = (lastPoint[0],lastPoint[1],depth)
+						else:
+							m = (lastPoint[2] - p[2])/(lastPoint[1] - p[1])
+							lastPoint = (lastPoint[0],round(lastPoint[1] + m * (p[1] - lastPoint[1]),5), depth)
+					elif direction == 'AlongY':
+						if lastPoint[0] == p[0]:
+							lastPoint = (lastPoint[0],lastPoint[1],depth)
+						else:
+							m = (lastPoint[2] - p[2])/(lastPoint[0] - p[0])
+							lastPoint = (round(lastPoint[0] + m * (p[0] - lastPoint[0]),5),lastPoint[1], depth)
+						
+					wireAboveDepth.append(lastPoint)				
+			lastPoint = p
+			
+		if len(wireAboveDepth) == 0: return None
+		
+		w = wireAboveDepth
+		if direction in ['AlongX','Diagonal']:
+			pos = 0
+			val = round(w[0][1],5)
+			i = 1
+			while i < len(w):
+				y = round(w[i][1],5)
+				z = round(w[i][2],5)				
+				if y <= val:
+					if y == val:
+						if z < round(w[pos][2],5):
+							pos = i
+					else:
+						pos = i
+						val = y
+				i = i + 1
+		else:
+			pos = 0
+			val = round(w[0][0],5)
+			i = 1
+			while i < len(w):
+				x = round(w[i][0],5)
+				z = round(w[i][2],5)
+				if x <= val:
+					if x == val:
+						if z < round(w[pos][2],5):
+							pos = i
+					else:
+						pos = i
+						val = x
+				i = i + 1							
+
+		shiftedWire = w[pos:] + w[:pos]
+		
+		if direction in ['AlongX','Diagonal']:
+			n = shiftedWire[1][1]
+			m = shiftedWire[len(shiftedWire)-1][1]
+		elif direction == 'AlongY':
+			n = shiftedWire[1][0]
+			m = shiftedWire[len(shiftedWire)-1][0]
+
+		if n > m:
+			temp = shiftedWire[1:]
+			temp.reverse()
+			shiftedWire = shiftedWire[:1] + temp
+		
+		i = 0
+		while i < len(shiftedWire):
+			x = shiftedWire[i][0] - self.parent.XOriginValue.Value
+			y = shiftedWire[i][1] - self.parent.YOriginValue.Value
+			z = shiftedWire[i][2] - self.parent.ZOriginValue.Value
+			shiftedWire[i] = fv(x,y,z)
+			i = i+ 1
+
+		return shiftedWire
+			
 	def getPolysAtSlice(self,objectToCut,plane,height):
 		fc = FreeCAD.ActiveDocument
 		obj = fc.getObjectsByLabel(objectToCut)[0]
 		shape = obj.Shape
-		if hasattr(obj,"MaximumError") == False: error = .1
+		if hasattr(self.obj,"MaximumError") == False: error = .1
 		else: error = self.obj.MaximumError.Value
 		FreeCADGui.ActiveDocument.getObject(obj.Name).Deviation = error / 3.
 		wires = list()
@@ -456,7 +587,7 @@ class Cut:
 		polys = []
 		for wire in wires:
 			segList = []
-			for edge in wire.Edges:
+			for edge in wire.OrderedEdges:
 				segList.append(edge.discretize(QuasiDeflection=error/3.))
 			newWire = segList.pop()
 			while len(segList) > 0:
@@ -478,7 +609,7 @@ class Cut:
 			for v in newWire:
 				poly.append([v[0],v[1]])
 			polys.append(poly)
-		return polys
+		return self.scaleFromClipper(pyclipper.SimplifyPolygons(self.scaleToClipper(polys,100000.)),1/100000.)
 	
 	def __getstate__(self):
 		state = {}
