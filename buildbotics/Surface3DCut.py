@@ -28,6 +28,7 @@ from pivy import coin
 import os
 from Cut import Cut, ViewCut
 import validator as VAL
+import math
 
 class ViewSurface3DCut(ViewCut):
 	def getIcon(self):
@@ -436,12 +437,19 @@ class Surface3DCut(Cut):
 		self.updateActionLabel("getting slice wires")
 		
 		i = 0.
+		xmin = offsetObject.Shape.BoundBox.XMin
+		xmax = offsetObject.Shape.BoundBox.XMax
+		ymin = offsetObject.Shape.BoundBox.YMin
+		ymax = offsetObject.Shape.BoundBox.YMax
 		if obj.Direction == 'AlongX':
-			position = offsetObject.Shape.BoundBox.XMin
-			maxPosition = offsetObject.Shape.BoundBox.XMax
+			position = ymin
+			maxPosition = ymax
 		elif obj.Direction == 'AlongY':
-			position = offsetObject.Shape.BoundBox.YMin
-			maxPosition = offsetObject.Shape.BoundBox.YMax
+			position = xmin
+			maxPosition = xmax
+		elif obj.Direction == 'Diagonal':
+			position = xmin
+			maxPosition = xmax + (ymax - ymin) * math.sqrt(2.)
 		wire = list()
 		while position <= maxPosition:
 			if i % 2 == 0:
@@ -449,15 +457,16 @@ class Surface3DCut(Cut):
 				if temp != None: wire = wire + temp
 			else:
 				temp = self.getWire(offsetObject,obj.Direction,self.parent.ZOriginValue.Value - obj.MaximumDepth.Value,position)
-				if temp != None:
-					while len(temp) > 0:
-						wire.append(temp.pop())
+				if temp != None: 
+					temp.reverse()
+					wire = wire + temp
 					
-			position = position + obj.StepOver.Value
+			if obj.Direction == 'Diagonal': position = position + obj.StepOver.Value * math.sqrt(2.)
+			else: position = position + obj.StepOver.Value
 			i = i + 1
-			if len(wire) > 0: break
 
-		print wire
 		self.cutWire(wire)
+		fc.removeObject(offsetName)
+		fc.recompute()
 
 

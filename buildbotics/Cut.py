@@ -440,50 +440,47 @@ class Cut:
 		if hasattr(self.obj,"MaximumError") == False: error = .1
 		else: error = self.obj.MaximumError.Value
 		fv = FreeCAD.Base.Vector
-		if direction == 'AlongX': vec = fv(1,0,0)
-		elif direction == 'AlongY': vec = fv(0,1,0)
+		if direction == 'AlongX': vec = fv(0,1,0)
+		elif direction == 'AlongY': vec = fv(1,0,0)
 		else: vec = fv(1,1,0)
 		wires = list()
 		wires = objectToSlice.Shape.slice(vec,position)
 		if len(wires) == 0: return None
 		else: wire = wires[0]
 
+		segList = list()
+		for e in wire.Edges: segList.append(e.discretize(QuasiDeflection = error/3.))
+		for seg in segList:
+			i = 0
+			while i < len(seg):
+				seg[i] = fv(round(seg[i][0],5),round(seg[i][1],5),round(seg[i][2],5))
+				i = i + 1
 		poly = list()
-		edges = wire.OrderedEdges
-		i = 0
-		while i < len(edges):
-			j = 0
-			segs = edges[i].discretize(QuasiDeflection = error/3.)
-			while j < len(segs):
-				segs[j] = fv(round(segs[j][0],5),round(segs[j][1],5),round(segs[j][2],5))
-				j = j + 1
-			print segs
-			if i > 0: 
-				if segs[0] == poly[len(poly)-1]: pass
-				elif segs[len(segs) - 1] == poly[len(poly)-1]:
-					print 'reversing segs'
-					segs.reverse()
-				elif segs[0] == poly[0]:
-					print 'reversing poly'
-					poly.reverse()
-				elif segs[len(segs)-1] == poly[0]:
-					print 'reversing both'
-					poly.reverse()
-					segs.reverse()
-				else: print 'Error: broken polygon'
-
-			if i == 0: poly = poly + segs
-			else: poly = poly + segs[1:]
-			i = i + 1
+		poly = poly + segList.pop(0)
+		while len(segList) > 0:
+			i = 0
+			end = poly[len(poly)-1]
+			while i < len(segList):
+				seg = segList[i]
+				if seg[0] == end:
+					poly = poly + seg[1:]
+					segList.pop(i)
+					break
+				elif seg[len(seg)-1] == end:
+					seg.reverse()
+					poly = poly + seg[1:]
+					segList.pop(i)
+					break
+				else: i = i + 1
 		poly.pop()
-				
+		
 		wireAboveDepth = list()
 		lastPoint = poly[len(poly) - 1]
 		while len(poly) > 0:
 			p = poly.pop(0)
 			if p[2] >= depth:
 				if lastPoint[2] < depth:
-					if direction == 'AlongX':
+					if direction in ['AlongX','Diagonal']:
 						if lastPoint[1] == p[1]:
 							lastPoint = (lastPoint[0],lastPoint[1],depth)
 						else:
@@ -500,7 +497,7 @@ class Cut:
 				wireAboveDepth.append(p)
 			else:
 				if lastPoint[2] >= depth:
-					if direction == 'AlongX':
+					if direction in ['AlongX','Diagonal']:
 						if lastPoint[1] == p[1]:
 							lastPoint = (lastPoint[0],lastPoint[1],depth)
 						else:
@@ -517,62 +514,21 @@ class Cut:
 			lastPoint = p
 			
 		if len(wireAboveDepth) == 0: return None
-		
-		w = wireAboveDepth
-		if direction in ['AlongX','Diagonal']:
-			pos = 0
-			val = round(w[0][1],5)
-			i = 1
-			while i < len(w):
-				y = round(w[i][1],5)
-				z = round(w[i][2],5)				
-				if y <= val:
-					if y == val:
-						if z < round(w[pos][2],5):
-							pos = i
-					else:
-						pos = i
-						val = y
-				i = i + 1
-		else:
-			pos = 0
-			val = round(w[0][0],5)
-			i = 1
-			while i < len(w):
-				x = round(w[i][0],5)
-				z = round(w[i][2],5)
-				if x <= val:
-					if x == val:
-						if z < round(w[pos][2],5):
-							pos = i
-					else:
-						pos = i
-						val = x
-				i = i + 1							
 
-		shiftedWire = w[pos:] + w[:pos]
-		
-		if direction in ['AlongX','Diagonal']:
-			n = shiftedWire[1][1]
-			m = shiftedWire[len(shiftedWire)-1][1]
-		elif direction == 'AlongY':
-			n = shiftedWire[1][0]
-			m = shiftedWire[len(shiftedWire)-1][0]
+		def mySort(e):
+			if direction in ['AlongX','Diagonal']: return 100 * e[0] + e[2]
+			else: return 100 * e[1] + e[2]
+		wireAboveDepth.sort(key=mySort)
 
-		if n > m:
-			temp = shiftedWire[1:]
-			temp.reverse()
-			shiftedWire = shiftedWire[:1] + temp
-		
 		i = 0
-		while i < len(shiftedWire):
-			x = shiftedWire[i][0] - self.parent.XOriginValue.Value
-			y = shiftedWire[i][1] - self.parent.YOriginValue.Value
-			z = shiftedWire[i][2] - self.parent.ZOriginValue.Value
-			shiftedWire[i] = fv(x,y,z)
-			i = i+ 1
-
-		return shiftedWire
+		while i < len(wireAboveDepth):
+			x = round(wireAboveDepth[i][0] - self.parent.XOriginValue.Value,5)
+			y = round(wireAboveDepth[i][1] - self.parent.YOriginValue.Value,5)
+			z = round(wireAboveDepth[i][2] - self.parent.ZOriginValue.Value,5)
+			wireAboveDepth[i] = fv(x,y,z)
+			i = i + 1
+			
+		return wireAboveDepth
 			
 	def getPolysAtSlice(self,objectToCut,plane,height):
 		fc = FreeCAD.ActiveDocument
