@@ -519,6 +519,13 @@ class Cut:
 			if direction in ['AlongX','Diagonal']: return 100 * e[0] + e[2]
 			else: return 100 * e[1] + e[2]
 		wireAboveDepth.sort(key=mySort)
+		
+		w = wireAboveDepth[:]
+		l = len(w)
+		if w[l-1][1] == w[l-2][1]:
+			if w[l-1][2] > w[l-2][2]:
+				wireAboveDepth.pop()
+				wireAboveDepth.insert(l-2,w[l-1])
 
 		i = 0
 		while i < len(wireAboveDepth):
