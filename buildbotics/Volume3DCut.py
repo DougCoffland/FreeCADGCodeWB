@@ -293,6 +293,7 @@ class Volume3DCut(Cut):
 		self.outputUnits = outputUnits
 		self.error = obj.MaximumError.Value
 		self.cuttingDirection = None
+		self.lastSlice = None
 		out = self.writeGCodeLine
 		self.updateActionLabel("Running " + obj.CutName)
 		self.safeHeight = obj.SafeHeight.Value
@@ -317,9 +318,14 @@ class Volume3DCut(Cut):
 		mold = self.differenceOfShapes(obj.CutArea, obj.ObjectToCut)
 		
 		level = obj.StartHeight.Value + self.parent.ZOriginValue.Value
+		mask = None
 		while level >= mold.Shape.BoundBox.ZMin:
 			self.updateActionLabel('getting slice at z = ' + str(level - self.parent.ZOriginValue.Value))
 			polys = self.getPolysAtSlice(mold.Name,"XY",level)
+			if len(polys) == 0: break
+			if mask != None:
+				polys = self.intersectionOfShapes(mask,polys)
+			mask = polys	
 			polyList = []
 			self.updateActionLabel('Getting offset polygons for z = ' + str(level - self.parent.ZOriginValue.Value))
 			offset = obj.OffsetFromPerimeter.Value

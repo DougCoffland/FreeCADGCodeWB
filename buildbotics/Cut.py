@@ -401,6 +401,14 @@ class Cut:
 		if reducedPoly[0] != reducedPoly[len(reducedPoly) - 1]: reducedPoly.append(poly[0])
 		return reducedPoly
 
+	def moveOrigin2D(self,polys):
+		xOff = self.parent.XOriginValue.Value
+		yOff = self.parent.YOriginValue.Value
+		zOff = self.parent.ZOriginValue.Value
+		for poly in polys:
+			for point in poly:
+				point = (point[0] - xOff,point[1] - yOff)
+		return polys
 		
 	def getUniqueName(self,base):
 		i = 1
@@ -409,6 +417,13 @@ class Cut:
 			i = i + 1
 			name = base + str(i)
 		return name
+		
+	def intersectionOfShapes(self,mask,polys):
+		pc = pyclipper.Pyclipper()
+		pc.AddPaths(pyclipper.scale_to_clipper(mask), pyclipper.PT_CLIP, True)
+		pc.AddPaths(pyclipper.scale_to_clipper(polys), pyclipper.PT_SUBJECT, True)
+		solution = pyclipper.scale_from_clipper(pc.Execute(pyclipper.CT_INTERSECTION, pyclipper.PFT_EVENODD, pyclipper.PFT_EVENODD))
+		return solution		
 		
 	def differenceOfShapes(self,name1,name2):
 		fc = FreeCAD.ActiveDocument
@@ -522,7 +537,11 @@ class Cut:
 		
 		w = wireAboveDepth[:]
 		l = len(w)
-		if w[l-1][1] == w[l-2][1]:
+		if direction in ['AlongX', 'Diagonal'] and w[l-1][0] == w[l-2][0]:
+			if w[l-1][2] > w[l-2][2]:
+				wireAboveDepth.pop()
+				wireAboveDepth.insert(l-2,w[l-1])
+		elif direction == 'AlongY' and w[l-1][1] == w[l-2][1]:
 			if w[l-1][2] > w[l-2][2]:
 				wireAboveDepth.pop()
 				wireAboveDepth.insert(l-2,w[l-1])
@@ -572,7 +591,21 @@ class Cut:
 			for v in newWire:
 				poly.append([v[0],v[1]])
 			polys.append(poly)
-		return self.scaleFromClipper(pyclipper.SimplifyPolygons(self.scaleToClipper(polys,100000.)),1/100000.)
+			
+		if hasattr(self,"lastSlice"):
+			if self.lastSlice != None:
+				scaledLastSlice = pyclipper.SimplifyPolygons(self.scaleToClipper(self.lastSlice,100000.))
+				scaledPolys = pyclipper.SimplifyPolygons(self.scaleToClipper(simplePolys,100000.))
+				pc = pyclipper.Pyclipper()
+				pc.AddPath(scaledPolys,pyclipper.PT_CLIP,True)
+				pc.AddPaths([scaledLastSlice],pyclipper.PT_SUBJECT,True)
+				solution = pc.Execute(pyclipper.CT_UNION, pyclipper.PFT_EVENODD, pyclipper.PFT_EVENODD)
+				simplePolys = self.scaleFromClipper(pyclipper.SimplifyPolygons(solutions,1/100000.))
+			else:
+				simplePolys = self.scaleFromClipper(pyclipper.SimplifyPolygons(self.scaleToClipper(polys,100000.)),1/100000.)
+			return simplePolys
+		else:
+			return self.scaleFromClipper(pyclipper.SimplifyPolygons(self.scaleToClipper(polys,100000.)),1/100000.)
 	
 	def __getstate__(self):
 		state = {}

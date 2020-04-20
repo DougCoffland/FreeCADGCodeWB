@@ -347,6 +347,7 @@ class GCodeProject():
 		ui.lcL.setText("")
 		outFile = ui.outFileL.text()
 		obj = self.selectedObject
+
 		if os.path.exists(outFile) == True:
 			self.AYS.questionLabel.setText('Overwriting "' + outFile + '"\nClick Cancel to abort')
 			if self.AYS.exec_() == QtGui.QDialog.Rejected: return

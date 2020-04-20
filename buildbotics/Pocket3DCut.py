@@ -350,12 +350,18 @@ class Pocket3DCut(Cut):
 		
 		# Get intersection of workpiece and object to cut
 		self.updateActionLabel('making intersection between workpiece and ' + obj.ObjectToCut)
-		differenceShape = self.differenceOfShapes(self.parent.WorkPiece,obj.ObjectToCut)
+		differenceShape = self.differenceOfShapes(self.parent.WorkPiece,obj.ObjectToCut)		
 		level = differenceShape.Shape.BoundBox.ZMax
+
+		mask = None
 		while level >= differenceShape.Shape.BoundBox.ZMin:
 			self.updateActionLabel('getting slice a z = ' + str(level - self.parent.ZOriginValue.Value))
 			polys = self.getPolysAtSlice(differenceShape.Name,"XY",level)
 			polys = self.moveOrigin2D(polys)
+			if len(polys) == 0: break
+			if mask != None:
+				polys = self.intersectionOfShapes(mask,polys)
+			mask = polys	
 			polyList = []
 			self.updateActionLabel('Getting offset polygons for z = ' + str(level - self.parent.ZOriginValue.Value))
 			offset = obj.OffsetFromPerimeter.Value

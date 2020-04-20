@@ -368,7 +368,7 @@ static char * pocket2D_xpm[] = {
 "  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .                       "};
 """
 
-class Pocket2DCut(Cut):	
+class Pocket2DCut(Cut):
 	def setProperties(self,p,obj):
 		if hasattr(obj,'PropertiesList'):
 			for prop in obj.PropertiesList:
