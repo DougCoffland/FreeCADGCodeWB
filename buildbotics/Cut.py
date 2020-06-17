@@ -23,7 +23,7 @@
 #*                                                                         *
 #***************************************************************************/
 import FreeCAD,FreeCADGui
-from PySide import QtGui, QtCore, QtWebKit
+from PySide import QtGui, QtCore
 from pivy import coin
 import os
 import math
@@ -221,6 +221,20 @@ class Cut:
 		if hasattr(tool,'Diameter'): self.bitWidth = tool.Diameter.Value
 		else: self.bitWidth = 0.0	
 		return
+		
+	def setToolParams(self,obj):
+		tool = FreeCAD.ActiveDocument.getObjectsByLabel(obj.Tool)[0]
+		if tool.ToolType == "Ball":
+			self.toolParams = {'type':'Ball', 'ballDiameter': tool.BallDiameter.Value}
+		elif tool.ToolType == "Straight":
+			self.toolParams = {'type': 'Straight', 'diameter': tool.Diameter.Value}
+		elif tool.ToolType == 'Conical':
+			self.toolParams = {'type': 'Conical', 'cutLength': tool.CutLength.Value, 'topDiameter': tool.TopDiameter.Value}
+		else:
+			print "Error: " + tool.ToolType + 'not implemented'
+			self.toolParams = None
+		return
+		
 	
 	def getLabel(self,s):
 		i = 0
@@ -348,7 +362,7 @@ class Cut:
 	def getOffset(self, polys, offset):
 		pco = pyclipper.PyclipperOffset()
 		bigPolys = self.scaleToClipper(polys,100000.)
-		pco.AddPaths(bigPolys, pyclipper.JT_ROUND, pyclipper.ET_CLOSEDPOLYGON)
+		pco.AddPaths(bigPolys, pyclipper.JT_MITER, pyclipper.ET_CLOSEDPOLYGON)
 		offsetPolys = self.scaleFromClipper(pco.Execute(offset * 100000.),1/100000.)
 		for poly in offsetPolys:
 			poly.append(poly[0])
@@ -452,6 +466,7 @@ class Cut:
 		return newP
 
 	def getWire(self,objectToSlice,direction,depth,position):
+		print "getting wire at: ",position
 		if hasattr(self.obj,"MaximumError") == False: error = .1
 		else: error = self.obj.MaximumError.Value
 		fv = FreeCAD.Base.Vector
@@ -465,6 +480,7 @@ class Cut:
 
 		segList = list()
 		for e in wire.Edges: segList.append(e.discretize(QuasiDeflection = error/3.))
+		print "length of segList is: ",len(segList)
 		for seg in segList:
 			i = 0
 			while i < len(seg):
@@ -488,11 +504,13 @@ class Cut:
 					break
 				else: i = i + 1
 		poly.pop()
+		print "length of poly is: ", len(poly)
 		
 		wireAboveDepth = list()
 		lastPoint = poly[len(poly) - 1]
 		while len(poly) > 0:
 			p = poly.pop(0)
+			print "p[2] is: ",p[2]," depth is: ",depth
 			if p[2] >= depth:
 				if lastPoint[2] < depth:
 					if direction in ['AlongX','Diagonal']:
@@ -527,7 +545,7 @@ class Cut:
 						
 					wireAboveDepth.append(lastPoint)				
 			lastPoint = p
-			
+		print "length of wireAboveDepth is: ",len(wireAboveDepth)
 		if len(wireAboveDepth) == 0: return None
 
 		def mySort(e):
@@ -555,7 +573,107 @@ class Cut:
 			i = i + 1
 			
 		return wireAboveDepth
-			
+	
+	def getSlice(self,obj,plane,offset):
+		fc = FreeCAD.ActiveDocument
+		shape = obj.Shape
+		bb = shape.BoundBox
+		if plane == "Horizontal":
+			vec = Base.Vector(0,0,1)
+		elif plane == "AlongX":
+			vec = Base.Vector(0,1,0)
+		elif plane == "AlongY":
+			vec = Base.Vector(1,0,0)
+		elif plane == "Diagonal":
+			vec = Base.Vector(.7071,.7071,0)
+		else: 
+			vec = Base.Vector(0,0,1)
+		wires = list()
+		wires = shape.slice(vec,offset)
+		ds = list()
+		for w in wires:
+			ds = ds + self.wireToDiscreteSegments(w)
+		del shape,wires,bb
+		return ds	
+
+	def discretizeWire(self,wire):
+		if hasattr(self.obj,"MaximumError") == False: error = .1
+		else: error = self.obj.MaximumError.Value
+		segList = []
+		for edge in wire.OrderedEdges:
+			segList = segList + edge.discretize(QuasiDeflection=error/3.)
+		return segList
+	
+	def wireToDiscreteSegments(self,wire):		
+		if hasattr(self.obj,"MaximumError") == False: error = .1
+		else: error = self.obj.MaximumError.Value
+		segList = []
+		for edge in wire.OrderedEdges:
+			vertexes = edge.discretize(QuasiDeflection = error/3)
+			i = 0
+			while i < len(vertexes) - 1:
+				segList.append([vertexes[i],vertexes[i+1]])
+				i = i + 1
+		return segList	
+
+	def sortPoly(self,point):
+		return point[0]
+		
+	def getTopSegs(self,seg1,seg2):
+		x11,y11,x12,y12 = seg1[0][0],seg1[0][2],seg1[1][0],seg1[1][2]
+		if x11 > x12: x11,y11,x12,y12 = x12,y12,x11,y11
+		if x11 == x12: m1 = None
+		else: m1 = (y12 - y11)/(x12 - x11)
+		x21,y21,x22,y22 = seg2[0][0],seg2[0][2],seg2[1][0],seg2[1][2]
+		if x21 > x22: x21,y21,x22,y22 = x22,y22,x21,y21
+		if x21 == x22: m2 = None
+		else: m2 = (y22 - y21)/(x22 - x21)
+		newSegs = list()
+		if x12 <= x21 or x11 >= x22:
+			newSegs.append((x11,y11),(x12,y12))
+			newSegs.append((x21,y21),(x22,y22))
+			return newSegs
+		if x11 < x21:
+			newSeg = (x11,y11),(x21,y11 + m1*(x21 - x11))
+			newSegs.append(newSeg)
+			x11,y11 = newSeg[1]
+		elif x21 < x11:
+			newSeg = (x21,y21),(x11, y21 + m2* (x11,x21))
+			newSegs.append(newSeg)
+			x21,y21 = newSeg[1]
+		if x22 > x12:
+			newSeg = (x12,y21 + m2 *(x22 - x12)),(x22,y22)
+			newSegs.append(newSeg)
+			x22,y22 = newSeg[0]
+		elif x12 > x22:
+			newSeg = (x22,y12 + m1 * (x12 - x22)),(x12,y12)
+			newSegs.append(newSeg)
+			x12,y12 = x22,y12 + m1 * (x22 - x11)
+		if y11 > y21 or y12 > y22: newSeg = (x11,y11),(x12,y12)
+		elif y21 > y11 or y22 > y12: newSeg = (x21,y21),(x22,y22)
+		else: newSeg = (x11,y11),(x21,y21)
+		newSegs.append(newSeg)
+		return newSegs
+		
+		 					
+	def normalizePolyToClipper(self,wire,obj):
+		direction = obj.Direction
+		depth = obj.MaximumDepth.Value
+		parent = obj.getParentGroup()
+		xOff = parent.XOriginValue.Value
+		yOff = parent.YOriginValue.Value
+		zOff = parent.ZOriginValue.Value
+		clipperPoly = []
+		if direction == 'AlongX':
+			for vertex in wire:
+				clipperPoly.append((round(vertex[0] - xOff,3),round(vertex[2] - zOff,3)))
+				
+		print clipperPoly
+		print "sorting"
+		print clipperPoly.sort(key=self.sortPoly)		
+
+		return clipperPoly	
+					
 	def getPolysAtSlice(self,objectToCut,plane,height):
 		fc = FreeCAD.ActiveDocument
 		obj = fc.getObjectsByLabel(objectToCut)[0]

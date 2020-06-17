@@ -23,7 +23,7 @@
 #*                                                                         *
 #***************************************************************************/
 import FreeCAD,FreeCADGui
-from PySide import QtGui, QtCore, QtWebKit
+from PySide import QtGui, QtCore
 from pivy import coin
 import os
 from Cut import Cut, ViewCut

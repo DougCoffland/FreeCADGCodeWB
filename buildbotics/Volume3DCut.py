@@ -23,7 +23,7 @@
 #*                                                                         *
 #***************************************************************************/
 import FreeCAD,FreeCADGui
-from PySide import QtGui, QtCore, QtWebKit
+from PySide import QtGui, QtCore
 from pivy import coin
 import os
 from Cut import Cut, ViewCut
@@ -318,8 +318,9 @@ class Volume3DCut(Cut):
 		mold = self.differenceOfShapes(obj.CutArea, obj.ObjectToCut)
 		
 		level = obj.StartHeight.Value + self.parent.ZOriginValue.Value
+		bottom = round(mold.Shape.BoundBox.ZMin,4) +.0001
 		mask = None
-		while level >= mold.Shape.BoundBox.ZMin:
+		while level >= bottom:
 			self.updateActionLabel('getting slice at z = ' + str(level - self.parent.ZOriginValue.Value))
 			polys = self.getPolysAtSlice(mold.Name,"XY",level)
 			if len(polys) == 0: break
@@ -358,7 +359,9 @@ class Volume3DCut(Cut):
 					polyList.remove(poly)
 					poly = self.nextPoly(poly[0][0],poly[0][1],polyList,self.bitWidth)					
 			self.rapid(z = self.safeHeight)
+			if level == bottom: break
 			level = level - obj.StepDown.Value
-		fc.removeObject(mold.Name)
+			if level < bottom: level = bottom
+		# fc.removeObject(mold.Name)
 		return
 			
