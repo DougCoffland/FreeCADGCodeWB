@@ -391,44 +391,6 @@ class Surface3DCut(Cut):
 		for prop in obj.PropertiesList:
 			obj.setEditorMode(prop,("ReadOnly",))
 		FreeCAD.ActiveDocument.recompute()
-		
-	"""
-		def getObjectAtZero(self, name):
-		fc = FreeCAD.ActiveDocument
-		obj = fc.getObjectsByLabel(name)[0]
-		radius = 0
-		bb = obj.Shape.BoundBox
-		if abs(bb.XMin) > radius: radius = abs(bb.XMin)
-		if abs(bb.XMax) > radius: radius = abs(bb.XMax)
-		if abs(bb.YMin) > radius: radius = abs(bb.YMin)
-		if abs(bb.YMax) > radius: radius = abs(bb.YMax)
-		if abs(bb.ZMin) > radius: radius = abs(bb.ZMin)
-		if abs(bb.ZMax) > radius: radius = abs(bb.ZMax)
-
-		newName = self.getUniqueName("Sphere")
-		newSphere = fc.addObject("Part::Sphere",newName)
-		newSphere.Radius = radius * 2.
-		newSphereName = self.getUniqueName("Common")
-		newPart = fc.addObject("Part::MultiCommon",newSphereName)
-		newPart.Shapes = [obj,newSphere]
-		return newPart
-		
-
-	def getOffsetPart(self, obj):
-		fc = FreeCAD.ActiveDocument
-		offsetName = self.getUniqueName("Offset")
-		offsetObject = fc.addObject("Part::Offset",offsetName)
-
-		objectToScan = self.getObjectAtZero(obj.ObjectToCut)
-		offsetObject.Source = objectToScan
-		offsetObject.Value = obj.Offset.Value
-		offsetObject.Mode = 0
-		offsetObject.Join = 0
-		offsetObject.Intersection = False
-		offsetObject.SelfIntersection = False
-		fc.recompute()
-		return offsetObject	
-	"""
 	
 	def joinPolys(self,clip,subj):
 		pc = pyclipper.Pyclipper()
@@ -442,7 +404,7 @@ class Surface3DCut(Cut):
 		return[(seg[0][1],seg[0][2]),(seg[1][1],seg[1][2]),(seg[1][1],depth),(seg[0][1],depth),(seg[0][1],seg[0][2])]
 		
 	def loopToTopContour(self,loop,depth):
-		if loop[0] == loop[-1]: loop.pop()
+		if loop[0] == loop[-1] and len(loop) > 1: loop.pop()
 		# find the point farthest to the right and lowest
 		maxPointIndex = 0
 		maxPoint = loop[0]
@@ -479,8 +441,9 @@ class Surface3DCut(Cut):
 				m = (loop[i+1][1] - loop[i][1]) / (loop[i + 1][0] - loop[i][0])
 				loop[i] = (loop[i][0] + (depth - loop[i][1])/m,depth)
 				i = i + 1
-		return loop		
-		
+		if loop[-1][1] < depth: loop.pop()
+		return loop
+
 	def heightAt(self,x,path, default):
 		if len(path) == 0: return default
 		if x < path[0][0] or x > path[len(path) - 1][0]: return default
@@ -509,14 +472,6 @@ class Surface3DCut(Cut):
 				bitProfile.insert(0,[round(-r,3),round(r,3)])
 				bitProfile.append([round(r,3),round(r,3)])
 		return bitProfile
-
-	def compareAdjacentHeights(self,x,y,zmin,hMap,stepSize):
-		''' At position x, compare height to adjacent contours at x and take 
-		the highest position, taking into account the shape of the bit. The number
-		of adjacent contours to check is determined by the bit radius and step size.
-		If the bit radius is not an exact multiple of the step size, then extrapolate
-		the height at the edge of the bit between the two contours. '''
-		return
 		
 	def getPixMap(self,obj,axis):
 		fc = FreeCAD.ActiveDocument
@@ -588,6 +543,265 @@ class Surface3DCut(Cut):
 			i = i + 1
 		return h
 		
+	def interpolate(self,p1,p2,x):
+		if p1[0] == p2[0]: return (p1[0],max(p1[1],p2[1]))
+		m = (p2[1] - p1[1])/(p2[0] - p1[0])
+		return (x,p1[1] + m * (x - p1[0]))
+	
+	def getTopContours(self,axis):
+		obj = self.obj
+		objectToCut = FreeCAD.ActiveDocument.getObjectsByLabel(obj.ObjectToCut)[0]		
+		bb = objectToCut.Shape.BoundBox
+		if axis == 'AlongX':
+			colMin, colMax, rowMin, rowMax = bb.XMin, bb.XMax, bb.YMin, bb.YMax
+			a = 0
+		else:
+			colMin, colMax, rowMin, rowMax = bb.YMin, bb.YMax, bb.XMin, bb.XMax
+			a = 1
+		contours = list()
+		zmin, zmax = bb.ZMin, bb.ZMax
+		depth = self.parent.ZOriginValue.Value - obj.MaximumDepth.Value
+		step = self.obj.StepOver.Value
+		offset = rowMin + step
+		maximum = rowMax - step
+		while offset <= maximum:
+			self.updateActionLabel("Getting " + axis + "contour at offset = " + str(offset))
+			ds = self.getSlice(objectToCut,axis,offset)
+			# form trapazoids below each segment and union each trapazoid with
+			# the others and a base block that is defined with the maximum depth
+			# and the bounds of the unit. This will return a single polygon
+			traps = list()
+			base = [(colMin,zmin-1),(colMax,zmin-1),(colMax,depth),(colMin,depth),(colMin,zmin-1)]
+			traps.append(base)
+
+			for seg in ds:
+				if round(seg[0][a],6) == round(seg[1][a],6): continue
+				trap = self.makeTrapazoid(seg,zmin - 1.,axis)
+				polys = self.joinPolys(base,trap)
+				base = polys[0]
+			# get an outer offset from the single polygon that is offset by the value
+			# specified by the user
+			loop = self.getOffset([base],obj.Offset.Value)[0]
+			i = 0
+			while i < len(loop):
+				loop[i] = (round(loop[i][0],3),round(loop[i][1],3))
+				i = i + 1
+			# throw away everything but the top contour of the object being cut
+			# topContour = self.loopToTopContour(loop,depth + obj.Offset.Value)
+			topContour = self.loopToTopContour(loop,depth + obj.Offset.Value)
+			
+			lastPoint = topContour[0]
+			while len(topContour) > 0:
+				if  topContour[0][0] < colMin:
+					lastPoint = topContour.pop(0)
+				else:
+					if topContour[0] != lastPoint:
+						topContour.insert(0,self.interpolate(lastPoint,topContour[0],colMin)) 
+					break
+			while len(topContour) > 0:
+				if topContour[-1][0] > colMax:
+					lastPoint = topContour.pop()
+				else:
+					if topContour[-1] != lastPoint:
+						topContour.append(self.interpolate(lastPoint,topContour[-1],colMax)) 
+					break
+					
+			contours.append(topContour)
+			offset = offset + step
+		return contours
+		
+	def getCrossTopContour(self, yTops, x):
+		obj = self.obj
+		objectToCut = FreeCAD.ActiveDocument.getObjectsByLabel(obj.ObjectToCut)[0]		
+		bb = objectToCut.Shape.BoundBox
+		step = self.obj.StepOver.Value
+		xVal = bb.YMin + x * step
+		default = self.parent.ZOriginValue.Value - self.obj.MaximumDepth.Value + self.obj.Offset.Value
+		topContour = list()
+		i = 0
+		while i < len(yTops):
+			height = self.heightAt(xVal,yTops[i],default)
+			topContour.append((bb.XMin + i * step,height))
+			i = i + 1
+		return topContour
+		
+	def insertPoint(self,p,path):
+		x = p[0]
+		i = 0
+		while i < len(path):
+			if path[i][0] >= x: break
+			i = i + 1
+		if i == len(path):
+			path.append(p)
+			return
+		if path[i][0] == path[i - 1][0]:
+			p = (path[i][0],max(path[i][1],path[i - 1][1]))
+		else:
+			m = (path[i][1] - path[i-1][1])/(path[i][0] - path[i-1][0])
+			p = (x,path[i-1][1] + m * (x - path[i-1][0]))
+		path.insert(i,p)
+		return
+		
+	def getDelta(self,p1,p2,m):
+		if m == "UP" or m == "DOWN":
+			return abs(p2[0] - p1[0])
+		else:
+			return abs(p1[1] + m * (p2[0] - p1[0]) - p2[1])
+		
+	def reducePath(self,p):
+		e = self.obj.MaximumError.Value
+		l = p[0]
+		r = [l]
+		i = 1
+		while i < len(p):
+			if p[i] == r[-1]:
+				i = i + 1
+				continue
+			if p[i][0] == r[-1][0]:
+				if p[i][1] >= r[-1][1]: m = "UP"
+				else: m = "DOWN"
+			else:
+				m = (p[i][1] - r[-1][1])/(p[i][0] - r[-1][0])
+			i = i + 1
+			while i < len(p) and self.getDelta(r[-1],p[i],m) < e:
+				l = p[i]
+				i = i + 1
+			r.append(l)
+			if i < len(p): l = p[i]		
+		if p[-1] != r[-1]: r.append(p[-1])
+		return r		
+		
+	def getCombinedPath(self,p1,p2):
+		''' create new paths with from p1 and p2. Both paths will have
+		every x point in either path, then check for segments crossing
+		and create the return top path from there. Where crossings
+		occur, calculate the crossing point and create another point there.
+		Finally, reduce the paths by eliminating colinear line segments.'''
+		newP1 = p1[:]
+		i = 0
+		while i < len(p2):
+			self.insertPoint(p2[i],newP1)
+			i = i + 1
+		i = 0
+		newP2 = p2[:]
+		while i < len(p1):
+			self.insertPoint(p1[i],newP2)
+			i = i + 1
+		if p1[0][1] >= p2[0][1]: newPath = [p1[0]]
+		else: newPath = [p2[0]]
+		i = 1
+		while i < len(newP1):
+			if newP1[i][1] >= newP2[i][1] and newP1[i-1][1] >= newP2[i-1][1]:
+				newPath.append(newP1[i])
+				i = i + 1
+				continue
+			elif newP1[i][1] <= newP2[i][1] and newP1[i-1][1] <= newP2[i-1][1]:
+				newPath.append(newP2[i])
+				i = i + 1
+				continue
+			else:
+				xLen = newP1[i][0] - newP1[i-1][0]
+				if xLen == 0.:
+					newPath.append((newP1[i][0],max(newP1[i][1],newP2[i][1])))
+				else:
+					m1 = (newP1[i][1] - newP1[i-1][1])/xLen
+					m2 = (newP2[i][1] - newP2[i-1][1])/xLen
+					xf = newP1[i-1][0] + (newP2[i][1] - newP1[i][1])/(m1 - m2)
+					yf = newP1[i-1][1] + m1 * (xf - newP1[i-1][0])
+					newPath.append((xf,yf))
+					newPath.append((newP1[i][0],max(newP1[i][1],newP2[i][1])))
+			i = i + 1
+		reducedPath = self.reducePath(newPath)
+		return reducedPath
+		
+	def shiftLoop(self,loop,delta):
+		shiftedLoop = loop[:]
+		for p in shiftedLoop:
+			p = (p[0],p[1] + delta)
+		return shiftedLoop
+		
+	def joinManyPolys(self,polys):
+		pc = pyclipper.Pyclipper()
+		pc.AddPath(pyclipper.scale_to_clipper(polys[0]), pyclipper.PT_CLIP, True)
+		pc.AddPaths(pyclipper.scale_to_clipper(polys[1:]), pyclipper.PT_SUBJECT, True)
+		solution = pyclipper.scale_from_clipper(pc.Execute(pyclipper.CT_UNION, pyclipper.PFT_NONZERO, pyclipper.PFT_NONZERO))
+		return solution
+	
+	def getContours(self):
+		obj = self.obj
+		objectToCut = FreeCAD.ActiveDocument.getObjectsByLabel(obj.ObjectToCut)[0]		
+		bb = objectToCut.Shape.BoundBox
+		if obj.Direction == 'AlongX':
+			colMin, colMax, rowMin, rowMax = bb.XMin, bb.XMax, bb.YMin, bb.YMax
+			a = 0
+		else:
+			colMin, colMax, rowMin, rowMax = bb.YMin, bb.YMax, bb.XMin, bb.XMax
+			a = 1
+		toolProfile = self.getToolProfile()
+
+		slices = list()
+		zmin, zmax = bb.ZMin, bb.ZMax
+		depth = self.parent.ZOriginValue.Value - obj.MaximumDepth.Value
+		step = self.obj.StepOver.Value
+		direction = obj.Direction
+		offset = rowMin + step
+		maximum = rowMax - step
+		while offset <= maximum:
+			self.updateActionLabel("Getting " + direction + " slice at offset = " + str(offset))
+			ds = self.getSlice(objectToCut,direction,offset)
+			# form trapazoids below each segment and union each trapazoid with
+			# the others and a base block that is defined with the maximum depth
+			# and the bounds of the unit. This will return a single polygon
+			traps = list()
+			base = [(colMin,zmin-1),(colMax,zmin-1),(colMax,depth),(colMin,depth),(colMin,zmin-1)]
+			traps.append(base)
+
+			for seg in ds:
+				if round(seg[0][a],6) == round(seg[1][a],6): continue
+				trap = self.makeTrapazoid(seg,zmin - 1.,direction)
+				polys = self.joinPolys(base,trap)
+				base = polys[0]
+			# get an outer offset from the single polygon that is offset by the value
+			# specified by the user
+			slices.append(self.getOffset([base],obj.Offset.Value)[0])
+			offset = offset + step
+		topContours = list()
+		j = 0
+		while j < len(slices):
+			loopsToCombine = list()
+			offset = 0
+			i = -int(len(toolProfile) / 2)
+			while i <= int(len(toolProfile) / 2):
+				if j + i >= 0 and j + i < len(slices):
+					loopsToCombine.append(self.shiftLoop(slices[j + i],toolProfile[int(len(toolProfile) / 2) + i][1]))
+				i = i + 1			
+			if len(loopsToCombine) > 1:
+				solution = self.joinManyPolys(loopsToCombine)[0]
+			elif len(loopsToCombine) == 1:
+				solution = loopsToCombine[0]
+			else:
+				solution = []
+
+			if solution != []: topContour = self.loopToTopContour(solution,depth + obj.Offset.Value)
+			lastPoint = topContour[0]
+			while len(topContour) > 0:
+				if  topContour[0][0] < colMin:
+					lastPoint = topContour.pop(0)
+				else:
+					if topContour[0] != lastPoint:
+						topContour.insert(0,self.interpolate(lastPoint,topContour[0],colMin)) 
+					break
+			while len(topContour) > 0:
+				if topContour[-1][0] > colMax:
+					lastPoint = topContour.pop()
+				else:
+					if topContour[-1] != lastPoint:
+						topContour.append(self.interpolate(lastPoint,topContour[-1],colMax)) 
+					break
+			topContours.append(topContour)
+			j = j + 1
+		return topContours
+				
 	def run(self, ui, obj, outputUnits,fp):
 		self.obj = obj
 		self.parent = obj.getParentGroup()
@@ -612,7 +826,59 @@ class Surface3DCut(Cut):
 		rapid(obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)
 		out('T' + tool + 'M6')
 		out('S' + str(obj.SpindleSpeed).split()[0])
+		
+		#xTopContours = self.getTopContours('AlongX')
 
+		combinedPaths = self.getContours()
+		'''
+		
+		yTopContours = self.getTopContours('AlongY')
+		self.updateActionLabel("Getting cross top contours")
+		crossTopContours = list()
+		i = 0
+		while i < len(xTopContours):
+			crossTopContours.append(self.getCrossTopContour(yTopContours,i))
+			i = i + 1
+		self.updateActionLabel('Combining X contours with crosstop contours')
+		
+		combinedPaths = list()
+		i = 0
+		while i < len(xTopContours):
+			combinedPaths.append(self.getCombinedPath(xTopContours[i],crossTopContours[i]))
+			i = i + 1
+		'''
+		fc = FreeCAD.ActiveDocument
+		objectToCut = fc.getObjectsByLabel(obj.ObjectToCut)[0]		
+		bb = objectToCut.Shape.BoundBox
+		offset = obj.Offset.Value
+		step = obj.StepOver.Value
+		
+		if obj.Direction == 'AlongX':
+			rowShift = bb.YMin
+			i = 0
+			while i < len(combinedPaths):
+				self.rapid(z = self.safeHeight)
+				self.rapid(combinedPaths[i][0][0], rowShift + i * step)
+				j = 0
+				while j < len(combinedPaths[i]):
+					self.cut(combinedPaths[i][j][0],rowShift + i * step,combinedPaths[i][j][1] - self.parent.ZOriginValue.Value - obj.Offset.Value)
+					j = j + 1
+				i = i + 1
+		else:
+			colShift = bb.XMin
+			i = 0
+			while i < len(combinedPaths):
+				self.rapid(z = self.safeHeight)
+				self.rapid(colShift + i * step,combinedPaths[i][0][0])
+				j = 0
+				while j < len(combinedPaths[i]):
+					self.cut(colShift + i * step,combinedPaths[i][j][0],combinedPaths[i][j][1] - self.parent.ZOriginValue.Value - obj.Offset.Value)
+					j = j + 1
+				i = i + 1
+					
+		self.rapid(z = self.safeHeight)
+		return
+		'''
 		self.updateActionLabel("Making X oriented pixel map")
 		xMap = self.getPixMap(obj,obj.Direction)
 		# adjust height if bit conflicts with adjacent contours
@@ -648,37 +914,4 @@ class Surface3DCut(Cut):
 			r = r + 1
 		
 		return		
-		
-		'''
-		axis = obj.Direction
-		fc = FreeCAD.ActiveDocument
-		objectToCut = fc.getObjectsByLabel(obj.ObjectToCut)[0]		
-		bb = objectToCut.Shape.BoundBox
-		offset = obj.Offset.Value
-		if axis == 'AlongX':
-			colMin, colMax, rowMin, rowMax= bb.YMin, bb.YMax, bb.XMin, bb.XMax
-			a = 0
-			offset = bb.YMin - offset
-			maximum = bb.YMax + offset
-		else:
-			colMin, colMax, rowMin, rowMax = bb.XMin, bb.XMax, bb.YMin, bb.YMax
-			a = 1
-			offset = bb.XMin - offset
-			maximum = bb.XMax + offset
-
-		maxDepth = -obj.MaximumDepth.Value
-		step = obj.StepOver.Value
-		i = 0
-		while i < len(pixMap):
-			self.rapid(z = self.safeHeight)
-			self.rapid(offset + i * step, offset)
-			self.cut(z = max(maxDepth, pixMap[i][0] - self.parent.ZOriginValue.Value - obj.Offset.Value ))
-			j = 0
-			while j < len(pixMap[i]):
-				depth = max(maxDepth, pixMap[i][j] - self.parent.ZOriginValue.Value - obj.Offset.Value)
-				self.cut(offset + i * step,offset + j * step,depth)
-				j = j + 1
-			i = i + 1
-			
-		return
 		'''
