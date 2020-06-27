@@ -225,11 +225,11 @@ class Cut:
 	def setToolParams(self,obj):
 		tool = FreeCAD.ActiveDocument.getObjectsByLabel(obj.Tool)[0]
 		if tool.ToolType == "Ball":
-			self.toolParams = {'type':'Ball', 'ballDiameter': tool.BallDiameter.Value}
+			self.toolParams = {'type':'Ball', 'diameter': tool.BallDiameter.Value}
 		elif tool.ToolType == "Straight":
 			self.toolParams = {'type': 'Straight', 'diameter': tool.Diameter.Value}
 		elif tool.ToolType == 'Conical':
-			self.toolParams = {'type': 'Conical', 'cutLength': tool.CutLength.Value, 'topDiameter': tool.TopDiameter.Value}
+			self.toolParams = {'type': 'Conical', 'cutLength': tool.CutLength.Value, 'diameter': tool.TopDiameter.Value}
 		else:
 			print "Error: " + tool.ToolType + 'not implemented'
 			self.toolParams = None
