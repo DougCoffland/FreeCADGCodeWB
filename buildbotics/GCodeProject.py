@@ -435,17 +435,17 @@ class GCodeProject():
 			obj = FreeCAD.ActiveDocument.getObjectsByLabel(wpcb.currentText())[0]
 			box = obj.Shape.BoundBox
 			if axis == 'x':
-				if sel == 'Left': le.setText(VAL.fromSystemValue('length',0))
-				elif sel == 'Middle': le.setText(VAL.fromSystemValue('length',(box.XMax - box.XMin) / 2.))
-				elif sel == 'Right': le.setText(VAL.fromSystemValue('length',box.XMax - box.XMin))
+				if sel == 'Left': le.setText(VAL.fromSystemValue('length',box.XMin))
+				elif sel == 'Middle': le.setText(VAL.fromSystemValue('length',(box.XMax + box.XMin) / 2.))
+				elif sel == 'Right': le.setText(VAL.fromSystemValue('length',box.XMax))
 			elif axis == 'y':
-				if sel == 'Front': le.setText(VAL.fromSystemValue('length',0))
-				elif sel == 'Middle': le.setText(VAL.fromSystemValue('length',(box.YMax - box.YMin) / 2.))
-				elif sel == 'Back': le.setText(VAL.fromSystemValue('length',box.YMax - box.YMin))
+				if sel == 'Front': le.setText(VAL.fromSystemValue('length',box.YMin))
+				elif sel == 'Middle': le.setText(VAL.fromSystemValue('length',(box.YMax + box.YMin) / 2.))
+				elif sel == 'Back': le.setText(VAL.fromSystemValue('length',box.YMax))
 			elif axis == 'z':
-				if sel == 'Top': le.setText(VAL.fromSystemValue('length',box.ZMax - box.ZMin))
-				elif sel == 'Middle': le.setText(VAL.fromSystemValue('length',(box.ZMax - box.ZMin) / 2.))
-				elif sel == 'Bottom': le.setText(VAL.fromSystemValue('length',0))
+				if sel == 'Top': le.setText(VAL.fromSystemValue('length',box.ZMax))
+				elif sel == 'Middle': le.setText(VAL.fromSystemValue('length',(box.ZMax + box.ZMin) / 2.))
+				elif sel == 'Bottom': le.setText(VAL.fromSystemValue('length',box.ZMin))
 
 	def setButtonStates(self,valid):
 		ui = self.defineJobUi

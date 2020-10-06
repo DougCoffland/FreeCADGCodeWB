@@ -64,62 +64,15 @@ class Cut:
 		obj = FreeCAD.ActiveDocument.addObject('App::FeaturePython', "Cut")
 		obj.Proxy = self
 		self.obj = obj
-		selectedObject.addObject(self.obj)
-		self.outputUnits = ""
+		selectedObject.addObject(obj)
+		'''self.outputUnits = ""
 		self.currentCut = None
 		self.ui = None
 		self.cuttingDirection = None
-		self.error = 0.25
+		self.error = 0.25'''
 		
 	def getObject(self):
 		return self.obj
-	
-	def writeGCodeLine(self,line):
-		self.fp.write(line + '\n')
-		try:
-			lc = int(self.ui.lcL.text())
-		except:
-			lc = 0
-		self.ui.lcL.setText(str(lc + 1))		
-		
-	def run(self):
-		print "overide run program in derived cut type"
-
-	def cut(self,x=None,y=None,z=None):
-		obj = self.obj
-		line = 'G1'
-		if x != None: line = line + 'X' + str(round(self.toOutputUnits(x,'length'),4))
-		if y != None: line = line + 'Y' + str(round(self.toOutputUnits(y,'length'),4))
-		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z,'length'),4))
-		if x != None or y != None:
-			if self.cuttingDirection != "cutting":
-				feedString = 'F' + str(self.toOutputUnits(obj.FeedRate,'velocity'))
-				self.cuttingDirection = "cutting"
-			else: feedString = ""
-		else:
-			if self.cuttingDirection != "plunging":
-				feedString = 'F' + str(self.toOutputUnits(obj.PlungeRate,'velocity'))
-				self.cuttingDirection = "plunging"
-			else: feedString = ""
-		self.writeGCodeLine(line + ' ' + feedString)
-
-	def rapid(self,x=None,y=None,z=None):
-		line = 'G0'
-		if x != None: line = line + 'X' + str(round(self.toOutputUnits(x,'length'),4))
-		if y != None: line = line + 'Y' + str(round(self.toOutputUnits(y,'length'),4))
-		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z,'length'),4))
-		self.writeGCodeLine(line)
-		
-	def cutWire(self,wire):
-		self.rapid(z=self.safeHeight)
-		self.rapid(wire[0][0],wire[0][1])
-		self.cut(z = wire[0][2])
-		i = 1
-		while i < len(wire):
-			x,y,z = wire[i]
-			self.cut(x,y,z)
-			i = i + 1
-		self.rapid(z = self.safeHeight)
 		
 	def setProperties(self,p,obj):
 		if hasattr(obj,'PropertiesList'):
@@ -135,6 +88,106 @@ class Cut:
 		for prop in obj.PropertiesList:
 			obj.setEditorMode(prop,("ReadOnly",))
 		FreeCAD.ActiveDocument.recompute()
+		
+	def setCommonProperties(self, ui, obj, outputUnits,fp):
+		self.obj = obj
+		self.parent = obj.getParentGroup()
+		self.setOffset(self.parent.XOriginValue.Value, self.parent.YOriginValue.Value, self.parent.ZOriginValue.Value)
+		self.fp = fp
+		self.ui = ui
+		self.outputUnits = outputUnits
+		self.safeHeight = obj.SafeHeight.Value
+		self.speed = obj.SpindleSpeed.split()[0]
+		self.zToolChange = obj.ZToolChangeLocation.Value
+		self.xToolChange = obj.XToolChangeLocation.Value
+		self.yToolChange = obj.YToolChangeLocation.Value
+		self.cutName = obj.CutName
+		if hasattr(obj,'FeedRate'): self.FeedRate = obj.FeedRate.Value
+		if hasattr(obj,'PlungeRate'): self.PlungeRate = obj.PlungeRate.Value
+		self.setUserUnits()		
+		self.tool = FreeCAD.ActiveDocument.getObjectsByLabel(obj.Tool)[0]
+		if self.tool.ToolType == "Ball":
+			self.toolParams = {'type':'Ball', 'diameter': self.tool.BallDiameter.Value, 'number': str(obj.ToolNumber)}
+		elif self.tool.ToolType == "Straight":
+			self.toolParams = {'type': 'Straight', 'diameter': self.tool.Diameter.Value, 'number': str(obj.ToolNumber)}
+		elif self.tool.ToolType == 'Conical':
+			self.toolParams = {'type': 'Conical', 'cutLength': self.tool.CutLength.Value, 'diameter': tool.TopDiameter.Value, 'number': str(obj.ToolNumber)}
+		else:
+			print "Error: " + tool.ToolType + 'not implemented'
+			self.toolParams = None
+		return
+		
+	def writeGCodeLine(self,line):
+		self.fp.write(line + '\n')
+		try:
+			lc = int(self.ui.lcL.text())
+		except:
+			lc = 0
+		self.ui.lcL.setText(str(lc + 1))		
+		
+	def run(self):
+		print "overide run program in derived cut type"
+
+	def cut(self,x=None,y=None,z=None,ox=False,oy=False,oz=False):
+		obj = self.obj
+		line = 'G1'
+		if x != None: line = line + 'X' + str(round(self.toOutputUnits(x - (self.xOff if ox else 0.),'length'),4))
+		if y != None: line = line + 'Y' + str(round(self.toOutputUnits(y - (self.yOff if oy else 0.),'length'),4))
+		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z - (self.zOff if oz else 0.),'length'),4))
+		if x != None or y != None:
+			if self.cuttingDirection != "cutting":
+				feedString = 'F' + str(self.toOutputUnits(obj.FeedRate.Value,'velocity'))
+				self.cuttingDirection = "cutting"
+			else: feedString = ""
+		else:
+			if self.cuttingDirection != "plunging":
+				feedString = 'F' + str(self.toOutputUnits(obj.PlungeRate.Value,'velocity'))
+				self.cuttingDirection = "plunging"
+			else: feedString = ""
+		self.writeGCodeLine(line + ' ' + feedString)
+
+	def rapid(self,x=None,y=None,z=None,ox=False,oy=False,oz=False):
+		line = 'G0'
+		if x != None: line = line + 'X' + str(round(self.toOutputUnits(x - (self.xOff if ox else 0.),'length'),4))
+		if y != None: line = line + 'Y' + str(round(self.toOutputUnits(y - (self.yOff if oy else 0.),'length'),4))
+		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z - (self.zOff if oz else 0.),'length'),4))
+		self.writeGCodeLine(line)
+
+	'''def cut(self,x=None,y=None,z=None):
+		obj = self.obj
+		line = 'G1'
+		if x != None: line = line + 'X' + str(round(self.toOutputUnits(x,'length') - self.xOff,4))
+		if y != None: line = line + 'Y' + str(round(self.toOutputUnits(y,'length') - self.yOff,4))
+		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z,'length') - self.zOff,4))
+		if x != None or y != None:
+			if self.cuttingDirection != "cutting":
+				feedString = 'F' + str(self.toOutputUnits(obj.FeedRate.Value,'velocity'))
+				self.cuttingDirection = "cutting"
+			else: feedString = ""
+		else:
+			if self.cuttingDirection != "plunging":
+				feedString = 'F' + str(self.toOutputUnits(obj.PlungeRate.Value,'velocity'))
+				self.cuttingDirection = "plunging"
+			else: feedString = ""
+		self.writeGCodeLine(line + ' ' + feedString)
+
+	def rapid(self,x=None,y=None,z=None):
+		line = 'G0'
+		if x != None: line = line + 'X' + str(round(self.toOutputUnits(x,'length') - self.xOff,4))
+		if y != None: line = line + 'Y' + str(round(self.toOutputUnits(y,'length') - self.yOff,4))
+		if z != None: line = line + 'Z' + str(round(self.toOutputUnits(z,'length') - self.zOff,4))
+		self.writeGCodeLine(line)'''
+		
+	def cutWire(self,wire):
+		self.rapid(z=self.safeHeight)
+		self.rapid(wire[0][0],wire[0][1])
+		self.cut(z = wire[0][2])
+		i = 1
+		while i < len(wire):
+			x,y,z = wire[i]
+			self.cut(x,y,z)
+			i = i + 1
+		self.rapid(z = self.safeHeight)
 		
 	def setUserUnits(self):
 		userPref = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units").GetInt("UserSchema")
@@ -152,8 +205,15 @@ class Cut:
 			
 	def toOutputUnits(self,s,form):
 		if hasattr(s,"UserString") == False:
-			if self.outputUnits == 'METRIC': return s
-			return s/25.4
+			if form == 'length':
+				if self.outputUnits == 'METRIC': return s
+				return s/25.4
+			elif form == 'velocity':
+				if self.outputUnits == 'METRIC': return s * 60.
+				return s * 60. / 25.4
+			else:
+				print 'unknown form: ' + form
+				return s
 		s = s.UserString
 		sUnit = s.lstrip('-+0123456789.e\ ')
 		sValue = eval(s[:len(s) - len(sUnit)])
@@ -216,26 +276,12 @@ class Cut:
 		z = self.toOutputUnits(obj.getParentGroup().ZOriginValue,'length')
 		return (x,y,z)
 	
-	def setBitWidth(self,obj):
+	'''def setBitWidth(self,obj):
 		tool = FreeCAD.ActiveDocument.getObjectsByLabel(obj.Tool)[0]
-		if hasattr(tool,'Diameter'): self.bitWidth = tool.Diameter.Value
+		if hasattr(tool,'cutPolyInsideConventional'): self.bitWidth = tool.Diameter.Value
 		else: self.bitWidth = 0.0	
-		return
-		
-	def setToolParams(self,obj):
-		tool = FreeCAD.ActiveDocument.getObjectsByLabel(obj.Tool)[0]
-		if tool.ToolType == "Ball":
-			self.toolParams = {'type':'Ball', 'diameter': tool.BallDiameter.Value}
-		elif tool.ToolType == "Straight":
-			self.toolParams = {'type': 'Straight', 'diameter': tool.Diameter.Value}
-		elif tool.ToolType == 'Conical':
-			self.toolParams = {'type': 'Conical', 'cutLength': tool.CutLength.Value, 'diameter': tool.TopDiameter.Value}
-		else:
-			print "Error: " + tool.ToolType + 'not implemented'
-			self.toolParams = None
-		return
-		
-	
+		return'''
+			
 	def getLabel(self,s):
 		i = 0
 		while len(FreeCAD.ActiveDocument.getObjectsByLabel(s)) > 0:
@@ -328,25 +374,25 @@ class Cut:
 	def cutPolyInsideClimb(self,poly):
 		i = 0
 		while i < len(poly):
-			self.cut(poly[i][0],poly[i][1])
+			self.cut(x = poly[i][0],y = poly[i][1],ox=True,oy=True)
 			i = i + 1
 		
 	def cutPolyInsideConventional(self,poly):
 		i = len(poly) - 1
 		while (i >= 0):
-			self.cut(poly[i][0],poly[i][1])
+			self.cut(x = poly[i][0],y = poly[i][1],ox=True,oy=True)
 			i = i - 1
 		
 	def cutPolyOutsideClimb(self,poly):
 		i = len(poly) - 1
 		while (i >= 0):
-			self.cut(poly[i][0],poly[i][1])
+			self.cut(x = poly[i][0],y = poly[i][1],ox=True,oy=True)
 			i = i - 1
 		
 	def cutPolyOutsideConventional(self,poly):
 		i = 0
 		while i < len(poly):
-			self.cut(poly[i][0],poly[i],[1])
+			self.cut(x = poly[i][0],y = poly[i][1],ox=True,oy=True)
 			i = i + 1
 	
 	def getClipSolutions(self,clip,subj):
@@ -416,12 +462,9 @@ class Cut:
 		return reducedPoly
 
 	def moveOrigin2D(self,polys):
-		xOff = self.parent.XOriginValue.Value
-		yOff = self.parent.YOriginValue.Value
-		zOff = self.parent.ZOriginValue.Value
 		for poly in polys:
 			for point in poly:
-				point = (point[0] - xOff,point[1] - yOff)
+				point = (point[0] - self.xOff,point[1] - self.yOff)
 		return polys
 		
 	def getUniqueName(self,base):
@@ -674,7 +717,7 @@ class Cut:
 
 		return clipperPoly	
 					
-	def getPolysAtSlice(self,objectToCut,plane,height):
+	def getPolysAtSlice(self,objectToCut,plane,depth):
 		fc = FreeCAD.ActiveDocument
 		obj = fc.getObjectsByLabel(objectToCut)[0]
 		shape = obj.Shape
@@ -682,7 +725,7 @@ class Cut:
 		else: error = self.obj.MaximumError.Value
 		FreeCADGui.ActiveDocument.getObject(obj.Name).Deviation = error / 3.
 		wires = list()
-		for i in shape.slice(Base.Vector(0,0,1),height):
+		for i in shape.slice(Base.Vector(0,0,1),self.zOff - depth):
 			wires.append(i)
 		polys = []
 		for wire in wires:
@@ -724,6 +767,11 @@ class Cut:
 			return simplePolys
 		else:
 			return self.scaleFromClipper(pyclipper.SimplifyPolygons(self.scaleToClipper(polys,100000.)),1/100000.)
+			
+	def changeTool(self):
+		self.rapid(z = self.zToolChange)
+		self.rapid(self.xToolChange,self.yToolChange)
+		self.writeGCodeLine('T' + str(self.obj.ToolNumber) + 'M6')
 	
 	def __getstate__(self):
 		state = {}

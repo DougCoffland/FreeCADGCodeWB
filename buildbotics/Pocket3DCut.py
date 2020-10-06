@@ -321,49 +321,24 @@ class Pocket3DCut(Cut):
 			obj.setEditorMode(prop,("ReadOnly",))
 		FreeCAD.ActiveDocument.recompute()
 		
-	def run(self, ui, obj, outputUnits,fp):
-		self.obj = obj
-		self.parent = obj.getParentGroup()
-		self.fp = fp
-		self.ui = ui
-		self.outputUnits = outputUnits
-		self.error = obj.MaximumError.Value
+	def setParameters(self,ui, obj, outputUnits,fp):
+		self.setCommonProperties(ui, obj, outputUnits,fp)
+		self.out = self.writeGCodeLine
 		self.cuttingDirection = None
-		out = self.writeGCodeLine
+		self.error = obj.MaximumError.Value
+				
+	def run(self, ui, obj, outputUnits,fp):
+		self.setParameters(ui, obj, outputUnits,fp)
 		self.updateActionLabel("Running " + obj.CutName)
-		self.safeHeight = obj.SafeHeight.Value
-		tool = str(obj.ToolNumber)
-		rapid = self.rapid
-		cut = self.cut
-		self.setBitWidth(obj)
-		out("(Starting " + obj.CutName + ')')
-		self.setUserUnits()
-		self.setOffset(self.parent.XOriginValue.Value, self.parent.YOriginValue.Value, self.parent.ZOriginValue.Value)
-		self.updateActionLabel("Setting feeds and speeds for " + obj.CutName)
-
-		rapid(z=obj.ZToolChangeLocation.Value)
-		rapid(obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)
-		out('T' + tool + 'M6')
-		out('S' + str(obj.SpindleSpeed).split()[0])
-		
-		fc = FreeCAD.ActiveDocument
-		
-		# Get intersection of workpiece and object to cut
-		self.updateActionLabel('making intersection between workpiece and ' + obj.ObjectToCut)
-		differenceShape = self.differenceOfShapes(self.parent.WorkPiece,obj.ObjectToCut)		
-		level = differenceShape.Shape.BoundBox.ZMax
-
-		mask = None
-		while level >= differenceShape.Shape.BoundBox.ZMin:
-			self.updateActionLabel('getting slice a z = ' + str(level - self.parent.ZOriginValue.Value))
-			polys = self.getPolysAtSlice(differenceShape.Name,"XY",level)
-			polys = self.moveOrigin2D(polys)
-			if len(polys) == 0: break
-			if mask != None:
-				polys = self.intersectionOfShapes(mask,polys)
-			mask = polys	
-			polyList = []
-			self.updateActionLabel('Getting offset polygons for z = ' + str(level - self.parent.ZOriginValue.Value))
+		self.out("(Starting " + obj.CutName + ')')
+		self.changeTool()
+		self.out('M3 S' + self.speed)
+		shape = FreeCAD.ActiveDocument.getObjectsByLabel(obj.ObjectToCut)[0]
+		level = 0
+		while level >= shape.Shape.BoundBox.ZMin - self.zOff:
+			print level,' ',shape.Shape.BoundBox.ZMin,' ',self.zOff
+			polys = self.getPolysAtSlice(shape.Name,"XY",level)
+			polyList = list()
 			offset = obj.OffsetFromPerimeter.Value
 			offsetPolys = self.getOffset(polys,-offset)
 			while len(offsetPolys) > 0:
@@ -371,18 +346,18 @@ class Pocket3DCut(Cut):
 					polyList.append(poly)
 				offset = offset + obj.StepOver.Value
 				offsetPolys = self.getOffset(polys,-offset)
-			self.updateActionLabel('Generating cuts for z = ' + str(level - self.parent.ZOriginValue.Value))
+			self.updateActionLabel('Generating cuts for z = ' + str(level))
 			while len(polyList) > 0:
 				self.rapid(z = self.safeHeight)
 				poly = self.shortestPoly(polyList)
-				self.rapid(poly[0][0],poly[0][1])
-				self.cut(z = level - self.parent.ZOriginValue.Value)
+				self.rapid(x=poly[0][0],y=poly[0][1],ox=True,oy=True)
+				self.cut(z = level)
 				area = self.areaOfPoly(poly)
 				reducedPoly = self.smoothePoly(poly)
 				if obj.MillingMethod == "Climb": self.cutPolyInsideClimb(reducedPoly)
 				else: self.cutPolyInsideConventional(reducedPoly)
 				polyList.remove(poly)
-				poly = self.nextPoly(poly[0][0],poly[0][1],polyList,self.bitWidth)
+				poly = self.nextPoly(poly[0][0],poly[0][1],polyList,self.toolParams['diameter'])
 				while poly != None:
 					length = self.lengthOfPoly(poly)
 					lengthTimesWidth = length * obj.StepOver.Value
@@ -392,10 +367,63 @@ class Pocket3DCut(Cut):
 					else: self.cutPolyInsideConventional(reducedPoly)
 					area = self.areaOfPoly(poly)
 					polyList.remove(poly)
-					poly = self.nextPoly(poly[0][0],poly[0][1],polyList,self.bitWidth)					
+					poly = self.nextPoly(poly[0][0],poly[0][1],polyList,self.toolParams['diameter'])					
 			self.rapid(z = self.safeHeight)
 			level = level - obj.StepDown.Value
-		fc.removeObject(differenceShape.Name)
+		#FreeCAD.ActiveDocument.removeObject(differenceShape.Name)
 		return
+		'''	
+		# Get intersection of workpiece and object to cut
+		self.updateActionLabel('making intersection between workpiece and ' + obj.ObjectToCut)
+		differenceShape = self.differenceOfShapes(self.parent.WorkPiece,obj.ObjectToCut)		
+		level = differenceShape.Shape.BoundBox.ZMax
+
+		mask = None
+		while level >= differenceShape.Shape.BoundBox.ZMin:
+			self.updateActionLabel('getting slice a z = ' + str(level - self.zOff))
+			polys = self.getPolysAtSlice(differenceShape.Name,"XY",level)
+			print len(polys),' ',differenceShape.Name,' ',level
+			if len(polys) == 0:
+				level = level - obj.StepDown.Value
+				continue
+			if mask != None:
+				polys = self.intersectionOfShapes(mask,polys)
+			mask = polys	
+			polyList = []
+			self.updateActionLabel('Getting offset polygons for z = ' + str(level - self.zOff))
+			offset = obj.OffsetFromPerimeter.Value
+			offsetPolys = self.getOffset(polys,-offset)
+			while len(offsetPolys) > 0:
+				for poly in offsetPolys:
+					polyList.append(poly)
+				offset = offset + obj.StepOver.Value
+				offsetPolys = self.getOffset(polys,-offset)
+			self.updateActionLabel('Generating cuts for z = ' + str(level - self.zOff))
+			while len(polyList) > 0:
+				self.rapid(z = self.safeHeight)
+				poly = self.shortestPoly(polyList)
+				self.rapid(x=poly[0][0],y=poly[0][1],ox=True,oy=True)
+				self.cut(z = level,oz=True)
+				area = self.areaOfPoly(poly)
+				reducedPoly = self.smoothePoly(poly)
+				if obj.MillingMethod == "Climb": self.cutPolyInsideClimb(reducedPoly)
+				else: self.cutPolyInsideConventional(reducedPoly)
+				polyList.remove(poly)
+				poly = self.nextPoly(poly[0][0],poly[0][1],polyList,self.toolParams['diameter'])
+				while poly != None:
+					length = self.lengthOfPoly(poly)
+					lengthTimesWidth = length * obj.StepOver.Value
+					if self.areaOfPoly(poly) - lengthTimesWidth > area: break
+					reducedPoly = self.smoothePoly(poly)
+					if obj.MillingMethod == "Climb": self.cutPolyInsideClimb(reducedPoly)
+					else: self.cutPolyInsideConventional(reducedPoly)
+					area = self.areaOfPoly(poly)
+					polyList.remove(poly)
+					poly = self.nextPoly(poly[0][0],poly[0][1],polyList,self.toolParams['diameter'])					
+			self.rapid(z = self.safeHeight)
+			level = level - obj.StepDown.Value
+		#FreeCAD.ActiveDocument.removeObject(differenceShape.Name)
+		return
+		'''
 
 			

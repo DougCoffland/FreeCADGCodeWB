@@ -382,34 +382,21 @@ class Pocket2DCut(Cut):
 			obj.setEditorMode(prop,("ReadOnly",))
 		FreeCAD.ActiveDocument.recompute()
 		
-	def run(self, ui, obj, outputUnits,fp):
-		self.obj = obj
-		self.parent = obj.getParentGroup()
-		self.fp = fp
-		self.ui = ui
-		self.outputUnits = outputUnits
-		self.error = obj.MaximumError.Value
+	def setParameters(self,ui, obj, outputUnits,fp):
+		self.setCommonProperties(ui, obj, outputUnits,fp)
+		self.out = self.writeGCodeLine
 		self.cuttingDirection = None
-		out = self.writeGCodeLine
+		self.error = obj.MaximumError.Value
+				
+	def run(self, ui, obj, outputUnits,fp):
+		self.setParameters(ui, obj, outputUnits,fp)
 		self.updateActionLabel("Running " + obj.CutName)
-		self.safeHeight = obj.SafeHeight.Value
-		tool = str(obj.ToolNumber)
-		rapid = self.rapid
-		cut = self.cut
-		self.setBitWidth(obj)
-		out("(Starting " + obj.CutName + ')')
-		self.setUserUnits()
-		self.setOffset(self.parent.XOriginValue.Value, self.parent.YOriginValue.Value, self.parent.ZOriginValue.Value)
-		self.updateActionLabel("Setting feeds and speeds for " + obj.CutName)
-
-		rapid(z=obj.ZToolChangeLocation.Value)
-		rapid(obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)
-		out('T' + tool + 'M6')
-		out('S' + str(obj.SpindleSpeed).split()[0])
-		
+		self.changeTool()
+		self.out('M3 S' + self.speed)
+		self.updateActionLabel("Running " + obj.CutName)
+		self.out("(Starting " + obj.CutName + ')')	
 		self.updateActionLabel("Getting Boundaries for " + obj.CutName)
-		polys = self.getPolysAtSlice(obj.ObjectToCut,"XY",self.parent.ZOriginValue.Value - obj.PerimeterDepth.Value)
-		polys = self.moveOrigin2D(polys)
+		polys = self.getPolysAtSlice(obj.ObjectToCut,"XY",obj.PerimeterDepth.Value)
 		polyList =[]
 		offset = 0
 		self.updateActionLabel("Getting offset polygons for " + obj.CutName)
@@ -419,24 +406,22 @@ class Pocket2DCut(Cut):
 			for poly in offsetPolys:
 				polyList.append(poly)
 			offset = offset + obj.StepOver.Value
-			offsetPolys = self.getOffset(polys,-offset)
-		
+			offsetPolys = self.getOffset(polys,-offset)		
 		self.updateActionLabel("Generating cuts for " + obj.CutName)
 		currentDepth = obj.StartHeight.Value
 		while currentDepth >= -obj.DepthOfCut.Value:
 			currentList = polyList[:]
 			while len(currentList) > 0:
 				self.rapid(z=self.safeHeight)
-
 				poly = self.shortestPoly(currentList)
-				self.rapid(poly[0][0],poly[0][1])
+				self.rapid(x=poly[0][0],y=poly[0][1],ox=True,oy=True)
 				self.cut(z=currentDepth)
 				area = self.areaOfPoly(poly)
 				reducedPoly = self.smoothePoly(poly)
 				if obj.MillingMethod == "Climb": self.cutPolyInsideClimb(reducedPoly)
 				else: self.cutPolyInsideConventional(reducedPoly)
 				currentList.remove(poly)
-				poly = self.nextPoly(poly[0][0],poly[0][1],currentList,self.bitWidth)
+				poly = self.nextPoly(poly[0][0],poly[0][1],currentList,self.toolParams['diameter'])
 				while poly != None:
 					length = self.lengthOfPoly(poly)
 					lengthTimesWidth = length * obj.StepOver.Value
@@ -446,7 +431,7 @@ class Pocket2DCut(Cut):
 					else: self.cutPolyInsideConventional(reducedPoly)
 					area = self.areaOfPoly(poly)
 					currentList.remove(poly)
-					poly = self.nextPoly(poly[0][0],poly[0][1],currentList,self.bitWidth)					
+					poly = self.nextPoly(poly[0][0],poly[0][1],currentList,self.toolParams['diameter'])					
 			if currentDepth == -obj.DepthOfCut.Value: break
 			if currentDepth - obj.StepDown.Value <= -obj.DepthOfCut.Value: currentDepth = -obj.DepthOfCut.Value
 			else: currentDepth = currentDepth - obj.StepDown.Value

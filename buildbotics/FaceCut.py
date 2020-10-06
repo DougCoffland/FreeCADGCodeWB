@@ -209,6 +209,11 @@ class FaceCut(Cut):
 			obj.setEditorMode(prop,("ReadOnly",))
 		FreeCAD.ActiveDocument.recompute()
 		
+	def setParameters(self,ui, obj, outputUnits,fp):
+		self.setCommonProperties(ui, obj, outputUnits,fp)
+		self.out = self.writeGCodeLine
+		self.cuttingDirection = None
+		
 	def getBoundBox(self,polys):
 		xMin = xMax = polys[0][0][0]
 		yMin = yMax = polys[0][0][1]
@@ -274,11 +279,17 @@ class FaceCut(Cut):
 		a_s = self.getDirection(seg)
 		a_p = self.getDirection(polySeg)
 		
+	def samePoint(self,p1,p2):
+		x1,y1 = p1[0],p1[1]
+		x2,y2 = p2[0],p2[1]
+		if round(math.sqrt((x2-x1)*(x2-x2) + (y2-y1)*(y2-y1)),6) == 0.0: return True
+		else: return False
+				
 	def getPointsOfInterest(self,seg,polySegs):
 		pointDataList = []
-		m0 = self.getSegDirection(seg)
+		m0 = round(self.getSegDirection(seg),6)
 		for polySeg in polySegs:
-			m1 = self.getSegDirection(polySeg)
+			m1 = round(self.getSegDirection(polySeg),6)
 			if m1 == m0 or m1 == -m0:
 				pointDataList.append({"type": "ON_SEG", "point": polySeg[0], "otherPoint": polySeg[1], "angle": m1})
 			else:
@@ -291,20 +302,21 @@ class FaceCut(Cut):
 					print "Error: getPointsOfInterest: divide by zero"
 					return
 				t = ((y3 - y4)*(x1 - x3) + (x4 - x3)*(y1 - y3))/d
-				p = (x1 + t * (x2 - x1),y1 + t * (y2 - y1))
-				if p == polySeg[0] or p == polySeg[1]:
-					if p == polySeg[0]: p2 == polySeg[1]
+				p = x1 + t * (x2 - x1),y1 + t * (y2 - y1)
+				if  self.samePoint(p,polySeg[0]) or self.samePoint(p,polySeg[1]):
+					if self.samePoint(p,polySeg[1]) == False: p2 = polySeg[1]
 					else: p2 = polySeg[0]
-					pointDataList.append({"type": "END", "point": p, "otherPoint": p2,  "angle": m1})
+					pointDataList.append({"type": "END_POINT", "point": p, "otherPoint": p2,  "angle": m1})
 				else:
 					pointDataList.append({"type": "CROSS_POINT", "point": p})
 		return pointDataList
 		
-	def getConnectingSeg(self, segs, p):
+	def getConnectingSeg(self, pointsOfInterest, p):
 		i = 0
-		while i < len(segs):
-			if seg[i][0] == p or seg[i][1] == p: return i
+		while i < len(pointsOfInterest):
+			if self.samePoint(pointsOfInterest[i]["point"],p): return i
 			i = i + 1
+		return -1
 		
 	def getNearestPoint(self,p,pList):
 		i = 0
@@ -347,10 +359,10 @@ class FaceCut(Cut):
 	def cutZigZags(self,obj,cutList,depth):
 		if obj.MillingMethod == "Either":
 			cut = cutList.pop(0)
-			self.rapid(z = obj.SafeHeight.Value)
-			self.rapid(cut[0][0],cut[0][1])
+			self.rapid(z = self.safeHeight)
+			self.rapid(x=cut[0][0],y=cut[0][1],ox=True,oy=True)
 			self.cut(z=depth)
-			self.cut(cut[1][0],cut[1][1])
+			self.cut(x=cut[1][0],y=cut[1][1],ox=True,oy=True)
 			lastPoint = cut[1]
 			while len(cutList) > 0:
 				nearestCut,shortestDistance,end = self.getNearestCut(lastPoint,cutList)
@@ -361,26 +373,29 @@ class FaceCut(Cut):
 				else:
 					p1 = cut[1]
 					p2 = cut[0]
-				if shortestDistance >= self.bitWidth * .75:
-					self.rapid(z=obj.SafeHeight.Value)
-					self.rapid(p1[0],p1[1])
+				if shortestDistance >= self.toolParams['diameter'] * .75:
+					self.rapid(z=self.safeHeight)
+					self.rapid(x=p1[0],y=p1[1],ox=True,oy=True)
 					self.cut(z=depth)
 				else:
-					self.cut(p1[0],p1[1])
-				self.cut(p2[0],p2[1])
+					self.cut(x=p1[0],y=p1[1],ox=True,oy=True)
+				self.cut(x=p2[0],y=p2[1],ox=True,oy=True)
 				lastPoint = p2
-			self.rapid(z=obj.SafeHeight.Value)			
-		for cut in cutList:
-			self.rapid(z=obj.SafeHeight.Value)
+			self.rapid(z=self.safeHeight)
+		i = 0
+		while i < len(cutList):
+			cut = cutList[i]			
+			self.rapid(z=self.safeHeight)
 			if obj.MillingMethod == "Climb":
-				self.rapid(cut[0][0],cut[0][1])
+				self.rapid(x=cut[0][0],y=cut[0][1],ox=True,oy=True)
 				self.cut(z=depth)
-				self.cut(cut[1][0],cut[1][1])
+				self.cut(x=cut[1][0],y=cut[1][1],ox=True,oy=True)
 			elif obj.MillingMethod == "Conventional":
-				self.rapid(cut[1][0],cut[1][1])
-				self.cut(z=depth)
-				self.cut(cut[0][0],cut[0][1])
-			self.rapid(z=obj.SafeHeight.Value)				
+				self.rapid(x=cut[1][0],y=cut[1][1],ox=True,oy=True)
+				self.cut(z=depth )
+				self.cut(x=cut[0][0],y=cut[0][1],ox=True,oy=True)
+			self.rapid(z=self.safeHeight)
+			i = i + 1				
 					
 	def getSide(self, seg, p):
 		x = p[0]
@@ -389,7 +404,7 @@ class FaceCut(Cut):
 		y1 = seg[0][1]
 		x2 = seg[1][0]
 		y2 = seg[1][1]
-		d = (x - x1)(y2 - y1) - (y - y2)(x2 - x1)
+		d = (x - x1) * (y2 - y1) - (y - y2) * (x2 - x1)
 		if d < 0: return -1
 		elif d > 0: return 1
 		else: return 0
@@ -398,8 +413,8 @@ class FaceCut(Cut):
 		if direction == "DIAGONAL": self.updateActionLabel("Getting Boundaries for Zig Zag facing")
 		elif direction == "ALONGX": self.updateActionLabel("Getting Boundaries for Along X facing")
 		else: self.updateActionLabel("Getting Boundaries for Along Y facing")
-		polys = self.getPolysAtSlice(obj.CutArea,"XY",self.parent.ZOriginValue.Value - obj.Depth.Value)
-		polys = self.moveOrigin2D(polys)
+		polys = self.getPolysAtSlice(obj.CutArea,"XY",obj.Depth.Value)
+		#polys = self.moveOrigin2D(polys)
 		if len(polys) == 0: return
 		root2 = math.sqrt(2)
 		xMin,xMax,yMin,yMax = self.getBoundBox(polys)
@@ -435,114 +450,85 @@ class FaceCut(Cut):
 			while x1 < xMax:
 				segList.append([[x1,yMin],[x1,yMax]])
 				x1 = x1 + obj.StepOver.Value
-		offsetPolys = self.getOffset(polys,-(self.bitWidth)/2)
+		offsetPolys = self.getOffset(polys,-(self.toolParams['diameter'])/2)
 		cutList = []
 		for seg in segList:
 			intersectingPolySegs = self.getIntersections(seg,offsetPolys)
+			if intersectingPolySegs == []: continue
 			pointsOfInterest = self.getPointsOfInterest(seg,intersectingPolySegs)
 			cutting = False
-			cuttingOnSegment = False
+			onSegment = False
 			startPoint = None
-			endPoint = None
+			
 			while len(pointsOfInterest) > 0:
 				i = self.getNearestPoint(seg[0],pointsOfInterest)
 				p = pointsOfInterest.pop(i)
 				if p["type"] == 'CROSS_POINT':
-					if cuttingOnSegment == True:
-						print "Warning: invalid polygon"
-						cuttingOnSegment = False
+					cuttingOnSegment = False
 					if cutting == False:
 						startPoint = p['point']
 						cutting = True
 					else:
-						endPoint = p['point']
-						cutList.append([startPoint,endPoint])
+						cutList.append([startPoint,p['point']])
 						cutting = False
 						startPoint = None
-						endPoint = None
-				elif p["type"] == "END_POINT":
-					side1 = self.getSide(seg,p["otherPoint"])
-					i = self.getConnectingSeg(pointsOfInterest,p["point"])
-					p2 = pointsOfInterest.pop(i)
-					while p2["type"] == "ON_SEG":
-						i = self.getConnectingSeg(pointsOfInterest,p2["otherPoint"])
-						p2 = pointsOfInterest.pop(i)
-					endPoint = p2["point"]
-					side2 = self.getSide(seg,p2["otherPoint"])
-					if side1 == side2:
-						if cutting == False:
-							startPoint = p["point"]
-							endPoint = p2["point"]
-							cutList.append([startPoint,endPoint])
-							startPoint = None
-							endPoint = None
+				elif p["type"] == 'END_POINT':
+					if onSegment == False:
+						startPoint = p['point']
+						side1 = self.getSide(seg,p['otherPoint'])
+						onSegment = True
 					else:
-						if cutting == True:
-							endPoint = p2
-							cutList.append([startPoint,endPoint])
-							cutting = False
+						side2 = self.getSide(seg,p['otherPoint'])
+						if side1 == side2:
+							onSegment = False
+							if cutting == False:
+								if startPoint != p['point']: cutList.append([startPoint,p['point']])
+								startPoint = None
 						else:
-							startPoint = p["point"]
-							cutting = True
-				elif p["type"] == "ON_SEG":
-					i = self.getConnectingSeg(pointsOfInterest,p["point"])
-					p1 = pointsOfInterest.pop(i)
-					side1 = self.getSide(seg,p1["otherPoint"])
-					i = self.getConnectingSeg(pointsOfInterest,p["otherPoint"])
-					p2 = pointsOfInterest.pop(i)
-					while p2["type"] == "ON_SEG":
-						i = self.getConnectingSeg(pointsOfInterest,p2["otherPoint"])
-						p2 = pointsOfInterest.pop(i)
-					endPoint = p2["point"]
-					side2 = self.getSide(seg,p2["otherPoint"])
-					if side1 == side2:
-						if startPoint == endPoint: pass
-						elif cutting == False:
-							startPoint = p["point"]
-							endPoint = p2["point"]
-							cutList.append([startPoint,endPoint])
-						else: pass
-					else:
-						if cutting == False:
-							startPoint = p["point"]
-							cutting = True
-						else:
-							endPoint = p2["point"]
-							cutList.append([startPoint,endPoint])
-							startPoint = None
-							endPoint = None
-							cutting = False								
+							cutList.append([startPoint,p['point']])
+							if cutting == True:
+								startPoint = None
+								cutting = False
+							else:
+								startPoint = p['point']
+								cutting = True
+							onSegment = False
+				else:
+					if cutting == False:
+						cutList.append([p['point'],p['otherPoint']])
 		depth = obj.StartHeight.Value
 		while depth > -obj.Depth.Value:
 			if cutPerimeter == True:
 				for poly in offsetPolys:
-					self.rapid(z=obj.SafeHeight.Value)
-					self.rapid(poly[0][0],poly[0][1])
+					self.rapid(z=self.safeHeight)
+					self.rapid(x=poly[0][0],y=poly[0][1],ox=True,oy=True)
 					self.cut(z=depth)
 					if obj.MillingMethod == "Conventional":
 						self.cutPolyInsideConventional(poly)
 					else: self.cutPolyInsideClimb(poly)				
-					self.rapid(z=obj.SafeHeight.Value)
+					self.rapid(z=self.safeHeight)
 			self.cutZigZags(obj,cutList[:],depth)
 			depth = depth - obj.StepDown.Value
+			return
 		if depth + obj.StepDown.Value > -obj.Depth.Value:
 			depth = -obj.Depth.Value
 			if cutPerimeter == True:
 				for poly in offsetPolys:
-					self.rapid(z=obj.SafeHeight.Value)
-					self.rapid(poly[0][0],poly[0][1])
+					self.rapid(z=self.safeHeight)
+					self.rapid(x=poly[0][0],y=poly[0][1],ox=True,oy=True)
 					self.cut(z=depth)
 					if obj.MillingMethod == "Conventional":
 						self.cutPolyInsideConventional(poly)
 					else: self.cutPolyInsideClimb(poly)				
-					self.rapid(z=obj.SafeHeight.Value)
-			self.cutZigZags(obj,cutList[:],depth)		
+					self.rapid(z=self.safeHeight)
+			self.cutZigZags(obj,cutList[:],depth)
+	
 		
 	def runCircular(self,obj):
-		offset = -self.bitWidth/2
+		offset = -self.toolParams['diameter']/2
 		self.updateActionLabel("Getting Boundaries for circular facing")
-		polys = self.getPolysAtSlice(obj.CutArea,"XY",self.parent.ZOriginValue.Value - obj.Depth.Value)
-		polys = self.moveOrigin2D(polys)
+		polys = self.getPolysAtSlice(obj.CutArea,"XY",obj.Depth.Value)
+		#polys = self.moveOrigin2D(polys)
 		self.updateActionLabel("Getting Offsets")
 		offsetPolys = self.getOffset(polys, offset)
 		polyList = offsetPolys
@@ -560,12 +546,12 @@ class FaceCut(Cut):
 				outerLength = self.lengthOfPoly(poly)
 				lengthTimesWidth = outerLength * obj.StepOver.Value
 				self.rapid(z=self.safeHeight)
-				self.rapid(poly[0][0],poly[0][1])
+				self.rapid(x=poly[0][0],y=poly[0][1],ox=True,oy=True)
 				self.cut(z=currentDepth)
 				if obj.MillingMethod != "Climb": self.cutPolyInsideClimb(poly)
 				else: self.cutPolyInsideConventional(poly)
 				currentList.remove(poly)
-				poly = self.nextPoly(poly[0][0],poly[0][1],currentList,self.bitWidth)
+				poly = self.nextPoly(poly[0][0],poly[0][1],currentList,self.toolParams['diameter'])
 				while poly != None:
 					if outerArea - lengthTimesWidth > self.areaOfPoly(poly): break
 					if obj.MillingMethod != "Climb": self.cutPolyInsideClimb(poly)
@@ -574,7 +560,7 @@ class FaceCut(Cut):
 					outerLength = self.lengthOfPoly(poly)
 					lengthTimesWidth = outerLength * obj.StepOver.Value
 					currentList.remove(poly)
-					poly = self.nextPoly(poly[0][0],poly[0][1],currentList,self.bitWidth)
+					poly = self.nextPoly(poly[0][0],poly[0][1],currentList,self.toolParams['diameter'])
 			if currentDepth == -obj.Depth.Value: break
 			if currentDepth - obj.StepDown.Value <= -obj.Depth.Value: currentDepth = -obj.Depth.Value
 			else: currentDepth = currentDepth - obj.StepDown.Value
@@ -582,27 +568,10 @@ class FaceCut(Cut):
 		self.rapid(z = self.safeHeight)
 
 	def run(self, ui, obj, outputUnits, fp):
-		self.obj = obj		
-		self.parent = obj.getParentGroup()
-		self.fp = fp
-		self.ui = ui
-		self.outputUnits = outputUnits
-		out = self.writeGCodeLine
-		self.safeHeight = obj.SafeHeight.Value
-		self.cuttingDirection = None
-		tool = str(obj.ToolNumber)
-		rapid = self.rapid
-		cut = self.cut
-		self.setBitWidth(obj)
-		out("(Starting " + obj.CutName + ')')
-		self.setUserUnits()
-		self.setOffset(self.parent.XOriginValue.Value, self.parent.YOriginValue.Value, self.parent.ZOriginValue.Value)
-		self.updateActionLabel("Setting feeds and speeds")
-
-		rapid(z=obj.ZToolChangeLocation.Value)
-		rapid(obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)
-		out('T' + tool + 'M6')
-		out('S' + str(obj.SpindleSpeed).split()[0])
+		self.setParameters(ui, obj, outputUnits,fp)
+		self.out("(Starting " + obj.CutName + ')')
+		self.changeTool()
+		self.out('M3 S' + self.speed)
 		if obj.FacingPattern == "Circular": self.runCircular(obj)
 		elif obj.FacingPattern == "Zig Zag": self.runLinear(obj, 'DIAGONAL', False)
 		elif obj.FacingPattern == "Perimeter then Zig-Zag": self.runLinear(obj, 'DIAGONAL', True)
@@ -610,5 +579,5 @@ class FaceCut(Cut):
 		elif obj.FacingPattern == "Perimeter then Along X": self.runLinear(obj, 'ALONGX', True)
 		elif obj.FacingPattern == "Along Y": self.runLinear(obj, 'ALONGY', False)
 		elif obj.FacingPattern == "Perimeter then Along Y": self.runLinear(obj, 'ALONGY', True)
-		rapid(z=self.safeHeight)
+		self.rapid(z=self.safeHeight)
 		self.updateActionLabel("Cut completed")

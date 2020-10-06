@@ -101,7 +101,10 @@ static char * drill_xpm[] = {
 "........                 "};
 """
 
-class DrillCut(Cut):	
+class DrillCut(Cut):
+	def __init__(self,selectedObject):
+		Cut.__init__(self,selectedObject)
+			
 	def setProperties(self,p,obj):
 		if hasattr(obj,'PropertiesList'):
 			for prop in obj.PropertiesList:
@@ -114,6 +117,13 @@ class DrillCut(Cut):
 		for prop in obj.PropertiesList:
 			obj.setEditorMode(prop,("ReadOnly",))
 		FreeCAD.ActiveDocument.recompute()
+		
+	def setParameters(self,ui, obj, outputUnits,fp):
+		self.setCommonProperties(ui, obj, outputUnits,fp)
+		self.out = self.writeGCodeLine
+		self.cuttingDirection = None
+		self.peckDepth = obj.PeckDepth.Value
+		self.drillList = obj.DrillPointList
 				
 	def drill(self,x,y,zed,safeHeight,peckDepth):
 		self.rapid(z=safeHeight)
@@ -126,28 +136,16 @@ class DrillCut(Cut):
 		self.cut(z = -zed)
 		
 	def run(self, ui, obj, outputUnits,fp):
-		self.obj = obj
-		self.parent = obj.getParentGroup()
-		self.fp = fp
-		self.ui = ui
-		out = self.writeGCodeLine
-		self.outputUnits = outputUnits
-		safeHeight = obj.SafeHeight.Value
-		self.cuttingDirection = None
-		tool = str(obj.ToolNumber)
-		rapid = self.rapid
-		out("(Starting " + obj.CutName + ')')
-		self.setUserUnits()
-
-		rapid(z=obj.ZToolChangeLocation.Value)
-		rapid(obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)
-		out('T' + tool + 'M6')
-		for point in obj.DrillPointList:
+		self.setParameters(ui, obj, outputUnits,fp)
+		self.out("(Starting " + self.cutName + ')')
+		self.changeTool()
+		self.out('M3 S' + self.speed)
+		for point in self.drillList:
 			x = point[0]
 			y = point[1]
 			z = point[2]
-			s = obj.SafeHeight.Value
-			p = obj.PeckDepth.Value
+			s = self.safeHeight
+			p = self.peckDepth
 			self.drill(x,y,z,s,p)
-		rapid(z=safeHeight)
+		self.rapid(z=self.safeHeight)
 		

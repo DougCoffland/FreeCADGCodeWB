@@ -291,13 +291,14 @@ class Volume3DCut(Cut):
 		self.fp = fp
 		self.ui = ui
 		self.outputUnits = outputUnits
+		print self.error
 		self.error = obj.MaximumError.Value
 		self.cuttingDirection = None
 		self.lastSlice = None
 		out = self.writeGCodeLine
 		self.updateActionLabel("Running " + obj.CutName)
-		self.safeHeight = obj.SafeHeight.Value
-		tool = str(obj.ToolNumber)
+		self.safeHeight = obj.SafeHeight.Value + self.parent.ZOriginValue.Value
+
 		rapid = self.rapid
 		cut = self.cut
 		self.setBitWidth(obj)
@@ -306,9 +307,7 @@ class Volume3DCut(Cut):
 		self.setOffset(self.parent.XOriginValue.Value, self.parent.YOriginValue.Value, self.parent.ZOriginValue.Value)
 		self.updateActionLabel("Setting feeds and speeds for " + obj.CutName)
 		
-		rapid(z=obj.ZToolChangeLocation.Value)
-		rapid(obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)
-		out('T' + tool + 'M6')
+		self.changeTool()
 		out('S' + str(obj.SpindleSpeed).split()[0])
 		
 		fc = FreeCAD.ActiveDocument
@@ -317,8 +316,8 @@ class Volume3DCut(Cut):
 		self.updateActionLabel('making mold by removing ' + obj.ObjectToCut + ' from ' + obj.CutArea)
 		mold = self.differenceOfShapes(obj.CutArea, obj.ObjectToCut)
 		
-		level = obj.StartHeight.Value + self.parent.ZOriginValue.Value
-		bottom = round(mold.Shape.BoundBox.ZMin,4) +.0001
+		level = round(mold.Shape.BoundBox.ZMax + obj.StartHeight.Value,4)
+		bottom = round(mold.Shape.BoundBox.ZMin,4)
 		mask = None
 		while level >= bottom:
 			self.updateActionLabel('getting slice at z = ' + str(level - self.parent.ZOriginValue.Value))
@@ -341,7 +340,7 @@ class Volume3DCut(Cut):
 				self.rapid(z = self.safeHeight)
 				poly = self.shortestPoly(polyList)
 				self.rapid(poly[0][0],poly[0][1])
-				self.cut(z = level - self.parent.ZOriginValue.Value)
+				self.cut(z = level)
 				area = self.areaOfPoly(poly)
 				reducedPoly = self.smoothePoly(poly)
 				if obj.MillingMethod == "Climb": self.cutPolyInsideClimb(reducedPoly)

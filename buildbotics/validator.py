@@ -116,8 +116,8 @@ def fromSystemValue(form,value):
 	else:
 		userPref = 'IMPERIAL'
 	if form == 'velocity':
-		if userPref == 'METRIC': return str(value)
 		value = eval(str(value).split()[0])
+		if userPref == 'METRIC': return str(round(value * 60,2)) + 'mm/min'
 		return str(round(value * 60 / 25.4, 2)) + ' in/min'
 	elif form == 'length':
 		if userPref == 'METRIC': return str(value)

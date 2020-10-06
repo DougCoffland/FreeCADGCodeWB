@@ -94,6 +94,11 @@ class RegistrationCut(Cut):
 			obj.setEditorMode(prop,("ReadOnly",))
 		FreeCAD.ActiveDocument.recompute()
 		
+	def setParameters(self,ui, obj, outputUnits,fp):
+		self.setCommonProperties(ui, obj, outputUnits,fp)
+		self.out = self.writeGCodeLine
+		self.cuttingDirection = None
+
 	def drill(self,x,y,safeHeight,drillDepth,peckDepth):
 		self.rapid(z=safeHeight)
 		self.rapid(x,y)
@@ -105,24 +110,12 @@ class RegistrationCut(Cut):
 		self.cut(z=-drillDepth)
 				
 	def run(self, ui, obj, outputUnits, fp):
-		self.obj = obj
-		self.fp = fp
-		self.ui = ui
-		out = self.writeGCodeLine
-		self.outputUnits = outputUnits
-		safeHeight = obj.SafeHeight.Value
-		self.cuttingDirection = None
-		tool = str(obj.ToolNumber)
-		rapid = self.rapid
-		out("(Starting " + obj.CutName + ')')
-		self.setUserUnits()
-		self.setOffset(0,0,0)
-
-		rapid(z=obj.ZToolChangeLocation.Value)
-		rapid(obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)
-		out('T' + tool + 'M6')
-		self.drill(obj.FirstX.Value,obj.FirstY.Value,safeHeight,obj.DrillDepth.Value,obj.PeckDepth.Value)
-		self.drill(obj.SecondX.Value,obj.SecondY.Value,safeHeight,obj.DrillDepth.Value,obj.PeckDepth.Value)
-		rapid(z=safeHeight)
+		self.setParameters(ui, obj, outputUnits, fp)
+		self.out("(Starting " + obj.CutName + ')')
+		self.changeTool()
+		self.out('M3 S' + self.speed)
+		self.drill(obj.FirstX.Value,obj.FirstY.Value,self.safeHeight,obj.DrillDepth.Value,obj.PeckDepth.Value)
+		self.drill(obj.SecondX.Value,obj.SecondY.Value,self.safeHeight,obj.DrillDepth.Value,obj.PeckDepth.Value)
+		self.rapid(z=self.safeHeight)
 		
 

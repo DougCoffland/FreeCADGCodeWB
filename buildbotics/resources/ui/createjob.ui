@@ -843,10 +843,7 @@ distance from the left edge.</string>
                      </size>
                     </property>
                     <property name="toolTip">
-                     <string>Displays the actual postion relative to the
-left edge of the workpiece bounding box.
-This value is set automatically if &quot;Left&quot;, &quot;Right&quot;, or &quot;Middle&quot; is selceted.
-If &quot;Custom&quot; is selected, the field can be set by the user.</string>
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Displays the actual postion relative to the origin. Cut distances will be&lt;/p&gt;&lt;p&gt;relative to this position.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;This value is set automatically if &amp;quot;Left&amp;quot;, &amp;quot;Right&amp;quot;, or &amp;quot;Middle&amp;quot; is selceted.&lt;/p&gt;&lt;p&gt;If &amp;quot;Custom&amp;quot; is selected, the field can be set by the user.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                     <property name="styleSheet">
                      <string notr="true"/>
@@ -982,10 +979,7 @@ distance from the front edge.</string>
                      </size>
                     </property>
                     <property name="toolTip">
-                     <string>Displays the actual postion relative to the
-front edge of the workpiece bounding box.
-This value is set automatically if &quot;Front&quot;, &quot;Back&quot;, or &quot;Middle&quot; is selceted.
-If &quot;Custom&quot; is selected, the field can be set by the user.</string>
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Displays the actual postion relative to the origin. Cut distances will be&lt;/p&gt;&lt;p&gt;relative to this position.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;This value is set automatically if &amp;quot;Left&amp;quot;, &amp;quot;Right&amp;quot;, or &amp;quot;Middle&amp;quot; is selceted.&lt;/p&gt;&lt;p&gt;If &amp;quot;Custom&amp;quot; is selected, the field can be set by the user&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                     <property name="styleSheet">
                      <string notr="true"/>
@@ -1121,10 +1115,7 @@ distance from the bottom edge.</string>
                      </size>
                     </property>
                     <property name="toolTip">
-                     <string>Displays the actual postion relative to the
-bottom edge of the workpiece bounding box.
-This value is set automatically if &quot;Top&quot;, &quot;Bottom&quot;, or &quot;Middle&quot; is selceted.
-If &quot;Custom&quot; is selected, the field can be set by the user.</string>
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Displays the actual postion relative to the origin. Cut distances will be&lt;/p&gt;&lt;p&gt;relative to this position.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;This value is set automatically if &amp;quot;Left&amp;quot;, &amp;quot;Right&amp;quot;, or &amp;quot;Middle&amp;quot; is selceted.&lt;/p&gt;&lt;p&gt;If &amp;quot;Custom&amp;quot; is selected, the field can be set by the user&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                     <property name="styleSheet">
                      <string notr="true"/>

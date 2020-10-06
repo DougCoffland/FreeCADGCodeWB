@@ -472,29 +472,28 @@ class Surface3DCut(Cut):
 			return abs(p2[0] - p1[0])
 		else:
 			return abs(p1[1] + m * (p2[0] - p1[0]) - p2[1])
-		
+			
 	def reducePath(self,p):
 		e = self.obj.MaximumError.Value
-		l = p[0]
-		r = [l]
+		r = [p[0]]
 		i = 1
 		while i < len(p):
 			if p[i] == r[-1]:
 				i = i + 1
 				continue
+			l = r[-1]
 			if p[i][0] == r[-1][0]:
 				if p[i][1] >= r[-1][1]: m = "UP"
 				else: m = "DOWN"
 			else:
 				m = (p[i][1] - r[-1][1])/(p[i][0] - r[-1][0])
-			i = i + 1
-			while i < len(p) and self.getDelta(r[-1],p[i],m) < e:
-				l = p[i]
-				i = i + 1
-			r.append(l)
-			if i < len(p): l = p[i]		
-		if p[-1] != r[-1]: r.append(p[-1])
-		return r		
+			j = 1
+			while i + j < len(p) and self.getDelta(r[-1],p[i + j],m) < e:
+				j = j + 1
+			r.append(p[i+j-1])
+			i = i + j
+		if r[-1] != p[-1]: r.append(p[-1])
+		return r	
 		
 	def shiftLoop(self,loop,delta):
 		shiftedLoop = loop[:]
@@ -599,8 +598,7 @@ class Surface3DCut(Cut):
 
 		out = self.writeGCodeLine
 		self.updateActionLabel("Running " + obj.CutName)
-		self.safeHeight = obj.SafeHeight.Value
-		tool = str(obj.ToolNumber)
+		self.safeHeight = obj.SafeHeight.Value + self.parent.ZOriginValue.Value
 		rapid = self.rapid
 		cut = self.cut
 		self.setToolParams(obj)
@@ -609,11 +607,9 @@ class Surface3DCut(Cut):
 		self.setOffset(self.parent.XOriginValue.Value, self.parent.YOriginValue.Value, self.parent.ZOriginValue.Value)
 		self.updateActionLabel("Setting feeds and speeds for " + obj.CutName)
 		
-		rapid(z=obj.ZToolChangeLocation.Value)
-		rapid(obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)
-		currentPosition = (obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)
-		out('T' + tool + 'M6')
+		self.changeTool()
 		out('S' + str(obj.SpindleSpeed).split()[0])
+		currentPosition = (obj.XToolChangeLocation.Value,obj.YToolChangeLocation.Value)
 
 		combinedPaths = self.getContours()
 		fc = FreeCAD.ActiveDocument
@@ -635,7 +631,7 @@ class Surface3DCut(Cut):
 				j = 0
 				while j < len(pathToCut):
 					x = pathToCut[j][0]
-					self.cut(x,y,pathToCut[j][1] - self.parent.ZOriginValue.Value - obj.Offset.Value)
+					self.cut(x,y,pathToCut[j][1] - obj.Offset.Value)
 					j = j + 1
 				currentPosition = (x,y)
 				i = i + 1
@@ -652,7 +648,7 @@ class Surface3DCut(Cut):
 				j = 0
 				while j < len(pathToCut):
 					y = pathToCut[j][0]
-					self.cut(x,y,pathToCut[j][1] - self.parent.ZOriginValue.Value - obj.Offset.Value)
+					self.cut(x,y,pathToCut[j][1] - obj.Offset.Value)
 					j = j + 1
 				currentPosition = (x,y)
 				i = i + 1
